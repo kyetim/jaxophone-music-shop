@@ -207,6 +207,13 @@ export function Header() {
                             >
                                 Hakkımızda
                             </Link>
+                            <Link
+                                href="/admin"
+                                className="text-gray-600 hover:text-amber-600 font-medium transition-colors cursor-pointer"
+                                onClick={(e) => handleNavClick('/admin', e)}
+                            >
+                                Admin
+                            </Link>
                         </nav>
 
                         {/* Desktop Search */}
@@ -355,6 +362,13 @@ export function Header() {
                                 onClick={(e) => handleNavClick('/about', e)}
                             >
                                 Hakkımızda
+                            </Link>
+                            <Link
+                                href="/admin"
+                                className="block text-gray-600 hover:text-amber-600 font-medium transition-colors py-2 cursor-pointer"
+                                onClick={(e) => handleNavClick('/admin', e)}
+                            >
+                                Admin
                             </Link>
                             {isAuthenticated ? (
                                 <>
