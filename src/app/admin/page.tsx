@@ -107,9 +107,9 @@ export default function AdminPage() {
                 return;
             }
 
-            // Validate file size (max 5MB)
-            if (file.size > 5 * 1024 * 1024) {
-                addLog('❌ Dosya boyutu 5MB\'dan küçük olmalı');
+            // Validate file size (max 20MB)
+            if (file.size > 20 * 1024 * 1024) {
+                addLog('❌ Dosya boyutu 20MB\'dan küçük olmalı');
                 return;
             }
 
@@ -361,8 +361,8 @@ export default function AdminPage() {
                                             type="button"
                                             onClick={() => setUploadMethod('url')}
                                             className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-all cursor-pointer ${uploadMethod === 'url'
-                                                    ? 'bg-white text-gray-900 shadow-sm'
-                                                    : 'text-gray-600 hover:text-gray-900'
+                                                ? 'bg-white text-gray-900 shadow-sm'
+                                                : 'text-gray-600 hover:text-gray-900'
                                                 }`}
                                         >
                                             <LinkIcon className="h-4 w-4" />
@@ -372,8 +372,8 @@ export default function AdminPage() {
                                             type="button"
                                             onClick={() => setUploadMethod('file')}
                                             className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-all cursor-pointer ${uploadMethod === 'file'
-                                                    ? 'bg-white text-gray-900 shadow-sm'
-                                                    : 'text-gray-600 hover:text-gray-900'
+                                                ? 'bg-white text-gray-900 shadow-sm'
+                                                : 'text-gray-600 hover:text-gray-900'
                                                 }`}
                                         >
                                             <Upload className="h-4 w-4" />
@@ -428,8 +428,8 @@ export default function AdminPage() {
                                             {selectedFile && (
                                                 <div className="text-xs text-gray-500">
                                                     Dosya boyutu: {(selectedFile.size / 1024 / 1024).toFixed(2)}MB
-                                                    {selectedFile.size > 5 * 1024 * 1024 && (
-                                                        <span className="text-red-500 ml-2">⚠️ Dosya çok büyük (max 5MB)</span>
+                                                    {selectedFile.size > 20 * 1024 * 1024 && (
+                                                        <span className="text-red-500 ml-2">⚠️ Dosya çok büyük (max 20MB)</span>
                                                     )}
                                                 </div>
                                             )}
