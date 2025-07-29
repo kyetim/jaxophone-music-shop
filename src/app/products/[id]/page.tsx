@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { createPortal } from 'react-dom';
 import { Header } from '@/components/layout/header';
 import { Button } from '@/components/ui/button';
 import { ProductCard } from '@/components/product/product-card';
@@ -37,9 +38,15 @@ export default function ProductDetailPage() {
     const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
     const [isRelatedLoading, setIsRelatedLoading] = useState(false);
     const [showImageModal, setShowImageModal] = useState(false);
+    const [isMounted, setIsMounted] = useState(false);
 
     const favorites = useAppSelector((state) => state.favorites.items);
     const isFavorite = product ? favorites.some(fav => fav.id === product.id) : false;
+
+    // Component mount state
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
 
     // Product ID'yi al
     const productId = params ? (Array.isArray(params.id) ? params.id[0] : params.id) : null;
@@ -217,18 +224,22 @@ export default function ProductDetailPage() {
                             {/* Product Images */}
                             <div className="space-y-4">
                                 <div className="aspect-square rounded-lg overflow-hidden bg-gray-100 relative group">
-                                    <Image
-                                        src={product.imageUrl}
-                                        alt={product.name}
-                                        width={600}
-                                        height={600}
-                                        className="w-full h-full object-cover cursor-pointer transition-transform group-hover:scale-105"
+                                    <div
+                                        className="w-full h-full cursor-pointer relative"
                                         onClick={handleImageClick}
-                                    />
-                                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-200 flex items-center justify-center">
-                                        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                                            <div className="bg-white bg-opacity-90 rounded-full p-2">
-                                                <ZoomIn className="h-6 w-6 text-gray-700" />
+                                    >
+                                        <Image
+                                            src={product.imageUrl}
+                                            alt={product.name}
+                                            width={600}
+                                            height={600}
+                                            className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                                        />
+                                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-200 flex items-center justify-center">
+                                            <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                                <div className="bg-white bg-opacity-90 rounded-full p-2">
+                                                    <ZoomIn className="h-6 w-6 text-gray-700" />
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -421,12 +432,19 @@ export default function ProductDetailPage() {
                 </main>
             </div>
 
-            {/* Image Zoom Modal */}
-            {showImageModal && (
+            {/* Image Zoom Modal - Using Portal */}
+            {isMounted && showImageModal && createPortal(
                 <div
-                    className="fixed inset-0 bg-black bg-opacity-90 z-[9999] flex items-center justify-center p-4"
+                    className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center p-4"
                     onClick={handleCloseModal}
-                    style={{ zIndex: 99999 }}
+                    style={{
+                        zIndex: 99999,
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        height: '100%'
+                    }}
                 >
                     <div className="relative max-w-4xl max-h-full">
                         <Image
@@ -450,7 +468,8 @@ export default function ProductDetailPage() {
                             <p className="text-sm opacity-80">{product.brand}</p>
                         </div>
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
         </>
     );
