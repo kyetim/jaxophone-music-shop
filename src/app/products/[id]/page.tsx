@@ -71,9 +71,11 @@ export default function ProductDetailPage() {
 
             try {
                 setIsRelatedLoading(true);
+                console.log('Loading related products for:', product.name);
 
                 // Aynı kategori veya markadan ürünler getir
                 const allProducts = await ProductService.getAll();
+                console.log('All products loaded:', allProducts.length);
 
                 const related = allProducts
                     .filter(p =>
@@ -82,6 +84,7 @@ export default function ProductDetailPage() {
                     )
                     .slice(0, 4); // İlk 4 ürünü al
 
+                console.log('Related products found:', related.length, related);
                 setRelatedProducts(related);
             } catch (error) {
                 console.error('Error loading related products:', error);
@@ -116,10 +119,12 @@ export default function ProductDetailPage() {
 
     // Fotoğraf modal'ını aç/kapat
     const handleImageClick = () => {
+        console.log('Image clicked, opening modal...');
         setShowImageModal(true);
     };
 
     const handleCloseModal = () => {
+        console.log('Closing modal...');
         setShowImageModal(false);
     };
 
@@ -252,8 +257,8 @@ export default function ProductDetailPage() {
                                                 <Star
                                                     key={i}
                                                     className={`h-4 w-4 ${i < Math.floor(product.rating)
-                                                            ? 'text-yellow-400 fill-current'
-                                                            : 'text-gray-300'
+                                                        ? 'text-yellow-400 fill-current'
+                                                        : 'text-gray-300'
                                                         }`}
                                                 />
                                             ))}
@@ -380,42 +385,48 @@ export default function ProductDetailPage() {
                     </div>
 
                     {/* Related Products */}
-                    {relatedProducts.length > 0 && (
-                        <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
-                            <div className="p-6 lg:p-8">
-                                <h2 className="text-2xl font-bold text-gray-900 mb-6">Benzer Ürünler</h2>
+                    <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
+                        <div className="p-6 lg:p-8">
+                            <h2 className="text-2xl font-bold text-gray-900 mb-6">
+                                Benzer Ürünler {relatedProducts.length > 0 && `(${relatedProducts.length})`}
+                            </h2>
 
-                                {isRelatedLoading ? (
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                                        {[...Array(4)].map((_, i) => (
-                                            <div key={i} className="animate-pulse">
-                                                <div className="bg-gray-300 rounded-lg h-48 mb-4"></div>
-                                                <div className="h-4 bg-gray-300 rounded mb-2"></div>
-                                                <div className="h-3 bg-gray-300 rounded w-3/4"></div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                                        {relatedProducts.map((relatedProduct) => (
-                                            <ProductCard
-                                                key={relatedProduct.id}
-                                                product={relatedProduct}
-                                            />
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
+                            {isRelatedLoading ? (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                                    {[...Array(4)].map((_, i) => (
+                                        <div key={i} className="animate-pulse">
+                                            <div className="bg-gray-300 rounded-lg h-48 mb-4"></div>
+                                            <div className="h-4 bg-gray-300 rounded mb-2"></div>
+                                            <div className="h-3 bg-gray-300 rounded w-3/4"></div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : relatedProducts.length > 0 ? (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                                    {relatedProducts.map((relatedProduct) => (
+                                        <ProductCard
+                                            key={relatedProduct.id}
+                                            product={relatedProduct}
+                                        />
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="text-center py-8 text-gray-500">
+                                    <p>Bu ürünle benzer ürün bulunamadı.</p>
+                                    <p className="text-sm mt-2">Kategori: {product.category} | Marka: {product.brand}</p>
+                                </div>
+                            )}
                         </div>
-                    )}
+                    </div>
                 </main>
             </div>
 
             {/* Image Zoom Modal */}
             {showImageModal && (
                 <div
-                    className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4"
+                    className="fixed inset-0 bg-black bg-opacity-90 z-[9999] flex items-center justify-center p-4"
                     onClick={handleCloseModal}
+                    style={{ zIndex: 99999 }}
                 >
                     <div className="relative max-w-4xl max-h-full">
                         <Image
