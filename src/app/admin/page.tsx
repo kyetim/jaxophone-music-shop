@@ -14,6 +14,23 @@ export default function AdminPage() {
         brands: number;
     } | null>(null);
 
+    // New Product Form State
+    const [showAddProductForm, setShowAddProductForm] = useState(false);
+    const [isAddingProduct, setIsAddingProduct] = useState(false);
+    const [newProduct, setNewProduct] = useState({
+        name: '',
+        description: '',
+        price: '',
+        originalPrice: '',
+        imageUrl: '',
+        category: '',
+        brand: '',
+        stockQuantity: '',
+        rating: '4.5',
+        reviewCount: '0',
+        tags: ''
+    });
+
     const addLog = (message: string) => {
         setMigrationLog(prev => [...prev, `${new Date().toLocaleTimeString()}: ${message}`]);
     };
@@ -72,6 +89,58 @@ export default function AdminPage() {
         loadStats();
     };
 
+    const handleAddProduct = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (isAddingProduct) return;
+
+        setIsAddingProduct(true);
+        addLog('🎸 Yeni ürün ekleniyor...');
+
+        try {
+            const productData = {
+                name: newProduct.name,
+                description: newProduct.description,
+                price: Number(newProduct.price),
+                originalPrice: newProduct.originalPrice ? Number(newProduct.originalPrice) : undefined,
+                imageUrl: newProduct.imageUrl,
+                category: newProduct.category,
+                brand: newProduct.brand,
+                inStock: true,
+                stockQuantity: Number(newProduct.stockQuantity),
+                rating: Number(newProduct.rating),
+                reviewCount: Number(newProduct.reviewCount),
+                tags: newProduct.tags.split(',').map(tag => tag.trim()).filter(tag => tag)
+            };
+
+            const productId = await ProductService.create(productData);
+            addLog(`✅ Ürün başarıyla eklendi: ${newProduct.name} (${productId})`);
+
+            // Reset form
+            setNewProduct({
+                name: '',
+                description: '',
+                price: '',
+                originalPrice: '',
+                imageUrl: '',
+                category: '',
+                brand: '',
+                stockQuantity: '',
+                rating: '4.5',
+                reviewCount: '0',
+                tags: ''
+            });
+
+            setShowAddProductForm(false);
+            await loadStats();
+
+        } catch (error) {
+            addLog(`❌ Ürün ekleme hatası: ${error}`);
+            console.error('Add product error:', error);
+        } finally {
+            setIsAddingProduct(false);
+        }
+    };
+
     return (
         <div className="min-h-screen bg-gray-50 py-8">
             <div className="max-w-4xl mx-auto px-4">
@@ -117,6 +186,148 @@ export default function AdminPage() {
                                     İstatistikleri yüklemek için "Yenile" butonuna tıklayın
                                 </p>
                             </div>
+                        )}
+                    </div>
+
+                    {/* Add New Product Section */}
+                    <div className="mb-8">
+                        <div className="flex items-center gap-4 mb-4">
+                            <h2 className="text-xl font-semibold text-gray-800">
+                                🎸 Yeni Ürün Ekle
+                            </h2>
+                            <Button
+                                onClick={() => setShowAddProductForm(!showAddProductForm)}
+                                variant="outline"
+                                size="sm"
+                                className="cursor-pointer"
+                            >
+                                {showAddProductForm ? 'Formu Gizle' : 'Ürün Ekle'}
+                            </Button>
+                        </div>
+
+                        {showAddProductForm && (
+                            <form onSubmit={handleAddProduct} className="bg-gray-50 p-6 rounded-lg space-y-4">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Ürün Adı</label>
+                                        <input
+                                            type="text"
+                                            required
+                                            value={newProduct.name}
+                                            onChange={(e) => setNewProduct(prev => ({ ...prev, name: e.target.value }))}
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
+                                            placeholder="Örn: Fender Player Telecaster"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Marka</label>
+                                        <input
+                                            type="text"
+                                            required
+                                            value={newProduct.brand}
+                                            onChange={(e) => setNewProduct(prev => ({ ...prev, brand: e.target.value }))}
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
+                                            placeholder="Örn: Fender"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Kategori</label>
+                                        <input
+                                            type="text"
+                                            required
+                                            value={newProduct.category}
+                                            onChange={(e) => setNewProduct(prev => ({ ...prev, category: e.target.value }))}
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
+                                            placeholder="Örn: guitars"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Fiyat (₺)</label>
+                                        <input
+                                            type="number"
+                                            required
+                                            value={newProduct.price}
+                                            onChange={(e) => setNewProduct(prev => ({ ...prev, price: e.target.value }))}
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
+                                            placeholder="Örn: 35000"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Orijinal Fiyat (₺) - Opsiyonel</label>
+                                        <input
+                                            type="number"
+                                            value={newProduct.originalPrice}
+                                            onChange={(e) => setNewProduct(prev => ({ ...prev, originalPrice: e.target.value }))}
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
+                                            placeholder="Örn: 42000"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Stok Miktarı</label>
+                                        <input
+                                            type="number"
+                                            required
+                                            value={newProduct.stockQuantity}
+                                            onChange={(e) => setNewProduct(prev => ({ ...prev, stockQuantity: e.target.value }))}
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
+                                            placeholder="Örn: 15"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Resim URL</label>
+                                    <input
+                                        type="url"
+                                        required
+                                        value={newProduct.imageUrl}
+                                        onChange={(e) => setNewProduct(prev => ({ ...prev, imageUrl: e.target.value }))}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
+                                        placeholder="https://images.unsplash.com/photo-..."
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Açıklama</label>
+                                    <textarea
+                                        required
+                                        value={newProduct.description}
+                                        onChange={(e) => setNewProduct(prev => ({ ...prev, description: e.target.value }))}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
+                                        rows={3}
+                                        placeholder="Ürün açıklaması..."
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Etiketler (virgülle ayırın)</label>
+                                    <input
+                                        type="text"
+                                        value={newProduct.tags}
+                                        onChange={(e) => setNewProduct(prev => ({ ...prev, tags: e.target.value }))}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
+                                        placeholder="electric, telecaster, professional, maple"
+                                    />
+                                </div>
+
+                                <div className="flex gap-4 pt-4">
+                                    <Button
+                                        type="submit"
+                                        disabled={isAddingProduct}
+                                        className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white cursor-pointer"
+                                    >
+                                        {isAddingProduct ? '⏳ Ekleniyor...' : '✅ Ürünü Ekle'}
+                                    </Button>
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        onClick={() => setShowAddProductForm(false)}
+                                        className="cursor-pointer"
+                                    >
+                                        İptal
+                                    </Button>
+                                </div>
+                            </form>
                         )}
                     </div>
 
