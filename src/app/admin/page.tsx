@@ -4,6 +4,9 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { migrateData } from '@/scripts/migrate-data';
 import { ProductService, CategoryService, BrandService } from '@/lib/firestore';
+import { storage } from '@/lib/firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { Upload, Link as LinkIcon, X } from 'lucide-react';
 
 export default function AdminPage() {
     const [isMigrating, setIsMigrating] = useState(false);
@@ -30,6 +33,12 @@ export default function AdminPage() {
         reviewCount: '0',
         tags: ''
     });
+
+    // Image Upload State
+    const [uploadMethod, setUploadMethod] = useState<'url' | 'file'>('url');
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [isUploading, setIsUploading] = useState(false);
+    const [uploadProgress, setUploadProgress] = useState(0);
 
     const addLog = (message: string) => {
         setMigrationLog(prev => [...prev, `${new Date().toLocaleTimeString()}: ${message}`]);
@@ -89,6 +98,59 @@ export default function AdminPage() {
         loadStats();
     };
 
+    const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                addLog('❌ Lütfen sadece resim dosyası seçin');
+                return;
+            }
+
+            // Validate file size (max 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                addLog('❌ Dosya boyutu 5MB\'dan küçük olmalı');
+                return;
+            }
+
+            setSelectedFile(file);
+            addLog(`📁 Dosya seçildi: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)}MB)`);
+        }
+    };
+
+    const uploadImage = async (file: File): Promise<string> => {
+        if (!storage) {
+            throw new Error('Firebase Storage not initialized');
+        }
+
+        setIsUploading(true);
+        setUploadProgress(0);
+        addLog('📤 Resim yükleniyor...');
+
+        try {
+            // Create unique filename
+            const timestamp = Date.now();
+            const fileName = `products/${timestamp}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '')}`;
+            const storageRef = ref(storage, fileName);
+
+            // Upload file
+            const snapshot = await uploadBytes(storageRef, file);
+            addLog('✅ Dosya yüklendi, URL alınıyor...');
+
+            // Get download URL
+            const downloadURL = await getDownloadURL(snapshot.ref);
+            addLog(`🔗 Resim URL'si hazır: ${downloadURL.substring(0, 50)}...`);
+
+            return downloadURL;
+        } catch (error) {
+            addLog(`❌ Resim yükleme hatası: ${error}`);
+            throw error;
+        } finally {
+            setIsUploading(false);
+            setUploadProgress(0);
+        }
+    };
+
     const handleAddProduct = async (e: React.FormEvent) => {
         e.preventDefault();
         if (isAddingProduct) return;
@@ -97,12 +159,25 @@ export default function AdminPage() {
         addLog('🎸 Yeni ürün ekleniyor...');
 
         try {
+            let imageUrl = newProduct.imageUrl;
+
+            // If file upload method and file selected, upload first
+            if (uploadMethod === 'file' && selectedFile) {
+                imageUrl = await uploadImage(selectedFile);
+            }
+
+            // Validate image URL
+            if (!imageUrl) {
+                addLog('❌ Resim URL\'si veya dosyası gerekli');
+                return;
+            }
+
             const productData = {
                 name: newProduct.name,
                 description: newProduct.description,
                 price: Number(newProduct.price),
                 originalPrice: newProduct.originalPrice ? Number(newProduct.originalPrice) : undefined,
-                imageUrl: newProduct.imageUrl,
+                imageUrl: imageUrl,
                 category: newProduct.category,
                 brand: newProduct.brand,
                 inStock: true,
@@ -130,6 +205,7 @@ export default function AdminPage() {
                 tags: ''
             });
 
+            setSelectedFile(null);
             setShowAddProductForm(false);
             await loadStats();
 
@@ -275,16 +351,95 @@ export default function AdminPage() {
                                     </div>
                                 </div>
 
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Resim URL</label>
-                                    <input
-                                        type="url"
-                                        required
-                                        value={newProduct.imageUrl}
-                                        onChange={(e) => setNewProduct(prev => ({ ...prev, imageUrl: e.target.value }))}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
-                                        placeholder="https://images.unsplash.com/photo-..."
-                                    />
+                                {/* Image Upload Section */}
+                                <div className="space-y-4">
+                                    <label className="block text-sm font-medium text-gray-700">Ürün Resmi</label>
+
+                                    {/* Upload Method Toggle */}
+                                    <div className="flex gap-2 p-1 bg-gray-100 rounded-lg w-fit">
+                                        <button
+                                            type="button"
+                                            onClick={() => setUploadMethod('url')}
+                                            className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-all cursor-pointer ${uploadMethod === 'url'
+                                                    ? 'bg-white text-gray-900 shadow-sm'
+                                                    : 'text-gray-600 hover:text-gray-900'
+                                                }`}
+                                        >
+                                            <LinkIcon className="h-4 w-4" />
+                                            URL ile
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setUploadMethod('file')}
+                                            className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-all cursor-pointer ${uploadMethod === 'file'
+                                                    ? 'bg-white text-gray-900 shadow-sm'
+                                                    : 'text-gray-600 hover:text-gray-900'
+                                                }`}
+                                        >
+                                            <Upload className="h-4 w-4" />
+                                            Dosya Yükle
+                                        </button>
+                                    </div>
+
+                                    {/* URL Input */}
+                                    {uploadMethod === 'url' && (
+                                        <input
+                                            type="url"
+                                            required={uploadMethod === 'url'}
+                                            value={newProduct.imageUrl}
+                                            onChange={(e) => setNewProduct(prev => ({ ...prev, imageUrl: e.target.value }))}
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
+                                            placeholder="https://images.unsplash.com/photo-..."
+                                        />
+                                    )}
+
+                                    {/* File Upload */}
+                                    {uploadMethod === 'file' && (
+                                        <div className="space-y-3">
+                                            <div className="flex items-center gap-4">
+                                                <input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    onChange={handleFileSelect}
+                                                    className="hidden"
+                                                    id="file-upload"
+                                                    required={uploadMethod === 'file'}
+                                                />
+                                                <label
+                                                    htmlFor="file-upload"
+                                                    className="cursor-pointer flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-md text-sm font-medium text-gray-700 transition-colors"
+                                                >
+                                                    <Upload className="h-4 w-4" />
+                                                    Resim Seç
+                                                </label>
+                                                {selectedFile && (
+                                                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                                                        <span>{selectedFile.name}</span>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setSelectedFile(null)}
+                                                            className="text-red-500 hover:text-red-700 cursor-pointer"
+                                                        >
+                                                            <X className="h-4 w-4" />
+                                                        </button>
+                                                    </div>
+                                                )}
+                                            </div>
+                                            {selectedFile && (
+                                                <div className="text-xs text-gray-500">
+                                                    Dosya boyutu: {(selectedFile.size / 1024 / 1024).toFixed(2)}MB
+                                                    {selectedFile.size > 5 * 1024 * 1024 && (
+                                                        <span className="text-red-500 ml-2">⚠️ Dosya çok büyük (max 5MB)</span>
+                                                    )}
+                                                </div>
+                                            )}
+                                            {isUploading && (
+                                                <div className="text-sm text-blue-600">
+                                                    📤 Yükleniyor...
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div>
@@ -313,15 +468,18 @@ export default function AdminPage() {
                                 <div className="flex gap-4 pt-4">
                                     <Button
                                         type="submit"
-                                        disabled={isAddingProduct}
+                                        disabled={isAddingProduct || isUploading}
                                         className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white cursor-pointer"
                                     >
-                                        {isAddingProduct ? '⏳ Ekleniyor...' : '✅ Ürünü Ekle'}
+                                        {isAddingProduct ? '⏳ Ekleniyor...' : isUploading ? '📤 Resim Yükleniyor...' : '✅ Ürünü Ekle'}
                                     </Button>
                                     <Button
                                         type="button"
                                         variant="outline"
-                                        onClick={() => setShowAddProductForm(false)}
+                                        onClick={() => {
+                                            setShowAddProductForm(false);
+                                            setSelectedFile(null);
+                                        }}
                                         className="cursor-pointer"
                                     >
                                         İptal
