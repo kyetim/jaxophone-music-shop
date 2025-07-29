@@ -357,9 +357,31 @@ export default function AdminPage() {
         <div className="min-h-screen bg-gray-50 py-8">
             <div className="max-w-4xl mx-auto px-4">
                 <div className="bg-white rounded-lg shadow-sm border p-6">
-                    <h1 className="text-3xl font-bold text-gray-900 mb-6">
-                        🔧 Admin Panel - Database Management
-                    </h1>
+                    <div className="flex items-center justify-between mb-6">
+                        <h1 className="text-3xl font-bold text-gray-900">
+                            🔧 Admin Panel - Database Management
+                        </h1>
+                        <Button
+                            onClick={() => window.location.href = '/'}
+                            variant="outline"
+                            className="cursor-pointer flex items-center gap-2 hover:bg-amber-50 hover:border-amber-300"
+                        >
+                            <svg
+                                className="h-4 w-4"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                                />
+                            </svg>
+                            Siteye Dön
+                        </Button>
+                    </div>
 
                     {/* Current Stats */}
                     <div className="mb-8">
@@ -694,8 +716,8 @@ export default function AdminPage() {
                                                                         {product.price.toLocaleString('tr-TR')}₺
                                                                     </span>
                                                                     <span className={`text-xs px-2 py-1 rounded ${product.inStock
-                                                                            ? 'bg-green-100 text-green-700'
-                                                                            : 'bg-red-100 text-red-700'
+                                                                        ? 'bg-green-100 text-green-700'
+                                                                        : 'bg-red-100 text-red-700'
                                                                         }`}>
                                                                         {product.inStock ? `Stokta (${product.stockQuantity})` : 'Stokta Yok'}
                                                                     </span>
