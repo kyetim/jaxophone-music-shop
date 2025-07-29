@@ -7,6 +7,8 @@ import { ProductCard } from '@/components/product/product-card';
 import { Button } from '@/components/ui/button';
 import { SearchInput } from '@/components/search/search-input';
 import { ProductCardSkeleton } from '@/components/ui/loading';
+import { ProductService } from '@/lib/firestore';
+import { Product } from '@/interfaces/product';
 import {
     Search,
     Grid3X3,
@@ -18,29 +20,44 @@ export default function ProductsPage() {
     const [sortBy, setSortBy] = useState('newest');
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
     const [isLoading, setIsLoading] = useState(true);
+    const [allProducts, setAllProducts] = useState<Product[]>([]);
     const searchParams = useSearchParams();
     const { searchResults, search, query, setQuery, isSearching } = useSearch();
 
     // URL'den arama parametresini al
     const urlSearchQuery = searchParams?.get('search');
 
-    // Sayfa yüklendiğinde URL'deki arama terimini uygula
+    // Tüm ürünleri Firestore'dan yükle
+    useEffect(() => {
+        const loadProducts = async () => {
+            try {
+                const products = await ProductService.getAll();
+                setAllProducts(products);
+            } catch (error) {
+                console.error('Error loading products:', error);
+                setAllProducts([]);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        loadProducts();
+    }, []);
+
+    // URL'den arama parametresini al ve uygula
     useEffect(() => {
         if (urlSearchQuery && urlSearchQuery !== query) {
             setQuery(urlSearchQuery);
             search(urlSearchQuery);
         }
-
-        // Sayfa ilk yüklendiğinde loading'i kapat
-        const timer = setTimeout(() => {
-            setIsLoading(false);
-        }, 600); // Daha hızlı ve doğal
-
-        return () => clearTimeout(timer);
     }, [urlSearchQuery, query, search, setQuery]);
 
-    // Arama sonuçlarını sırala
-    const sortedProducts = [...searchResults.products].sort((a, b) => {
+    // Gösterilecek ürünleri belirle (arama varsa search results, yoksa tüm ürünler)
+    const isSearchActive = query && query.length >= 2;
+    const displayProducts = isSearchActive ? searchResults.products : allProducts;
+
+    // Ürünleri sırala
+    const sortedProducts = [...displayProducts].sort((a, b) => {
         switch (sortBy) {
             case 'price-asc':
                 return a.price - b.price;
@@ -55,9 +72,8 @@ export default function ProductsPage() {
         }
     });
 
-    // Arama durumunu belirle
-    const isSearchActive = query && query.length >= 2;
-    const showLoading = isLoading || isSearching;
+    // Loading durumunu belirle
+    const showLoading = isLoading || (isSearchActive && isSearching);
 
     return (
         <div className="min-h-screen bg-gray-50">
