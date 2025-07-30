@@ -28,29 +28,30 @@ export function Header() {
 
     // Navigation link click handler with manual routing
     const handleNavClick = (href: string, e: React.MouseEvent) => {
-        e.preventDefault(); // Prevent default Link behavior
+        e.preventDefault();
 
-        // Mevcut pathname'i al
+        // Same page check
         const currentPath = window.location.pathname;
-
-        // Eğer aynı sayfaya gidiliyorsa loading gösterme
         if (currentPath === href) {
+            // Close sidebars for same page clicks
             setIsMobileMenuOpen(false);
             setIsCartOpen(false);
             setIsFavoritesOpen(false);
             return;
         }
 
-        // Loading'i başlat (force=true ile same page kontrolünü bypass et)
-        setLoading(true, true); // FORCE mode for navigation
-
-        // Sidebar'ları kapat
+        // Sidebar'ları hemen kapat
         setIsMobileMenuOpen(false);
         setIsCartOpen(false);
         setIsFavoritesOpen(false);
 
-        // Navigate et
-        router.push(href);
+        // Loading'i başlat ve hemen navigate et
+        setLoading(true, true);
+
+        // Navigate işlemini bir sonraki tick'te yap (smooth transition için)
+        setTimeout(() => {
+            router.push(href);
+        }, 10); // Minimal delay for smooth transition
     };
 
     // Mobile menu handlers

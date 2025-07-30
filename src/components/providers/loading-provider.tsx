@@ -20,6 +20,7 @@ export function LoadingProvider({ children }: { children: React.ReactNode }) {
     const [lastPathname, setLastPathname] = useState<string>('');
     const pathname = usePathname();
     const loadingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const routeChangeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     // İlk yüklemede loading gösterme
     useEffect(() => {
@@ -32,62 +33,62 @@ export function LoadingProvider({ children }: { children: React.ReactNode }) {
 
     // Route değişikliklerinde loading göster
     useEffect(() => {
-        if (!isInitialLoad) {
-            // Eğer pathname aynıysa loading gösterme
-            if (pathname === lastPathname) {
-                setIsLoading(false);
-                return;
+        if (!isInitialLoad && pathname !== lastPathname) {
+            // Önceki timeout'ları temizle
+            if (routeChangeTimeoutRef.current) {
+                clearTimeout(routeChangeTimeoutRef.current);
+            }
+            if (loadingTimeoutRef.current) {
+                clearTimeout(loadingTimeoutRef.current);
             }
 
+            // Loading'i hemen başlat
             setIsLoading(true);
-            setLastPathname(pathname || '');
 
-            // Minimum loading süresi (UX için)
-            const minLoadingTime = 200; // Daha doğal ve hızlı
-            const startTime = Date.now();
+            // Route değişimi tamamlandıktan sonra kısa bir gecikme ile kapat
+            routeChangeTimeoutRef.current = setTimeout(() => {
+                setIsLoading(false);
+                setLastPathname(pathname || '');
+            }, 150); // Daha kısa süre - sadece flash'ı önlemek için
 
-            const timer = setTimeout(() => {
-                const elapsedTime = Date.now() - startTime;
-                const remainingTime = Math.max(0, minLoadingTime - elapsedTime);
-
-                setTimeout(() => {
-                    setIsLoading(false);
-                }, remainingTime);
-            }, 0);
-
-            return () => clearTimeout(timer);
+            return () => {
+                if (routeChangeTimeoutRef.current) {
+                    clearTimeout(routeChangeTimeoutRef.current);
+                }
+            };
         }
     }, [pathname, isInitialLoad, lastPathname]);
 
     const setLoading = (loading: boolean, force: boolean = false) => {
-        // Eğer loading false yapılırsa, mevcut timeout'ları temizle
-        if (!loading && loadingTimeoutRef.current) {
+        // Timeout'ları temizle
+        if (loadingTimeoutRef.current) {
             clearTimeout(loadingTimeoutRef.current);
             loadingTimeoutRef.current = null;
         }
+        if (routeChangeTimeoutRef.current) {
+            clearTimeout(routeChangeTimeoutRef.current);
+            routeChangeTimeoutRef.current = null;
+        }
 
-        // Manual loading set edildiğinde de pathname kontrolü yap (force edilmediyse)
-        if (loading && !force) {
-            // Aynı sayfadaysak loading gösterme
+        if (!loading) {
+            setIsLoading(false);
+            return;
+        }
+
+        // Manual loading set edildiğinde pathname kontrolü yap (force edilmediyse)
+        if (!force) {
             const currentPath = window.location.pathname;
             if (currentPath === lastPathname) {
                 return;
             }
-
-            // Maximum loading süresi (güvenlik için)
-            loadingTimeoutRef.current = setTimeout(() => {
-                setIsLoading(false);
-            }, 2000); // 3 saniyeden 2 saniyeye düşür
         }
 
-        if (loading && force) {
-            // Maximum loading süresi (güvenlik için)
-            loadingTimeoutRef.current = setTimeout(() => {
-                setIsLoading(false);
-            }, 2000); // 3 saniyeden 2 saniyeye düşür
-        }
+        setIsLoading(true);
 
-        setIsLoading(loading);
+        // Maximum loading süresi (güvenlik için)
+        loadingTimeoutRef.current = setTimeout(() => {
+            setIsLoading(false);
+        }, 2000);
     };
 
     // Component unmount olduğunda timeout'ları temizle
@@ -95,6 +96,9 @@ export function LoadingProvider({ children }: { children: React.ReactNode }) {
         return () => {
             if (loadingTimeoutRef.current) {
                 clearTimeout(loadingTimeoutRef.current);
+            }
+            if (routeChangeTimeoutRef.current) {
+                clearTimeout(routeChangeTimeoutRef.current);
             }
         };
     }, []);
