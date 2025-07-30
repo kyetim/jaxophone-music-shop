@@ -251,29 +251,29 @@ export default function HomePage() {
         {/* Navigation Arrows */}
         <button
           onClick={prevSlide}
-          className="absolute left-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/20 backdrop-blur text-white hover:bg-white/30 transition-all duration-200 cursor-pointer"
+          className="absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 text-white hover:bg-white/30 hover:scale-110 transition-all duration-300 cursor-pointer group shadow-lg"
           aria-label="Önceki slayt"
         >
-          <ChevronLeft className="h-6 w-6" />
+          <ChevronLeft className="h-6 w-6 group-hover:scale-110 transition-transform duration-200" />
         </button>
 
         <button
           onClick={nextSlide}
-          className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/20 backdrop-blur text-white hover:bg-white/30 transition-all duration-200 cursor-pointer"
+          className="absolute right-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 text-white hover:bg-white/30 hover:scale-110 transition-all duration-300 cursor-pointer group shadow-lg"
           aria-label="Sonraki slayt"
         >
-          <ChevronRight className="h-6 w-6" />
+          <ChevronRight className="h-6 w-6 group-hover:scale-110 transition-transform duration-200" />
         </button>
 
         {/* Slide Indicators */}
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex space-x-2">
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex space-x-3">
           {sliderData.map((_, index) => (
             <button
               key={index}
               onClick={() => goToSlide(index)}
-              className={`w-3 h-3 rounded-full transition-all duration-200 cursor-pointer ${index === currentSlide
-                ? 'bg-white scale-110'
-                : 'bg-white/50 hover:bg-white/70'
+              className={`w-3 h-3 rounded-full transition-all duration-300 cursor-pointer hover:scale-125 ${index === currentSlide
+                ? 'bg-white shadow-lg scale-110'
+                : 'bg-white/50 hover:bg-white/80'
                 }`}
               aria-label={`Slayt ${index + 1}'e git`}
             />
@@ -365,16 +365,34 @@ export default function HomePage() {
         </section>
 
         {/* Features Section */}
-        <section className="py-16 bg-white">
+        <section className="py-20 bg-gradient-to-b from-white via-gray-50 to-white">
           <div className="max-w-7xl mx-auto px-6 lg:px-8">
+            <div className="text-center mb-16 animate-slide-up">
+              <h2 className="text-3xl lg:text-4xl font-bold mb-4">
+                <span className="gradient-gold text-shadow-gold">Neden Jaxophone?</span>
+              </h2>
+              <p className="text-lg text-gray-600 max-w-2xl mx-auto text-shadow-elegant">
+                Türkiye'nin en güvenilir müzik enstrümanları mağazası olarak, kalite ve müşteri memnuniyetini ön planda tutuyoruz.
+              </p>
+              <div className="w-24 h-1 bg-gradient-to-r from-amber-400 to-orange-500 mx-auto mt-6 rounded-full"></div>
+            </div>
+
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
               {features.map((feature, index) => (
-                <div key={index} className="text-center group">
-                  <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-amber-100 to-orange-100 rounded-2xl mb-4 group-hover:scale-110 transition-transform duration-300">
-                    <feature.icon className="h-8 w-8 text-amber-600" />
+                <div
+                  key={index}
+                  className="group text-center animate-scale-in hover-lift"
+                  style={{ animationDelay: `${index * 0.1}s` }}
+                >
+                  <div className="inline-flex items-center justify-center w-18 h-18 bg-gradient-to-br from-amber-100 via-orange-100 to-yellow-100 rounded-3xl mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-elegant hover:shadow-elegant-lg animate-gentle-float">
+                    <feature.icon className="h-9 w-9 text-amber-600 group-hover:text-orange-600 transition-colors duration-300" />
                   </div>
-                  <h3 className="font-semibold text-gray-900 mb-2">{feature.title}</h3>
-                  <p className="text-sm text-muted-foreground">{feature.description}</p>
+                  <h3 className="font-bold text-gray-900 mb-3 text-lg group-hover:text-amber-600 transition-colors duration-300 text-shadow-elegant">
+                    {feature.title}
+                  </h3>
+                  <p className="text-sm text-gray-600 leading-relaxed group-hover:text-gray-700 transition-colors duration-300">
+                    {feature.description}
+                  </p>
                 </div>
               ))}
             </div>
@@ -384,48 +402,72 @@ export default function HomePage() {
         {/* Featured Products */}
         <section className="py-20 bg-gradient-to-b from-gray-50 to-white">
           <div className="max-w-7xl mx-auto px-6 lg:px-8">
-            <div className="text-center mb-16">
-              <Badge className="bg-amber-100 text-amber-800 border-amber-200 mb-4">
+            <div className="text-center mb-16 animate-slide-up">
+              <Badge className="bg-gradient-to-r from-amber-100 to-orange-100 text-amber-800 border-amber-200 mb-4 px-4 py-2 rounded-full shadow-elegant animate-elegant-pulse">
                 ⭐ Öne Çıkan Ürünler
               </Badge>
-              <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-                En Çok Tercih Edilen Müzik Aletleri
+              <h2 className="text-3xl lg:text-4xl font-bold mb-4">
+                <span className="gradient-gold text-shadow-gold">En Çok Tercih Edilen Müzik Aletleri</span>
               </h2>
-              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed text-shadow-elegant">
                 Profesyonel müzisyenler ve başlangıç seviyesi için özenle seçilmiş kaliteli ürünler
               </p>
+              <div className="w-24 h-1 bg-gradient-to-r from-amber-400 to-orange-500 mx-auto mt-6 rounded-full"></div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
               {isLoading ? (
                 [...Array(4)].map((_, i) => (
-                  <ProductCardSkeleton key={i} />
+                  <div key={i} className="animate-scale-in" style={{ animationDelay: `${i * 0.1}s` }}>
+                    <ProductCardSkeleton />
+                  </div>
                 ))
               ) : (
                 sampleProducts.map((product, index) => (
-                  <div key={product.id} className="transform hover:-translate-y-2 transition-all duration-300">
-                    <ProductCard product={product} />
+                  <div
+                    key={product.id}
+                    className="group animate-scale-in hover-lift"
+                    style={{ animationDelay: `${index * 0.1}s` }}
+                  >
+                    <div className="transform transition-all duration-500 group-hover:scale-105 glass-card rounded-2xl overflow-hidden shadow-elegant hover:shadow-elegant-lg">
+                      <ProductCard product={product} />
+                    </div>
                   </div>
                 ))
               )}
             </div>
 
-            <div className="text-center mt-12">
-              <Button variant="outline" className="border-amber-300 text-amber-700 hover:bg-amber-50 px-8 py-3 rounded-xl font-semibold cursor-pointer">
+            <div className="text-center mt-12 animate-slide-up" style={{ animationDelay: "0.4s" }}>
+              <Button
+                variant="outline"
+                className="border-2 border-amber-600 text-amber-700 hover:bg-amber-600 hover:text-white px-8 py-3 rounded-xl font-semibold cursor-pointer hover:scale-105 transition-all duration-300 shadow-elegant hover:shadow-elegant-lg group"
+              >
                 Tüm Ürünleri Gör
-                <ArrowRight className="ml-2 h-5 w-5" />
+                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
               </Button>
             </div>
           </div>
         </section>
 
         {/* Categories */}
-        <section className="py-20">
+        <section className="py-20 bg-gradient-to-b from-white via-gray-50 to-white">
           <div className="max-w-7xl mx-auto px-6 lg:px-8">
+            <div className="text-center mb-16 animate-slide-up">
+              <h2 className="text-3xl lg:text-4xl font-bold mb-4">
+                <span className="gradient-gold text-shadow-gold">Kategoriler</span>
+              </h2>
+              <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed text-shadow-elegant">
+                Aradığınız enstrümanı kolayca bulun
+              </p>
+              <div className="w-24 h-1 bg-gradient-to-r from-amber-400 to-orange-500 mx-auto mt-6 rounded-full"></div>
+            </div>
+
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               {isLoading ? (
                 [...Array(4)].map((_, i) => (
-                  <CardSkeleton key={i} className="aspect-square" />
+                  <div key={i} className="animate-scale-in" style={{ animationDelay: `${i * 0.1}s` }}>
+                    <CardSkeleton className="aspect-square" />
+                  </div>
                 ))
               ) : (
                 [
@@ -434,30 +476,45 @@ export default function HomePage() {
                   { name: 'Davullar', icon: 'https://images.unsplash.com/photo-1571327073757-af4cf893f3e6?w=80&h=80&fit=crop&crop=center', count: '120+', image: 'https://images.unsplash.com/photo-1571327073757-af4cf893f3e6?w=300' },
                   { name: 'Keman', icon: 'https://images.unsplash.com/photo-1612225330812-01a9c6b355ec?w=80&h=80&fit=crop&crop=center', count: '95+', image: 'https://images.unsplash.com/photo-1612225330812-01a9c6b355ec?w=300' }
                 ].map((category, index) => (
-                  <div key={category.name} className="group cursor-pointer">
-                    <div className="relative overflow-hidden rounded-2xl bg-white shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
+                  <div
+                    key={category.name}
+                    className="group cursor-pointer animate-scale-in hover-lift"
+                    style={{ animationDelay: `${index * 0.1}s` }}
+                  >
+                    <div className="relative overflow-hidden rounded-2xl glass-card shadow-elegant hover:shadow-elegant-xl transition-all duration-500 transform group-hover:scale-105">
                       <div className="aspect-square relative">
                         <Image
                           src={category.image}
                           alt={category.name}
                           fill
-                          className="object-cover group-hover:scale-110 transition-transform duration-500"
+                          className="object-cover group-hover:scale-110 group-hover:rotate-2 transition-all duration-700"
                           sizes="(max-width: 768px) 50vw, 25vw"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent group-hover:from-black/70 transition-all duration-500"></div>
+
+                        {/* Shimmer effect on hover */}
+                        <div className="absolute inset-0 shimmer opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+
                         <div className="absolute bottom-4 left-4 text-white">
-                          <div className="w-12 h-12 bg-white/90 rounded-xl flex items-center justify-center mb-2 overflow-hidden">
+                          <div className="w-12 h-12 bg-white/90 backdrop-blur-sm rounded-xl flex items-center justify-center mb-3 overflow-hidden group-hover:scale-110 transition-transform duration-300 shadow-lg">
                             <Image
                               src={category.icon}
-                              alt={`${category.name} icon`}
+                              alt={category.name}
                               width={32}
                               height={32}
-                              className="object-cover rounded-lg"
+                              className="object-cover"
                             />
                           </div>
-                          <h3 className="font-bold text-lg">{category.name}</h3>
-                          <p className="text-sm opacity-90">{category.count} ürün</p>
+                          <h3 className="font-bold text-lg mb-1 group-hover:scale-105 transition-transform duration-300 text-shadow-elegant">
+                            {category.name}
+                          </h3>
+                          <p className="text-white/90 text-sm group-hover:text-white transition-colors duration-300">
+                            {category.count} ürün
+                          </p>
                         </div>
+
+                        {/* Elegant hover overlay */}
+                        <div className="absolute inset-0 border-2 border-transparent group-hover:border-white/30 rounded-2xl transition-all duration-500"></div>
                       </div>
                     </div>
                   </div>
