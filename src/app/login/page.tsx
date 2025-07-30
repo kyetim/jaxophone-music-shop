@@ -17,16 +17,42 @@ export default function LoginPage() {
     const [success, setSuccess] = useState(false);
     const [userName, setUserName] = useState('');
 
-    const { signIn } = useAuth();
+    const authHook = useAuth();
+    console.log('🔧 useAuth hook result:', {
+        hasSignIn: !!authHook?.signIn,
+        isLoading: authHook?.isLoading,
+        error: authHook?.error,
+        user: !!authHook?.user
+    });
+
+    const { signIn } = authHook;
     const router = useRouter();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        console.log('📝 Login form submitted:', { email, hasPassword: !!password });
+        console.log('🎯 FORM SUBMIT BAŞLADI - handleSubmit çağrıldı');
+        console.log('📝 Login form submitted:', {
+            email,
+            hasPassword: !!password,
+            emailLength: email.length,
+            passwordLength: password.length,
+            isLoading
+        });
+
+        // Immediate state check
+        console.log('🔍 Current states before processing:', {
+            isLoading,
+            error,
+            success,
+            email,
+            password: password ? '***' : 'empty'
+        });
 
         setError(null);
         setSuccess(false);
         setIsLoading(true);
+
+        console.log('✅ States set - isLoading now true');
 
         try {
             console.log('🔄 signIn fonksiyonu çağrılıyor...');
@@ -45,6 +71,7 @@ export default function LoginPage() {
             setError(error.message || 'Giriş yapılırken bir hata oluştu.');
         } finally {
             setIsLoading(false);
+            console.log('🏁 handleSubmit tamamlandı - isLoading false');
         }
     };
 
@@ -99,7 +126,13 @@ export default function LoginPage() {
 
                         {/* Form */}
                         <div className="px-8 py-6">
-                            <form onSubmit={handleSubmit} className="space-y-6">
+                            <form
+                                onSubmit={(e) => {
+                                    console.log('📋 FORM onSubmit triggered!', e);
+                                    handleSubmit(e);
+                                }}
+                                className="space-y-6"
+                            >
                                 {/* Error Message */}
                                 {error && (
                                     <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center gap-3">
@@ -160,6 +193,14 @@ export default function LoginPage() {
                                 <Button
                                     type="submit"
                                     disabled={isLoading || !email || !password}
+                                    onClick={() => {
+                                        console.log('🖱️ BUTTON CLICKED!', {
+                                            isLoading,
+                                            hasEmail: !!email,
+                                            hasPassword: !!password,
+                                            disabled: isLoading || !email || !password
+                                        });
+                                    }}
                                     className="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                                 >
                                     {isLoading ? (
@@ -174,6 +215,19 @@ export default function LoginPage() {
                                         </>
                                     )}
                                 </Button>
+
+                                {/* TEST BUTTON - Remove after debugging */}
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        console.log('🧪 TEST BUTTON CLICKED!');
+                                        console.log('📊 Current form state:', { email, password, isLoading });
+                                        handleSubmit(new Event('submit') as any);
+                                    }}
+                                    className="w-full mt-2 bg-red-500 text-white py-2 rounded"
+                                >
+                                    🧪 TEST BUTTON (Debug)
+                                </button>
 
                                 {/* Forgot Password Link */}
                                 <div className="text-center">
