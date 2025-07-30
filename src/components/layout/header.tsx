@@ -343,13 +343,10 @@ export function Header() {
 
                         {/* Desktop Search */}
                         <div className="hidden md:flex items-center flex-1 max-w-lg mx-8">
-                            <div className="relative w-full">
-                                <SearchInput
-                                    placeholder="Ne arıyorsunuz?"
-                                    className="w-full h-12 pl-12 pr-4 rounded-xl border-2 border-gray-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all duration-300 shadow-elegant"
-                                />
-                                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                            </div>
+                            <SearchInput
+                                placeholder="Ne arıyorsunuz?"
+                                className="w-full"
+                            />
                         </div>
 
                         {/* Right Side Actions */}
@@ -472,14 +469,11 @@ export function Header() {
             {/* Mobile Search Bar */}
             {isMobileSearchOpen && (
                 <div className="md:hidden bg-white border-b border-gray-200 p-4 animate-slide-up">
-                    <div className="relative">
-                        <SearchInput
-                            placeholder="Ne arıyorsunuz?"
-                            className="w-full h-12 pl-12 pr-4 rounded-xl border-2 border-gray-200 focus:border-amber-500 shadow-elegant"
-                            onResultClick={handleMobileSearchClose}
-                        />
-                        <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                    </div>
+                    <SearchInput
+                        placeholder="Ne arıyorsunuz?"
+                        className="w-full"
+                        onResultClick={handleMobileSearchClose}
+                    />
                 </div>
             )}
 
