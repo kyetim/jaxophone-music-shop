@@ -339,6 +339,23 @@ export function Header() {
                                 Hakkımızda
                                 <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-amber-600 to-orange-600 group-hover:w-full transition-all duration-300"></div>
                             </Link>
+
+                            {/* Admin Link - Development Access */}
+                            {(process.env.NODE_ENV === 'development' || true) && (
+                                <Link
+                                    href="/admin"
+                                    className="text-gray-700 hover:text-purple-600 font-semibold transition-all duration-300 hover:scale-105 cursor-pointer relative group"
+                                    onClick={(e) => handleNavClick('/admin', e)}
+                                >
+                                    <span className="flex items-center gap-1">
+                                        Admin
+                                        <span className="text-xs bg-purple-100 text-purple-600 px-1.5 py-0.5 rounded-full font-medium">
+                                            DEV
+                                        </span>
+                                    </span>
+                                    <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-600 to-blue-600 group-hover:w-full transition-all duration-300"></div>
+                                </Link>
+                            )}
                         </nav>
 
                         {/* Desktop Search */}
@@ -434,9 +451,21 @@ export function Header() {
                                 <div className="absolute top-full right-0 w-48 bg-white/95 backdrop-blur-xl border border-gray-200 rounded-xl shadow-elegant-lg p-3 opacity-0 group-hover:opacity-100 transform scale-95 group-hover:scale-100 transition-all duration-300 pointer-events-none group-hover:pointer-events-auto">
                                     <div className="text-sm text-gray-600 text-center">
                                         {isAuthenticated ? (
-                                            <div className="space-y-2">
-                                                <div className="font-semibold text-gray-800">Hesabım</div>
-                                                <div className="text-amber-600">Profil ve Siparişler</div>
+                                            <div className="space-y-3">
+                                                <div className="space-y-1">
+                                                    <div className="font-semibold text-gray-800">Hesabım</div>
+                                                    <div className="text-amber-600">Profil ve Siparişler</div>
+                                                </div>
+                                                {(process.env.NODE_ENV === 'development' || true) && (
+                                                    <Link
+                                                        href="/admin"
+                                                        onClick={(e) => handleNavClick('/admin', e)}
+                                                        className="flex items-center justify-center gap-2 w-full px-3 py-2 bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-100 transition-all duration-300 cursor-pointer text-xs font-medium"
+                                                    >
+                                                        <span>🔧</span>
+                                                        Admin Panel
+                                                    </Link>
+                                                )}
                                             </div>
                                         ) : (
                                             <div className="space-y-2">
@@ -543,6 +572,22 @@ export function Header() {
                             <div className="w-2 h-2 bg-purple-500 rounded-full group-hover:scale-150 transition-transform duration-300"></div>
                             Hakkımızda
                         </Link>
+
+                        {(process.env.NODE_ENV === 'development' || true) && (
+                            <Link
+                                href="/admin"
+                                className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 hover:bg-purple-50 hover:text-purple-600 font-semibold transition-all duration-300 cursor-pointer group"
+                                onClick={(e) => handleNavClick('/admin', e)}
+                            >
+                                <div className="w-2 h-2 bg-indigo-500 rounded-full group-hover:scale-150 transition-transform duration-300"></div>
+                                <span className="flex items-center gap-2">
+                                    Admin Panel
+                                    <span className="text-xs bg-purple-100 text-purple-600 px-2 py-1 rounded-full font-medium">
+                                        DEV
+                                    </span>
+                                </span>
+                            </Link>
+                        )}
                     </nav>
 
                     {/* Mobile Account Section */}
