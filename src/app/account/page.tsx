@@ -22,7 +22,7 @@ import {
 
 export default function AccountPage() {
     const { user, userProfile, isAuthenticated, isLoading } = useAppSelector((state) => state.user);
-    const { logout } = useAuth();
+    const { signOut } = useAuth();
     const router = useRouter();
 
     useEffect(() => {
@@ -33,7 +33,7 @@ export default function AccountPage() {
 
     const handleLogout = async () => {
         try {
-            await logout();
+            await signOut();
             router.push('/');
         } catch (error) {
             console.error('Logout error:', error);

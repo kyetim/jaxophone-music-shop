@@ -124,7 +124,10 @@ export function useAuth() {
     };
 
     const signIn = async (email: string, password: string) => {
+        console.log('🔐 signIn çağrıldı:', { email, hasAuth: !!auth, hasDb: !!db });
+
         if (!auth || !db) {
+            console.error('❌ Firebase servisleri bulunamadı');
             throw new Error('Firebase servisleri bulunamadı. Yapılandırmayı kontrol edin.');
         }
 
@@ -132,17 +135,22 @@ export function useAuth() {
             dispatch(setUserError(null));
             dispatch(setUserLoading(true));
 
+            console.log('🔄 Firebase signInWithEmailAndPassword çağrılıyor...');
             const result = await signInWithEmailAndPassword(auth, email, password);
+            console.log('✅ Firebase giriş başarılı:', result.user.uid);
 
             // Son giriş tarihini güncelle - undefined değerleri filtrele
             const updateData = sanitizeData({
                 lastLoginAt: new Date(),
             });
 
+            console.log('📝 Kullanıcı bilgileri güncelleniyor...');
             await setDoc(doc(db, 'users', result.user.uid), updateData, { merge: true });
+            console.log('✅ Kullanıcı bilgileri güncellendi');
 
             return result.user;
         } catch (error: any) {
+            console.error('❌ signIn hatası:', error);
             const errorMessage = getErrorMessage(error.code);
             dispatch(setUserError(errorMessage));
             throw error;
@@ -321,7 +329,7 @@ export function useAuth() {
     return {
         user,
         userProfile,
-        loading: isLoading,
+        isLoading,
         error,
         signIn,
         signUp,

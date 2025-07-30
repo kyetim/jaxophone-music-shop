@@ -22,12 +22,17 @@ export default function LoginPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        console.log('📝 Login form submitted:', { email, hasPassword: !!password });
+
         setError(null);
         setSuccess(false);
         setIsLoading(true);
 
         try {
+            console.log('🔄 signIn fonksiyonu çağrılıyor...');
             const user = await signIn(email, password);
+            console.log('✅ signIn başarılı:', user);
+
             setUserName(user.displayName || user.email || 'Kullanıcı');
             setSuccess(true);
 
@@ -36,6 +41,7 @@ export default function LoginPage() {
                 router.push('/account');
             }, 2000);
         } catch (error: any) {
+            console.error('❌ Login error:', error);
             setError(error.message || 'Giriş yapılırken bir hata oluştu.');
         } finally {
             setIsLoading(false);
