@@ -4,8 +4,9 @@ import {
     onAuthStateChanged,
     signInWithEmailAndPassword,
     createUserWithEmailAndPassword,
-    signOut,
-    updateProfile
+    signOut as firebaseSignOut,
+    updateProfile,
+    sendPasswordResetEmail
 } from 'firebase/auth';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
@@ -209,18 +210,46 @@ export function useAuth() {
         }
     };
 
-    const logout = async () => {
+    const signOut = async () => {
         if (!auth) {
-            throw new Error('Firebase Auth servisi bulunamadı.');
+            throw new Error('Firebase Auth servisi bulunamadı');
         }
 
         try {
-            await signOut(auth);
+            dispatch(setUserError(null));
+            dispatch(setUserLoading(true));
+            await firebaseSignOut(auth);
             dispatch(clearUser());
         } catch (error: any) {
             const errorMessage = getErrorMessage(error.code);
             dispatch(setUserError(errorMessage));
             throw error;
+        } finally {
+            dispatch(setUserLoading(false));
+        }
+    };
+
+    const resetPassword = async (email: string) => {
+        if (!auth) {
+            throw new Error('Firebase Auth servisi bulunamadı');
+        }
+
+        try {
+            dispatch(setUserError(null));
+            dispatch(setUserLoading(true));
+
+            await sendPasswordResetEmail(auth, email, {
+                url: `${window.location.origin}/login`,
+                handleCodeInApp: false,
+            });
+
+            return true;
+        } catch (error: any) {
+            const errorMessage = getErrorMessage(error.code);
+            dispatch(setUserError(errorMessage));
+            throw error;
+        } finally {
+            dispatch(setUserLoading(false));
         }
     };
 
@@ -259,6 +288,36 @@ export function useAuth() {
         }
     };
 
+    // Firebase error kodlarını Türkçe mesajlara çevir
+    const getErrorMessage = (errorCode: string): string => {
+        switch (errorCode) {
+            case 'auth/user-not-found':
+                return 'Bu e-posta adresi ile kayıtlı bir hesap bulunamadı.';
+            case 'auth/wrong-password':
+                return 'Hatalı şifre girdiniz.';
+            case 'auth/email-already-in-use':
+                return 'Bu e-posta adresi zaten kullanımda.';
+            case 'auth/weak-password':
+                return 'Şifre çok zayıf. En az 6 karakter olmalıdır.';
+            case 'auth/invalid-email':
+                return 'Geçersiz e-posta adresi.';
+            case 'auth/too-many-requests':
+                return 'Çok fazla deneme yapıldı. Lütfen daha sonra tekrar deneyin.';
+            case 'auth/network-request-failed':
+                return 'İnternet bağlantınızı kontrol edin.';
+            case 'auth/invalid-credential':
+                return 'Geçersiz e-posta veya şifre.';
+            case 'auth/user-disabled':
+                return 'Bu hesap devre dışı bırakılmış.';
+            case 'auth/expired-action-code':
+                return 'Şifre sıfırlama bağlantısının süresi dolmuş.';
+            case 'auth/invalid-action-code':
+                return 'Geçersiz veya kullanılmış şifre sıfırlama bağlantısı.';
+            default:
+                return 'Bilinmeyen bir hata oluştu. Lütfen tekrar deneyin.';
+        }
+    };
+
     return {
         user,
         userProfile,
@@ -266,27 +325,9 @@ export function useAuth() {
         error,
         signIn,
         signUp,
-        logout,
+        signOut,
+        resetPassword,
         updateUserProfile,
         fetchUserProfile,
     };
-}
-
-function getErrorMessage(errorCode: string): string {
-    switch (errorCode) {
-        case 'auth/user-not-found':
-            return 'Bu e-posta adresiyle kayıtlı kullanıcı bulunamadı.';
-        case 'auth/wrong-password':
-            return 'Hatalı şifre girdiniz.';
-        case 'auth/email-already-in-use':
-            return 'Bu e-posta adresi zaten kullanımda.';
-        case 'auth/weak-password':
-            return 'Şifre en az 6 karakter olmalıdır.';
-        case 'auth/invalid-email':
-            return 'Geçersiz e-posta adresi.';
-        case 'auth/too-many-requests':
-            return 'Çok fazla başarısız deneme. Lütfen daha sonra tekrar deneyin.';
-        default:
-            return 'Bir hata oluştu. Lütfen tekrar deneyin.';
-    }
 } 

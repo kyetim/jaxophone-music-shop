@@ -168,6 +168,16 @@ export default function LoginPage() {
                                         </>
                                     )}
                                 </Button>
+
+                                {/* Forgot Password Link */}
+                                <div className="text-center">
+                                    <Link
+                                        href="/forgot-password"
+                                        className="text-sm text-gray-600 hover:text-amber-600 transition-colors cursor-pointer"
+                                    >
+                                        Şifrenizi mi unuttunuz?
+                                    </Link>
+                                </div>
                             </form>
 
                             {/* Register Link */}
