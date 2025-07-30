@@ -249,7 +249,7 @@ export function Header() {
                         </Link>
 
                         {/* Navigation with Mega Menu */}
-                        <nav className="hidden lg:flex items-center space-x-8">
+                        <nav className="hidden lg:flex items-center space-x-5 xl:space-x-6">
                             <Link
                                 href="/"
                                 className="text-gray-700 hover:text-amber-600 font-semibold transition-all duration-300 hover:scale-105 cursor-pointer relative group"
@@ -273,7 +273,7 @@ export function Header() {
 
                                 {/* Mega Menu */}
                                 {hoveredCategory === 'categories' && (
-                                    <div className="absolute top-full left-0 w-96 bg-white/95 backdrop-blur-xl border border-gray-200 rounded-2xl shadow-elegant-xl p-6 animate-scale-in">
+                                    <div className="absolute top-full left-0 w-96 bg-white/95 backdrop-blur-xl border border-gray-200 rounded-2xl shadow-elegant-xl p-6 animate-scale-in z-50">
                                         <div className="grid grid-cols-1 gap-4">
                                             {categories.map((category) => (
                                                 <div key={category.name} className="group">
@@ -340,17 +340,16 @@ export function Header() {
                                 <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-amber-600 to-orange-600 group-hover:w-full transition-all duration-300"></div>
                             </Link>
 
-                            {/* Admin Link - Development Access */}
+                            {/* Admin Link - Only on XL screens or wider for space */}
                             {(process.env.NODE_ENV === 'development' || true) && (
                                 <Link
                                     href="/admin"
-                                    className="text-gray-700 hover:text-purple-600 font-semibold transition-all duration-300 hover:scale-105 cursor-pointer relative group"
+                                    className="hidden xl:flex text-gray-700 hover:text-purple-600 font-medium transition-all duration-300 hover:scale-105 cursor-pointer relative group"
                                     onClick={(e) => handleNavClick('/admin', e)}
                                 >
                                     <span className="flex items-center gap-1">
-                                        Admin
-                                        <span className="text-xs bg-purple-100 text-purple-600 px-1.5 py-0.5 rounded-full font-medium">
-                                            DEV
+                                        <span className="text-xs bg-purple-100 text-purple-600 px-2 py-1 rounded-md font-medium">
+                                            🔧 ADMIN
                                         </span>
                                     </span>
                                     <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-600 to-blue-600 group-hover:w-full transition-all duration-300"></div>
@@ -359,7 +358,7 @@ export function Header() {
                         </nav>
 
                         {/* Desktop Search */}
-                        <div className="hidden md:flex items-center flex-1 max-w-lg mx-8">
+                        <div className="hidden md:flex items-center flex-1 max-w-2xl mx-6">
                             <SearchInput
                                 placeholder="Ne arıyorsunuz?"
                                 className="w-full"

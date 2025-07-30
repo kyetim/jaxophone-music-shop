@@ -196,7 +196,7 @@ export function SearchInput({
             {isOpen && showDropdown && inputValue.length >= 2 && (
                 <div
                     ref={dropdownRef}
-                    className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-xl z-50 max-h-[32rem] overflow-hidden"
+                    className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-xl z-[60] max-h-[32rem] overflow-hidden"
                 >
                     {isSearching ? (
                         <div className="flex items-center justify-center py-8">
