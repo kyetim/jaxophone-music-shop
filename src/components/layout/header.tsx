@@ -325,10 +325,9 @@ export function Header() {
                                 {/* Mega Menu Dropdown */}
                                 {hoveredCategory === category.name && megaMenuCategories[category.name] && (
                                     <div
-                                        className="absolute top-full left-0 w-screen max-w-6xl bg-white text-gray-900 shadow-2xl z-50 border-t-4 border-blue-600 animate-fade-in"
+                                        className="absolute top-full left-1/2 transform -translate-x-1/2 w-screen max-w-6xl bg-white text-gray-900 shadow-2xl z-50 border-t-4 border-blue-600 animate-fade-in"
                                         onMouseEnter={() => handleCategoryHover(category.name)}
                                         onMouseLeave={() => handleCategoryHover(null)}
-                                        style={{ transform: 'translateX(-20%)' }}
                                     >
                                         <div className="p-8">
                                             <div className="grid grid-cols-12 gap-8">
