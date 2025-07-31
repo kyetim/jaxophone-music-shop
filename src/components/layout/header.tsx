@@ -282,7 +282,7 @@ export function Header() {
             {/* Horizontal Category Navigation - DoReMusic Style */}
             <nav className="bg-gray-900 text-white sticky top-20 z-40 hidden lg:block">
                 <div className="max-w-7xl mx-auto">
-                    <div className="flex items-center">
+                    <div className="flex items-center flex-nowrap overflow-x-auto">
                         {mainCategories.map((category) => (
                             <div
                                 key={category.name}
@@ -292,7 +292,7 @@ export function Header() {
                             >
                                 <Link
                                     href={category.href}
-                                    className={`block px-4 py-3 text-sm font-medium transition-colors cursor-pointer
+                                    className={`block px-3 py-3 text-xs font-medium transition-colors cursor-pointer whitespace-nowrap
                                         ${category.active
                                             ? 'bg-blue-600 text-white'
                                             : 'hover:bg-gray-800 hover:text-amber-300'
