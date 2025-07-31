@@ -31,7 +31,7 @@ export function Header() {
     const mainCategories = [
         { name: 'PİYANOLAR', href: '/products?category=piano', active: false },
         { name: 'TUŞLULAR', href: '/products?category=keyboard', active: false },
-        { name: 'GİTARLAR', href: '/products?category=guitar', active: true },
+        { name: 'GİTARLAR', href: '/products?category=guitar', active: false },
         { name: 'AMFİ & PEDAL', href: '/products?category=amplifier', active: false },
         { name: 'YAYLILAR', href: '/products?category=strings', active: false },
         { name: 'NEFESLİLER', href: '/products?category=winds', active: false },
@@ -66,6 +66,22 @@ export function Header() {
             featured: {
                 title: 'ÇOK SATAN ÜRÜNLER',
                 items: ['TANITIM VIDEOLARI', 'İNDİRİMLİ ÜRÜNLER']
+            }
+        },
+        'PİYANOLAR': {
+            sections: [
+                {
+                    title: 'Piyano Kategorileri',
+                    items: ['Akustik Piyanolar', 'Dijital Piyanolar', 'Klavyeler', 'Synthesizer']
+                },
+                {
+                    title: 'Aksesuarlar',
+                    items: ['Piyano Tabureleri', 'Pedaller', 'Metronoms']
+                }
+            ],
+            featured: {
+                title: 'ÖNE ÇIKAN ÜRÜNLER',
+                items: ['YENİ MODELLER', 'KAMPANYALI ÜRÜNLER']
             }
         }
     };
@@ -282,7 +298,7 @@ export function Header() {
             {/* Horizontal Category Navigation - DoReMusic Style */}
             <nav className="bg-gray-900 text-white sticky top-20 z-40 hidden lg:block">
                 <div className="max-w-7xl mx-auto">
-                    <div className="flex items-center flex-nowrap overflow-x-auto">
+                    <div className="flex items-center justify-center">
                         {mainCategories.map((category) => (
                             <div
                                 key={category.name}
@@ -292,39 +308,44 @@ export function Header() {
                             >
                                 <Link
                                     href={category.href}
-                                    className={`block px-3 py-3 text-xs font-medium transition-colors cursor-pointer whitespace-nowrap
-                                        ${category.active
-                                            ? 'bg-blue-600 text-white'
-                                            : 'hover:bg-gray-800 hover:text-amber-300'
+                                    className={`block px-4 py-4 text-sm font-medium transition-all duration-300 cursor-pointer whitespace-nowrap relative overflow-hidden
+                                        ${hoveredCategory === category.name
+                                            ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg'
+                                            : 'hover:bg-gray-800 hover:text-amber-300 text-gray-100'
                                         }`}
                                     onClick={(e) => handleNavClick(category.href, e)}
                                 >
-                                    {category.name}
+                                    <span className="relative z-10">{category.name}</span>
+                                    {/* Elegant hover background */}
+                                    <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-orange-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
+                                    {/* Bottom border effect */}
+                                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-amber-400 to-orange-400 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
                                 </Link>
 
                                 {/* Mega Menu Dropdown */}
                                 {hoveredCategory === category.name && megaMenuCategories[category.name] && (
                                     <div
-                                        className="absolute top-full left-0 w-screen max-w-6xl bg-white text-gray-900 shadow-xl z-50 border-t-2 border-blue-600"
+                                        className="absolute top-full left-0 w-screen max-w-6xl bg-white text-gray-900 shadow-2xl z-50 border-t-4 border-blue-600 animate-fade-in"
                                         onMouseEnter={() => handleCategoryHover(category.name)}
                                         onMouseLeave={() => handleCategoryHover(null)}
+                                        style={{ transform: 'translateX(-20%)' }}
                                     >
-                                        <div className="p-6">
-                                            <div className="grid grid-cols-12 gap-6">
+                                        <div className="p-8">
+                                            <div className="grid grid-cols-12 gap-8">
                                                 {/* Category Sections */}
                                                 <div className="col-span-9">
-                                                    <div className="grid grid-cols-3 gap-6">
+                                                    <div className="grid grid-cols-3 gap-8">
                                                         {megaMenuCategories[category.name].sections.map((section, index) => (
                                                             <div key={index}>
-                                                                <h3 className="font-semibold text-gray-900 mb-3 border-b border-gray-200 pb-2">
+                                                                <h3 className="font-bold text-gray-900 mb-4 border-b-2 border-amber-200 pb-2 text-base">
                                                                     {section.title}
                                                                 </h3>
-                                                                <ul className="space-y-2">
+                                                                <ul className="space-y-3">
                                                                     {section.items.map((item, itemIndex) => (
                                                                         <li key={itemIndex}>
                                                                             <Link
                                                                                 href={`/products?category=${item.toLowerCase().replace(' ', '-')}`}
-                                                                                className="text-sm text-gray-600 hover:text-amber-600 transition-colors cursor-pointer block whitespace-nowrap"
+                                                                                className="text-sm text-gray-600 hover:text-amber-600 hover:bg-amber-50 transition-all duration-200 cursor-pointer block py-1 px-2 rounded-md whitespace-nowrap"
                                                                                 onClick={(e) => handleNavClick(`/products?category=${item.toLowerCase().replace(' ', '-')}`, e)}
                                                                             >
                                                                                 {item}
@@ -338,18 +359,18 @@ export function Header() {
                                                 </div>
 
                                                 {/* Featured Section */}
-                                                <div className="col-span-3 bg-gray-50 p-4 rounded-lg">
-                                                    <div className="flex items-center space-x-2 mb-3">
-                                                        <Gift className="h-5 w-5 text-amber-600" />
-                                                        <h3 className="font-semibold text-gray-900">{megaMenuCategories[category.name].featured.title}</h3>
+                                                <div className="col-span-3 bg-gradient-to-br from-gray-50 to-amber-50 p-6 rounded-xl border border-amber-100">
+                                                    <div className="flex items-center space-x-2 mb-4">
+                                                        <Gift className="h-6 w-6 text-amber-600" />
+                                                        <h3 className="font-bold text-gray-900 text-base">{megaMenuCategories[category.name].featured.title}</h3>
                                                     </div>
-                                                    <div className="space-y-3">
+                                                    <div className="space-y-4">
                                                         {megaMenuCategories[category.name].featured.items.map((item, index) => (
-                                                            <div key={index} className="flex items-center space-x-2 text-sm">
-                                                                <div className="w-6 h-6 bg-amber-100 rounded flex items-center justify-center">
+                                                            <div key={index} className="flex items-center space-x-3 text-sm bg-white p-3 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+                                                                <div className="w-8 h-8 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center text-white font-bold">
                                                                     {index === 0 ? '📹' : index === 1 ? '🎬' : '🏷️'}
                                                                 </div>
-                                                                <span className="text-gray-700 whitespace-nowrap">{item}</span>
+                                                                <span className="text-gray-700 font-medium whitespace-nowrap">{item}</span>
                                                             </div>
                                                         ))}
                                                     </div>
