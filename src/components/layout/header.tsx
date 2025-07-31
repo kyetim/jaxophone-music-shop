@@ -446,7 +446,11 @@ export function Header() {
 
                             {/* User Account */}
                             <div className="hidden sm:block relative group cursor-pointer">
-                                <div className="flex items-center space-x-2 p-1 rounded-lg hover:bg-gray-50 transition-all duration-300">
+                                <Link
+                                    href={isAuthenticated ? "/account" : "/login"}
+                                    className="flex items-center space-x-2 p-1 rounded-lg hover:bg-gray-50 transition-all duration-300"
+                                    onClick={(e) => handleNavClick(isAuthenticated ? "/account" : "/login", e)}
+                                >
                                     <div className="w-7 h-7 bg-gradient-to-br from-amber-500 to-orange-600 rounded-full flex items-center justify-center">
                                         <User className="h-3 w-3 text-white" />
                                     </div>
@@ -463,7 +467,7 @@ export function Header() {
                                             </div>
                                         )}
                                     </div>
-                                </div>
+                                </Link>
                             </div>
 
                             {/* Mobile Menu Button */}
@@ -652,10 +656,20 @@ export function Header() {
 
                     {/* Mobile User Actions */}
                     <div className="pt-4 border-t border-gray-200 space-y-2">
-                        <div className="flex items-center justify-between">
-                            <span className="text-gray-700 font-medium">Hesabım</span>
+                        <Link
+                            href={isAuthenticated ? "/account" : "/login"}
+                            className="flex items-center justify-between cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-all duration-300"
+                            onClick={(e) => {
+                                handleNavClick(isAuthenticated ? "/account" : "/login", e);
+                                setIsMobileMenuOpen(false);
+                            }}
+                        >
+                            <span className="text-gray-700 font-medium">
+                                {isAuthenticated ? "Hesabım" : "Giriş Yap"}
+                            </span>
                             <User className="h-5 w-5 text-gray-500" />
-                        </div>
+                        </Link>
+
                         <div className="flex items-center justify-between">
                             <span className="text-gray-700 font-medium">Favorilerim</span>
                             <div className="flex items-center gap-1">
