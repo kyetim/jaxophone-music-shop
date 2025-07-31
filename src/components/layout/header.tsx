@@ -329,7 +329,9 @@ export function Header() {
                                         onMouseEnter={() => handleCategoryHover(category.name)}
                                         onMouseLeave={() => handleCategoryHover(null)}
                                         style={{
-                                            left: '-300px',
+                                            left: category.name === 'PİYANOLAR' || category.name === 'TUŞLULAR' ? '0px' :
+                                                category.name === 'OUTLET' || category.name === 'AKSESUARLAR' || category.name === 'HI-FI' ? '-700px' :
+                                                    '-300px',
                                             width: '1000px'
                                         }}
                                     >
