@@ -71,17 +71,185 @@ export function Header() {
         'PİYANOLAR': {
             sections: [
                 {
-                    title: 'Piyano Kategorileri',
-                    items: ['Akustik Piyanolar', 'Dijital Piyanolar', 'Klavyeler', 'Synthesizer']
+                    title: 'Piyanolar Kategorisi Anasayfa',
+                    items: ['Akustik Duvar Piyanolar', 'Akustik Kuyruklu Piyanolar', 'Dijital Konsol Piyanolar', 'Dijital Kuyruklu Piyanolar', 'Dijital Taşınabilir Piyanolar', 'Akustik Silent Piyanolar', 'Akustik Disklavier Piyanolar']
                 },
                 {
-                    title: 'Aksesuarlar',
-                    items: ['Piyano Tabureleri', 'Pedaller', 'Metronoms']
+                    title: 'Piyano Aksesuarları',
+                    items: []
                 }
             ],
             featured: {
                 title: 'ÖNE ÇIKAN ÜRÜNLER',
                 items: ['YENİ MODELLER', 'KAMPANYALI ÜRÜNLER']
+            }
+        },
+        'TUŞLULAR': {
+            sections: [
+                {
+                    title: 'Tuşlular Kategorisi Anasayfa',
+                    items: ['Eğitim Klavyeleri & Orglar', 'Ritmli Klavyeler', 'Synthesizer', 'Midi Klavyeler', 'Mini Orglar', 'Launchpad\'ler', 'Hammond Orglar']
+                },
+                {
+                    title: 'Groovebox & Modüler Synthesizer',
+                    items: ['Akordiyonlar', 'Pedallar', 'Standlar', 'Taşıma Çantaları', 'Kablolar', 'Tabureler', 'Aksesuarlar']
+                }
+            ],
+            featured: {
+                title: 'ÇOK SATAN ÜRÜNLER',
+                items: ['TANITIM VIDEOLARI', 'İNDİRİMLİ ÜRÜNLER']
+            }
+        },
+        'AMFİ & PEDAL': {
+            sections: [
+                {
+                    title: 'Amfi & Pedal Kategorisi Anasayfa',
+                    items: ['Elektro Gitar Amfileri', 'Bas Gitar Amfileri', 'Akustik Gitar Amfileri', 'Amfi Parçaları', 'Amfi Aksesuarları', 'Efekt Pedalları', 'Efekt Prosesörleri']
+                },
+                {
+                    title: 'Pedal & Prosesör Aksesuarları',
+                    items: []
+                }
+            ],
+            featured: {
+                title: 'ÇOK SATAN ÜRÜNLER',
+                items: ['TANITIM VIDEOLARI', 'İNDİRİMLİ ÜRÜNLER']
+            }
+        },
+        'YAYLILAR': {
+            sections: [
+                {
+                    title: 'Yaylılar Kategorisi Anasayfa',
+                    items: ['Kemanlar', 'Viyolalar', 'Çellolar', 'Kontrabaslar', 'Yaylar / Arşeler', 'Teller', 'Yaylı Parçaları']
+                },
+                {
+                    title: 'Aksesuarlar',
+                    items: []
+                }
+            ],
+            featured: {
+                title: 'ÇOK SATAN ÜRÜNLER',
+                items: ['TANITIM VIDEOLARI', 'İNDİRİMLİ ÜRÜNLER']
+            }
+        },
+        'NEFESLİLER': {
+            sections: [
+                {
+                    title: 'Nefesliler Kategorisi Anasayfa',
+                    items: ['Klarnetler', 'Yan Flütler', 'Saksafonlar', 'Mızıkalar', 'Trompetler', 'Trombonlar', 'Dijital Nefesli Enstrümanlar']
+                },
+                {
+                    title: 'Melodikalar',
+                    items: ['Kornolar', 'Tubalar', 'Obualar', 'Fagotlar', 'Marching Brass', 'Kornetler', 'Flugelhorn']
+                },
+                {
+                    title: 'Suzafonlar',
+                    items: ['Blok Flütler', 'Pikololar', 'Aksesuarlar']
+                }
+            ],
+            featured: {
+                title: 'ÇOK SATAN ÜRÜNLER',
+                items: ['TANITIM VIDEOLARI', 'İNDİRİMLİ ÜRÜNLER']
+            }
+        },
+        'DAVUL & PERKÜSYON': {
+            sections: [
+                {
+                    title: 'Davul & Perküsyon Anasayfa',
+                    items: ['Akustik Davullar', 'Akustik Davul Aksesuarları', 'Elektronik Davullar', 'Elektronik Davul Aksesuarları', 'Orff Çalgıları', 'Perküsyonlar', 'Perküsyon Aksesuarları']
+                },
+                {
+                    title: 'Aksamlar',
+                    items: ['Ziller', 'Bagetler', 'Malet & Beaterlar', 'Deriler', 'Çalışma Pedleri', 'Bando Davulları', 'Konser Perküsyonları']
+                },
+                {
+                    title: 'Kılıf & Taşıma Çantaları',
+                    items: ['Temizlik & Bakım Ürünleri', 'Ses Terapisi ve Meditasyon']
+                }
+            ],
+            featured: {
+                title: 'ÇOK SATAN ÜRÜNLER',
+                items: ['TANITIM VIDEOLARI', 'İNDİRİMLİ ÜRÜNLER']
+            }
+        },
+        'STÜDYO & DJ': {
+            sections: [
+                {
+                    title: 'Stüdyo & DJ Anasayfa',
+                    items: ['Ses Kartları', 'Monitör Hoparlörler', 'Midi Klavyeler', 'Monitör & DJ Kulaklıklar', 'Stüdyo Mikrofonları', 'Bluetooth Kulaklıklar', 'USB Mikrofonlar']
+                },
+                {
+                    title: 'DJ Mikser',
+                    items: ['DJ Turntable', 'DJ Controller', 'Groovebox & Modüler Synth', 'Launchpad\'ler', 'Hazır Stüdyo Paketleri', 'Kayıt Cihazları', 'Kontrol Arayüzleri']
+                },
+                {
+                    title: 'Mikrofon Aksesuarları',
+                    items: ['Podcast Uyumlu Ürünler', 'In-ear Monitörler', 'Telsiz Mikrofonlar', 'Mikrofon ve Monitör Kabloları', 'Stüdyo & Dj Standları', 'Stüdyo Monitör Stand ve İzolatörleri']
+                }
+            ],
+            featured: {
+                title: 'ÇOK SATAN ÜRÜNLER',
+                items: ['TANITIM VIDEOLARI', 'İNDİRİMLİ ÜRÜNLER']
+            }
+        },
+        'SESLENDIRME': {
+            sections: [
+                {
+                    title: 'Seslendirme Anasayfa',
+                    items: ['Aktif Hoparlörler', 'Pasif Hoparlörler', 'Zayıf Akım Hoparlörler', 'Analog Mikserler', 'Dijital Mikserler', 'Power Mikserler', 'Sahne Mikrofonları']
+                },
+                {
+                    title: 'Power Amfiler',
+                    items: ['DI Box', 'Kablolar', 'Sehpa & Standlar', 'In-ear Monitörler', 'Telsiz Mikrofonlar']
+                }
+            ],
+            featured: {
+                title: 'ÇOK SATAN ÜRÜNLER',
+                items: ['TANITIM VIDEOLARI', 'İNDİRİMLİ ÜRÜNLER']
+            }
+        },
+        'HI-FI': {
+            sections: [
+                {
+                    title: 'Hi-Fi Kategorisi Anasayfa',
+                    items: ['Aktif Hoparlörler', 'Pasif Hoparlörler', 'Pikap\'lar', 'Hi-Fi Amfiler', 'Subwoofer', 'Streamer ve Network Çalıcılar', 'Soundbarlar']
+                },
+                {
+                    title: 'Bluetooth Kulaklıklar',
+                    items: ['Kablo & Hi-Fi Aksesuarları', 'Plakçalar Aksesuarları', 'Hoparlör Standları']
+                }
+            ],
+            featured: {
+                title: 'ÇOK SATAN ÜRÜNLER',
+                items: ['TANITIM VIDEOLARI', 'İNDİRİMLİ ÜRÜNLER']
+            }
+        },
+        'AKSESUARLAR': {
+            sections: [
+                {
+                    title: 'Aksesuarlar Kategorisi Anasayfa',
+                    items: ['Sehpa & Standlar', 'Kablolar', 'Akort Aletleri', 'Metronomlar', 'Teller', 'Kılıf & Taşıma Çantaları', 'Temizlik & Bakım Ürünleri']
+                },
+                {
+                    title: 'Sırt Çantaları',
+                    items: ['Metoda', 'Dergi & Magazin', 'T-Shirt', 'Fincan & Mug', 'Müzikal Hediye Ürünleri', 'Saz & Bağlama Telleri']
+                }
+            ],
+            featured: {
+                title: 'ÇOK SATAN ÜRÜNLER',
+                items: ['TANITIM VIDEOLARI', 'İNDİRİMLİ ÜRÜNLER']
+            }
+        },
+        'OUTLET': {
+            sections: [
+                {
+                    title: 'Outlet Kategorisi',
+                    items: ['İndirimli Ürünler', 'Sergi Ürünleri', 'Son Model Ürünler', 'Kampanyalı Ürünler']
+                }
+            ],
+            featured: {
+                title: 'OUTLET FIRSATLARI',
+                items: ['BÜYÜK İNDİRİMLER', 'SERGİ ÜRÜNLERİ']
             }
         }
     };
