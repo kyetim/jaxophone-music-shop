@@ -161,7 +161,7 @@ export function Header() {
                 <div className="max-w-7xl mx-auto">
                     <div className="flex items-center justify-between text-sm text-gray-600">
                         <div className="flex items-center space-x-6">
-                            <Link href="/about" className="hover:text-amber-600 transition-colors">Akademi</Link>
+                            <Link href="/about" className="hover:text-amber-600 transition-colors">Hakkımızda</Link>
                             <Link href="/blog" className="hover:text-amber-600 transition-colors">Blog</Link>
                             <Link href="/stores" className="hover:text-amber-600 transition-colors">Mağazalar</Link>
                             <Link href="/installment" className="hover:text-amber-600 transition-colors">Sipariş Takibi</Link>
@@ -324,7 +324,7 @@ export function Header() {
                                                                         <li key={itemIndex}>
                                                                             <Link
                                                                                 href={`/products?category=${item.toLowerCase().replace(' ', '-')}`}
-                                                                                className="text-sm text-gray-600 hover:text-amber-600 transition-colors cursor-pointer"
+                                                                                className="text-sm text-gray-600 hover:text-amber-600 transition-colors cursor-pointer block whitespace-nowrap"
                                                                                 onClick={(e) => handleNavClick(`/products?category=${item.toLowerCase().replace(' ', '-')}`, e)}
                                                                             >
                                                                                 {item}
@@ -349,7 +349,7 @@ export function Header() {
                                                                 <div className="w-6 h-6 bg-amber-100 rounded flex items-center justify-center">
                                                                     {index === 0 ? '📹' : index === 1 ? '🎬' : '🏷️'}
                                                                 </div>
-                                                                <span className="text-gray-700">{item}</span>
+                                                                <span className="text-gray-700 whitespace-nowrap">{item}</span>
                                                             </div>
                                                         ))}
                                                     </div>
@@ -390,6 +390,18 @@ export function Header() {
                                 {category.name}
                             </Link>
                         ))}
+
+                        {/* Additional mobile links */}
+                        <Link
+                            href="/about"
+                            className="block py-2 text-gray-700 hover:text-amber-600 transition-colors cursor-pointer border-t border-gray-200 pt-4"
+                            onClick={(e) => {
+                                handleNavClick('/about', e);
+                                setIsMobileMenuOpen(false);
+                            }}
+                        >
+                            Hakkımızda
+                        </Link>
                     </div>
                 </div>
             )}
