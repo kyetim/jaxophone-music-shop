@@ -76,7 +76,7 @@ export function Header() {
                 },
                 {
                     title: 'Piyano Aksesuarları',
-                    items: []
+                    items: ['Piyano Tabureleri', 'Piyano Pedal Uzatıcıları', 'Piyano Kapakları', 'Piyano Lambaları', 'Metronom & Tuner', 'Piyano Bakım Ürünleri']
                 }
             ],
             featured: {
@@ -108,7 +108,7 @@ export function Header() {
                 },
                 {
                     title: 'Pedal & Prosesör Aksesuarları',
-                    items: []
+                    items: ['Pedal Board\'lar', 'Pedal Güç Kaynakları', 'Pedal Kabloları', 'Footswitch\'ler', 'Expression Pedalları', 'Tuner Pedalları']
                 }
             ],
             featured: {
@@ -124,7 +124,7 @@ export function Header() {
                 },
                 {
                     title: 'Aksesuarlar',
-                    items: []
+                    items: ['Yaylı Kılıfları', 'Omuz Yastıkları', 'Çene Dayamalar', 'Rozan & Reçine', 'Mute\'lar', 'Yaylı Standları']
                 }
             ],
             featured: {
@@ -498,7 +498,7 @@ export function Header() {
                                         onMouseLeave={() => handleCategoryHover(null)}
                                         style={{
                                             left: category.name === 'PİYANOLAR' || category.name === 'TUŞLULAR' ? '0px' :
-                                                category.name === 'OUTLET' || category.name === 'AKSESUARLAR' || category.name === 'HI-FI' ? '-700px' :
+                                                category.name === 'OUTLET' || category.name === 'AKSESUARLAR' || category.name === 'HI-FI' || category.name === 'SESLENDIRME' ? '-600px' :
                                                     '-300px',
                                             width: '1000px'
                                         }}
@@ -532,18 +532,18 @@ export function Header() {
                                                 </div>
 
                                                 {/* Featured Section */}
-                                                <div className="col-span-3 bg-gradient-to-br from-gray-50 to-amber-50 p-6 rounded-xl border border-amber-100">
-                                                    <div className="flex items-center space-x-2 mb-4">
-                                                        <Gift className="h-6 w-6 text-amber-600" />
-                                                        <h3 className="font-bold text-gray-900 text-base">{megaMenuCategories[category.name].featured.title}</h3>
+                                                <div className="col-span-3 bg-gradient-to-br from-gray-50 to-amber-50 p-4 rounded-xl border border-amber-100">
+                                                    <div className="flex items-center space-x-2 mb-3">
+                                                        <Gift className="h-5 w-5 text-amber-600" />
+                                                        <h3 className="font-semibold text-gray-900 text-sm">{megaMenuCategories[category.name].featured.title}</h3>
                                                     </div>
-                                                    <div className="space-y-4">
+                                                    <div className="space-y-2">
                                                         {megaMenuCategories[category.name].featured.items.map((item, index) => (
-                                                            <div key={index} className="flex items-center space-x-3 text-sm bg-white p-3 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
-                                                                <div className="w-8 h-8 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center text-white font-bold">
+                                                            <div key={index} className="flex items-center space-x-2 text-xs bg-white p-2 rounded-md shadow-sm hover:shadow-md transition-shadow duration-200">
+                                                                <div className="w-6 h-6 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
                                                                     {index === 0 ? '📹' : index === 1 ? '🎬' : '🏷️'}
                                                                 </div>
-                                                                <span className="text-gray-700 font-medium whitespace-nowrap">{item}</span>
+                                                                <span className="text-gray-700 font-medium text-xs leading-tight">{item}</span>
                                                             </div>
                                                         ))}
                                                     </div>
