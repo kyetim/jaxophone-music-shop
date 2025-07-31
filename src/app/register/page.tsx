@@ -53,19 +53,11 @@ export default function RegisterPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        console.log('📝 Register form submitted:', {
-            displayName: formData.displayName,
-            email: formData.email,
-            hasPassword: !!formData.password,
-            agreedToTerms
-        });
-
         setError(null);
         setSuccess(false);
 
         const validationError = validateForm();
         if (validationError) {
-            console.log('❌ Validation error:', validationError);
             setError(validationError);
             return;
         }
@@ -73,9 +65,7 @@ export default function RegisterPage() {
         setIsLoading(true);
 
         try {
-            console.log('🔄 signUp fonksiyonu çağrılıyor...');
             await signUp(formData.email, formData.password, formData.displayName);
-            console.log('✅ signUp başarılı');
             setSuccess(true);
 
             // Success mesajını göster ve 2 saniye sonra yönlendir
@@ -83,7 +73,6 @@ export default function RegisterPage() {
                 router.push('/account');
             }, 2000);
         } catch (error: any) {
-            console.error('❌ Register error:', error);
             setError(error.message || 'Hesap oluşturulurken bir hata oluştu.');
         } finally {
             setIsLoading(false);

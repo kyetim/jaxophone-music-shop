@@ -124,10 +124,7 @@ export function useAuth() {
     };
 
     const signIn = async (email: string, password: string) => {
-        console.log('🔐 signIn çağrıldı:', { email, hasAuth: !!auth, hasDb: !!db });
-
         if (!auth || !db) {
-            console.error('❌ Firebase servisleri bulunamadı');
             throw new Error('Firebase servisleri bulunamadı. Yapılandırmayı kontrol edin.');
         }
 
@@ -135,22 +132,17 @@ export function useAuth() {
             dispatch(setUserError(null));
             dispatch(setUserLoading(true));
 
-            console.log('🔄 Firebase signInWithEmailAndPassword çağrılıyor...');
             const result = await signInWithEmailAndPassword(auth, email, password);
-            console.log('✅ Firebase giriş başarılı:', result.user.uid);
 
             // Son giriş tarihini güncelle - undefined değerleri filtrele
             const updateData = sanitizeData({
                 lastLoginAt: new Date(),
             });
 
-            console.log('📝 Kullanıcı bilgileri güncelleniyor...');
             await setDoc(doc(db, 'users', result.user.uid), updateData, { merge: true });
-            console.log('✅ Kullanıcı bilgileri güncellendi');
 
             return result.user;
         } catch (error: any) {
-            console.error('❌ signIn hatası:', error);
             const errorMessage = getErrorMessage(error.code);
             dispatch(setUserError(errorMessage));
             throw error;
@@ -160,10 +152,7 @@ export function useAuth() {
     };
 
     const signUp = async (email: string, password: string, displayName: string) => {
-        console.log('🔐 signUp çağrıldı:', { email, displayName, hasAuth: !!auth, hasDb: !!db });
-
         if (!auth || !db) {
-            console.error('❌ Firebase servisleri bulunamadı (signUp)');
             throw new Error('Firebase servisleri bulunamadı. Yapılandırmayı kontrol edin.');
         }
 
@@ -171,14 +160,10 @@ export function useAuth() {
             dispatch(setUserError(null));
             dispatch(setUserLoading(true));
 
-            console.log('🔄 Firebase createUserWithEmailAndPassword çağrılıyor...');
             const result = await createUserWithEmailAndPassword(auth, email, password);
-            console.log('✅ Firebase kayıt başarılı:', result.user.uid);
 
             // Kullanıcı profilini güncelle
-            console.log('📝 Kullanıcı profili güncelleniyor...');
             await updateProfile(result.user, { displayName });
-            console.log('✅ updateProfile tamamlandı');
 
             // Firestore'da kullanıcı dokümantı oluştur - undefined değerleri filtrele
             const now = new Date();
@@ -203,9 +188,7 @@ export function useAuth() {
 
             // Undefined değerleri filtrele
             const sanitizedData = sanitizeData(userProfileData);
-            console.log('📝 Firestore dokümantı oluşturuluyor...');
             await setDoc(doc(db, 'users', result.user.uid), sanitizedData);
-            console.log('✅ Firestore dokümantı oluşturuldu');
 
             // Redux'a string formatında kaydet
             const profileForRedux = {
@@ -216,11 +199,9 @@ export function useAuth() {
             };
 
             dispatch(setUserProfile(profileForRedux));
-            console.log('✅ Redux state güncellendi');
 
             return result.user;
         } catch (error: any) {
-            console.error('❌ signUp hatası:', error);
             const errorMessage = getErrorMessage(error.code);
             dispatch(setUserError(errorMessage));
             throw error;
