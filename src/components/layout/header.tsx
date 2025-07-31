@@ -296,7 +296,7 @@ export function Header() {
             </header>
 
             {/* Horizontal Category Navigation - DoReMusic Style */}
-            <nav className="bg-gray-900 text-white sticky top-20 z-40 hidden lg:block relative">
+            <nav className="bg-gray-900 text-white sticky top-20 z-40 hidden lg:block">
                 <div className="max-w-7xl mx-auto">
                     <div className="flex items-center justify-center">
                         {mainCategories.map((category) => (
@@ -321,71 +321,70 @@ export function Header() {
                                     {/* Bottom border effect */}
                                     <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-amber-400 to-orange-400 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
                                 </Link>
+
+                                {/* Mega Menu Dropdown - Individual positioning for each category */}
+                                {hoveredCategory === category.name && megaMenuCategories[category.name] && (
+                                    <div
+                                        className="absolute top-full bg-white text-gray-900 shadow-2xl z-50 border-t-4 border-blue-600 animate-fade-in"
+                                        onMouseEnter={() => handleCategoryHover(category.name)}
+                                        onMouseLeave={() => handleCategoryHover(null)}
+                                        style={{
+                                            left: '-300px',
+                                            width: '1000px'
+                                        }}
+                                    >
+                                        <div className="p-8">
+                                            <div className="grid grid-cols-12 gap-8">
+                                                {/* Category Sections */}
+                                                <div className="col-span-9">
+                                                    <div className="grid grid-cols-3 gap-8">
+                                                        {megaMenuCategories[category.name].sections.map((section, index) => (
+                                                            <div key={index}>
+                                                                <h3 className="font-bold text-gray-900 mb-4 border-b-2 border-amber-200 pb-2 text-base">
+                                                                    {section.title}
+                                                                </h3>
+                                                                <ul className="space-y-3">
+                                                                    {section.items.map((item, itemIndex) => (
+                                                                        <li key={itemIndex}>
+                                                                            <Link
+                                                                                href={`/products?category=${item.toLowerCase().replace(' ', '-')}`}
+                                                                                className="text-sm text-gray-600 hover:text-amber-600 hover:bg-amber-50 transition-all duration-200 cursor-pointer block py-1 px-2 rounded-md whitespace-nowrap"
+                                                                                onClick={(e) => handleNavClick(`/products?category=${item.toLowerCase().replace(' ', '-')}`, e)}
+                                                                            >
+                                                                                {item}
+                                                                            </Link>
+                                                                        </li>
+                                                                    ))}
+                                                                </ul>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+
+                                                {/* Featured Section */}
+                                                <div className="col-span-3 bg-gradient-to-br from-gray-50 to-amber-50 p-6 rounded-xl border border-amber-100">
+                                                    <div className="flex items-center space-x-2 mb-4">
+                                                        <Gift className="h-6 w-6 text-amber-600" />
+                                                        <h3 className="font-bold text-gray-900 text-base">{megaMenuCategories[category.name].featured.title}</h3>
+                                                    </div>
+                                                    <div className="space-y-4">
+                                                        {megaMenuCategories[category.name].featured.items.map((item, index) => (
+                                                            <div key={index} className="flex items-center space-x-3 text-sm bg-white p-3 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+                                                                <div className="w-8 h-8 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center text-white font-bold">
+                                                                    {index === 0 ? '📹' : index === 1 ? '🎬' : '🏷️'}
+                                                                </div>
+                                                                <span className="text-gray-700 font-medium whitespace-nowrap">{item}</span>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         ))}
                     </div>
-
-                    {/* Mega Menu Dropdown - Positioned relative to nav container */}
-                    {hoveredCategory && megaMenuCategories[hoveredCategory] && (
-                        <div
-                            className="absolute top-full left-1/2 transform -translate-x-1/2 bg-white text-gray-900 shadow-2xl z-50 border-t-4 border-blue-600 animate-fade-in"
-                            onMouseEnter={() => handleCategoryHover(hoveredCategory)}
-                            onMouseLeave={() => handleCategoryHover(null)}
-                            style={{
-                                width: '1000px',
-                                marginLeft: '-500px',
-                                left: '50%'
-                            }}
-                        >
-                            <div className="p-8">
-                                <div className="grid grid-cols-12 gap-8">
-                                    {/* Category Sections */}
-                                    <div className="col-span-9">
-                                        <div className="grid grid-cols-3 gap-8">
-                                            {megaMenuCategories[hoveredCategory].sections.map((section, index) => (
-                                                <div key={index}>
-                                                    <h3 className="font-bold text-gray-900 mb-4 border-b-2 border-amber-200 pb-2 text-base">
-                                                        {section.title}
-                                                    </h3>
-                                                    <ul className="space-y-3">
-                                                        {section.items.map((item, itemIndex) => (
-                                                            <li key={itemIndex}>
-                                                                <Link
-                                                                    href={`/products?category=${item.toLowerCase().replace(' ', '-')}`}
-                                                                    className="text-sm text-gray-600 hover:text-amber-600 hover:bg-amber-50 transition-all duration-200 cursor-pointer block py-1 px-2 rounded-md whitespace-nowrap"
-                                                                    onClick={(e) => handleNavClick(`/products?category=${item.toLowerCase().replace(' ', '-')}`, e)}
-                                                                >
-                                                                    {item}
-                                                                </Link>
-                                                            </li>
-                                                        ))}
-                                                    </ul>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-
-                                    {/* Featured Section */}
-                                    <div className="col-span-3 bg-gradient-to-br from-gray-50 to-amber-50 p-6 rounded-xl border border-amber-100">
-                                        <div className="flex items-center space-x-2 mb-4">
-                                            <Gift className="h-6 w-6 text-amber-600" />
-                                            <h3 className="font-bold text-gray-900 text-base">{megaMenuCategories[hoveredCategory].featured.title}</h3>
-                                        </div>
-                                        <div className="space-y-4">
-                                            {megaMenuCategories[hoveredCategory].featured.items.map((item, index) => (
-                                                <div key={index} className="flex items-center space-x-3 text-sm bg-white p-3 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
-                                                    <div className="w-8 h-8 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center text-white font-bold">
-                                                        {index === 0 ? '📹' : index === 1 ? '🎬' : '🏷️'}
-                                                    </div>
-                                                    <span className="text-gray-700 font-medium whitespace-nowrap">{item}</span>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    )}
                 </div>
             </nav>
 
