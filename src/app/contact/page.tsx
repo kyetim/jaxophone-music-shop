@@ -67,6 +67,29 @@ export default function ContactPage() {
         }
     };
 
+    // Test email function
+    const handleTestEmail = async () => {
+        try {
+            const response = await fetch('/api/test-email', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                alert('Test e-postası başarıyla gönderildi! E-posta kutunuzu kontrol edin.');
+            } else {
+                alert(`Test e-postası hatası: ${result.error}`);
+            }
+        } catch (error) {
+            console.error('Test email error:', error);
+            alert('Test e-postası gönderilirken hata oluştu.');
+        }
+    };
+
     // Google Maps initialization
     useEffect(() => {
         const initMap = async () => {
@@ -430,6 +453,15 @@ export default function ContactPage() {
                                                 <span>Mesajı Gönder</span>
                                             </>
                                         )}
+                                    </Button>
+
+                                    {/* Test Email Button */}
+                                    <Button
+                                        type="button"
+                                        onClick={handleTestEmail}
+                                        className="w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg flex items-center justify-center space-x-2 transition-colors"
+                                    >
+                                        <span>🧪 Test E-postası Gönder</span>
                                     </Button>
                                 </form>
                             </div>

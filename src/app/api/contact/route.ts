@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
 
         // Send email using Resend
         const { data, error } = await resend.emails.send({
-            from: 'Jaxophone İletişim <noreply@jaxophone.com>',
+            from: 'Jaxophone İletişim <onboarding@resend.dev>', // Resend'in doğrulanmış domain'i
             to: ['kyetim.busi@gmail.com'], // Buraya kendi e-posta adresinizi yazın
             subject: `Yeni İletişim Formu: ${subject}`,
             html: `
