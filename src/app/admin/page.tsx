@@ -89,7 +89,7 @@ export default function AdminDashboard() {
             price: 2850,
             stock: 15,
             description: 'Başlangıç seviyesi için ideal akustik gitar',
-            image: '/images/products/yamaha-f310.jpg',
+            image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0yMCAxMkMyMi4yMDkxIDEyIDI0IDEzLjc5MDkgMjQgMTZDMjQgMTguMjA5MSAyMi4yMDkxIDIwIDIwIDIwQzE3Ljc5MDkgMjAgMTYgMTguMjA5MSAxNiAxNkMxNiAxMy43OTA5IDE3Ljc5MDkgMTIgMjAgMTJaIiBmaWxsPSIjOUI5QkEwIi8+CjxwYXRoIGQ9Ik0yOCAyOEMyOCAyOS4xMDQ2IDI3LjEwNDYgMzAgMjYgMzBIMTRDMTIuODk1NCAzMCAxMiAyOS4xMDQ2IDEyIDI4VjI2QzEyIDI0Ljg5NTQgMTIuODk1NCAyNCAxNCAyNEgyNkMyNy4xMDQ2IDI0IDI4IDI0Ljg5NTQgMjggMjZWMjhaIiBmaWxsPSIjOUI5QkEwIi8+Cjwvc3ZnPgo=',
             brand: 'Yamaha',
             status: 'active',
             createdAt: new Date('2024-01-01')
@@ -101,7 +101,7 @@ export default function AdminDashboard() {
             price: 15500,
             stock: 8,
             description: 'Profesyonel dijital piyano',
-            image: '/images/products/roland-fp30.jpg',
+            image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0yMCAxMkMyMi4yMDkxIDEyIDI0IDEzLjc5MDkgMjQgMTZDMjQgMTguMjA5MSAyMi4yMDkxIDIwIDIwIDIwQzE3Ljc5MDkgMjAgMTYgMTguMjA5MSAxNiAxNkMxNiAxMy43OTA5IDE3Ljc5MDkgMTIgMjAgMTJaIiBmaWxsPSIjOUI5QkEwIi8+CjxwYXRoIGQ9Ik0yOCAyOEMyOCAyOS4xMDQ2IDI3LjEwNDYgMzAgMjYgMzBIMTRDMTIuODk1NCAzMCAxMiAyOS4xMDQ2IDEyIDI4VjI2QzEyIDI0Ljg5NTQgMTIuODk1NCAyNCAxNCAyNEgyNkMyNy4xMDQ2IDI0IDI4IDI0Ljg5NTQgMjggMjZWMjhaIiBmaWxsPSIjOUI5QkEwIi8+Cjwvc3ZnPgo=',
             brand: 'Roland',
             status: 'active',
             createdAt: new Date('2024-01-02')
@@ -113,7 +113,7 @@ export default function AdminDashboard() {
             price: 8750,
             stock: 5,
             description: 'Klasik elektro gitar',
-            image: '/images/products/fender-strat.jpg',
+            image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0yMCAxMkMyMi4yMDkxIDEyIDI0IDEzLjc5MDkgMjQgMTZDMjQgMTguMjA5MSAyMi4yMDkxIDIwIDIwIDIwQzE3Ljc5MDkgMjAgMTYgMTguMjA5MSAxNiAxNkMxNiAxMy43OTA5IDE3Ljc5MDkgMTIgMjAgMTJaIiBmaWxsPSIjOUI5QkEwIi8+CjxwYXRoIGQ9Ik0yOCAyOEMyOCAyOS4xMDQ2IDI3LjEwNDYgMzAgMjYgMzBIMTRDMTIuODk1NCAzMCAxMiAyOS4xMDQ2IDEyIDI4VjI2QzEyIDI0Ljg5NTQgMTIuODk1NCAyNCAxNCAyNEgyNkMyNy4xMDQ2IDI0IDI4IDI0Ljg5NTQgMjggMjZWMjhaIiBmaWxsPSIjOUI5QkEwIi8+Cjwvc3ZnPgo=',
             brand: 'Fender',
             status: 'active',
             createdAt: new Date('2024-01-03')
@@ -125,7 +125,7 @@ export default function AdminDashboard() {
             price: 3200,
             stock: 12,
             description: 'Güçlü ve kompakt gitar amfisi',
-            image: '/images/products/boss-katana.jpg',
+            image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0yMCAxMkMyMi4yMDkxIDEyIDI0IDEzLjc5MDkgMjQgMTZDMjQgMTguMjA5MSAyMi4yMDkxIDIwIDIwIDIwQzE3Ljc5MDkgMjAgMTYgMTguMjA5MSAxNiAxNkMxNiAxMy43OTA5IDE3Ljc5MDkgMTIgMjAgMTJaIiBmaWxsPSIjOUI5QkEwIi8+CjxwYXRoIGQ9Ik0yOCAyOEMyOCAyOS4xMDQ2IDI3LjEwNDYgMzAgMjYgMzBIMTRDMTIuODk1NCAzMCAxMiAyOS4xMDQ2IDEyIDI4VjI2QzEyIDI0Ljg5NTQgMTIuODk1NCAyNCAxNCAyNEgyNkMyNy4xMDQ2IDI0IDI4IDI0Ljg5NTQgMjggMjZWMjhaIiBmaWxsPSIjOUI5QkEwIi8+Cjwvc3ZnPgo=',
             brand: 'Boss',
             status: 'active',
             createdAt: new Date('2024-01-04')
@@ -693,10 +693,11 @@ export default function AdminDashboard() {
                                                                 <div className="h-10 w-10 flex-shrink-0">
                                                                     <img
                                                                         className="h-10 w-10 rounded-lg object-cover"
-                                                                        src={product.image || '/images/placeholder.jpg'}
+                                                                        src={product.image || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0yMCAxMkMyMi4yMDkxIDEyIDI0IDEzLjc5MDkgMjQgMTZDMjQgMTguMjA5MSAyMi4yMDkxIDIwIDIwIDIwQzE3Ljc5MDkgMjAgMTYgMTguMjA5MSAxNiAxNkMxNiAxMy43OTA5IDE3Ljc5MDkgMTIgMjAgMTJaIiBmaWxsPSIjOUI5QkEwIi8+CjxwYXRoIGQ9Ik0yOCAyOEMyOCAyOS4xMDQ2IDI3LjEwNDYgMzAgMjYgMzBIMTRDMTIuODk1NCAzMCAxMiAyOS4xMDQ2IDEyIDI4VjI2QzEyIDI0Ljg5NTQgMTIuODk1NCAyNCAxNCAyNEgyNkMyNy4xMDQ2IDI0IDI4IDI0Ljg5NTQgMjggMjZWMjhaIiBmaWxsPSIjOUI5QkEwIi8+Cjwvc3ZnPgo='}
                                                                         alt={product.name}
                                                                         onError={(e) => {
-                                                                            e.currentTarget.src = '/images/placeholder.jpg';
+                                                                            // Prevent infinite loop by setting a data URL
+                                                                            e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0yMCAxMkMyMi4yMDkxIDEyIDI0IDEzLjc5MDkgMjQgMTZDMjQgMTguMjA5MSAyMi4yMDkxIDIwIDIwIDIwQzE3Ljc5MDkgMjAgMTYgMTguMjA5MSAxNiAxNkMxNiAxMy43OTA5IDE3Ljc5MDkgMTIgMjAgMTJaIiBmaWxsPSIjOUI5QkEwIi8+CjxwYXRoIGQ9Ik0yOCAyOEMyOCAyOS4xMDQ2IDI3LjEwNDYgMzAgMjYgMzBIMTRDMTIuODk1NCAzMCAxMiAyOS4xMDQ2IDEyIDI4VjI2QzEyIDI0Ljg5NTQgMTIuODk1NCAyNCAxNCAyNEgyNkMyNy4xMDQ2IDI0IDI4IDI0Ljg5NTQgMjggMjZWMjhaIiBmaWxsPSIjOUI5QkEwIi8+Cjwvc3ZnPgo=';
                                                                         }}
                                                                     />
                                                                 </div>
