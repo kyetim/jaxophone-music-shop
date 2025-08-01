@@ -36,18 +36,35 @@ export default function ContactPage() {
         e.preventDefault();
         setIsSubmitting(true);
 
-        // Simulate form submission
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        try {
+            const response = await fetch('/api/contact', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            });
 
-        alert('Mesajınız başarıyla gönderildi! En kısa sürede size dönüş yapacağız.');
-        setFormData({
-            name: '',
-            email: '',
-            phone: '',
-            subject: '',
-            message: ''
-        });
-        setIsSubmitting(false);
+            const result = await response.json();
+
+            if (response.ok) {
+                alert('Mesajınız başarıyla gönderildi! En kısa sürede size dönüş yapacağız.');
+                setFormData({
+                    name: '',
+                    email: '',
+                    phone: '',
+                    subject: '',
+                    message: ''
+                });
+            } else {
+                alert(`Hata: ${result.error || 'Mesaj gönderilirken bir hata oluştu.'}`);
+            }
+        } catch (error) {
+            console.error('Form submission error:', error);
+            alert('Mesaj gönderilirken bir hata oluştu. Lütfen tekrar deneyin.');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     // Google Maps initialization
