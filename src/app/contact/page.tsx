@@ -181,30 +181,6 @@ export default function ContactPage() {
         }
     };
 
-    // Weather API örneği - Hava durumu bilgisi
-    const getWeatherInfo = async () => {
-        try {
-            // OpenWeatherMap API örneği (ücretsiz)
-            const API_KEY = 'YOUR_OPENWEATHER_API_KEY'; // Gerçek API key gerekli
-            const city = 'Istanbul';
-
-            const response = await fetch(
-                `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric&lang=tr`
-            );
-
-            if (!response.ok) {
-                throw new Error(`Weather API error! status: ${response.status}`);
-            }
-
-            const weatherData = await response.json();
-            return weatherData;
-
-        } catch (error) {
-            console.error('Hava durumu API hatası:', error);
-            return null;
-        }
-    };
-
     return (
         <>
             <Header />
@@ -506,46 +482,6 @@ export default function ContactPage() {
                                     )}
                                 </div>
                             )}
-
-                            {/* API Kullanım Örnekleri */}
-                            <div className="mt-8 p-6 bg-blue-50 rounded-lg">
-                                <h3 className="text-lg font-semibold text-blue-900 mb-4">🔧 API Kullanım Örnekleri</h3>
-                                <div className="space-y-4 text-sm">
-                                    <div>
-                                        <h4 className="font-medium text-blue-800 mb-2">1. Form Gönderimi API'si:</h4>
-                                        <pre className="bg-white p-3 rounded text-xs overflow-x-auto">
-                                            {`// POST /api/contact
-const response = await fetch('/api/contact', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(formData)
-});`}
-                                        </pre>
-                                    </div>
-
-                                    <div>
-                                        <h4 className="font-medium text-blue-800 mb-2">2. Hava Durumu API'si:</h4>
-                                        <pre className="bg-white p-3 rounded text-xs overflow-x-auto">
-                                            {`// OpenWeatherMap API
-const response = await fetch(
-    \`https://api.openweathermap.org/data/2.5/weather?q=Istanbul&appid=\${API_KEY}&units=metric&lang=tr\`
-);`}
-                                        </pre>
-                                    </div>
-
-                                    <div>
-                                        <h4 className="font-medium text-blue-800 mb-2">3. Google Maps API:</h4>
-                                        <pre className="bg-white p-3 rounded text-xs overflow-x-auto">
-                                            {`// Google Maps JavaScript API
-const loader = new Loader({
-    apiKey: 'YOUR_API_KEY',
-    version: 'weekly',
-    libraries: ['places']
-});`}
-                                        </pre>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
