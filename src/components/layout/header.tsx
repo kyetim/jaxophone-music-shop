@@ -347,7 +347,7 @@ export function Header() {
                         <div className="flex items-center space-x-6">
                             <Link href="/about" className="hover:text-amber-600 transition-colors">Hakkımızda</Link>
                             <Link href="/blog" className="hover:text-amber-600 transition-colors">Blog</Link>
-                            <Link href="/stores" className="hover:text-amber-600 transition-colors">Mağazalar</Link>
+                            <Link href="/admin" className="hover:text-amber-600 transition-colors">Admin Dashboard</Link>
                             <Link href="/installment" className="hover:text-amber-600 transition-colors">Sipariş Takibi</Link>
                             <Link href="/contact" className="hover:text-amber-600 transition-colors">İletişim</Link>
                         </div>

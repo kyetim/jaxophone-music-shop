@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Phone, Mail, MapPin, Clock, Send, User, MessageSquare } from 'lucide-react';
 import { Header } from '@/components/layout/header';
+import { Loader } from '@googlemaps/js-api-loader';
 
 export default function ContactPage() {
     const [formData, setFormData] = useState({
@@ -15,6 +16,13 @@ export default function ContactPage() {
     });
 
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [mapLoaded, setMapLoaded] = useState(false);
+    const [mapError, setMapError] = useState<string | null>(null);
+    const mapRef = useRef<HTMLDivElement>(null);
+    const mapInstanceRef = useRef<google.maps.Map | null>(null);
+
+    // Google Maps API Key - Gerçek projede environment variable kullanın
+    const GOOGLE_MAPS_API_KEY = 'YOUR_GOOGLE_MAPS_API_KEY'; // Buraya gerçek API key'inizi ekleyin
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -40,6 +48,144 @@ export default function ContactPage() {
             message: ''
         });
         setIsSubmitting(false);
+    };
+
+    // Google Maps initialization
+    useEffect(() => {
+        const initMap = async () => {
+            if (!mapRef.current) return;
+
+            try {
+                const loader = new Loader({
+                    apiKey: GOOGLE_MAPS_API_KEY,
+                    version: 'weekly',
+                    libraries: ['places']
+                });
+
+                const google = await loader.load();
+
+                // Jaxophone mağazasının koordinatları (İstanbul, Maslak)
+                const jaxophoneLocation = { lat: 41.1124, lng: 29.0208 };
+
+                const map = new google.maps.Map(mapRef.current, {
+                    center: jaxophoneLocation,
+                    zoom: 15,
+                    styles: [
+                        {
+                            featureType: 'poi.business',
+                            stylers: [{ visibility: 'off' }]
+                        },
+                        {
+                            featureType: 'transit',
+                            elementType: 'labels.icon',
+                            stylers: [{ visibility: 'off' }]
+                        }
+                    ]
+                });
+
+                // Mağaza marker'ı ekle
+                const marker = new google.maps.Marker({
+                    position: jaxophoneLocation,
+                    map: map,
+                    title: 'Jaxophone Müzik Mağazası',
+                    icon: {
+                        url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                            <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="20" cy="20" r="20" fill="#F59E0B"/>
+                                <path d="M20 8L24 16H16L20 8Z" fill="white"/>
+                                <circle cx="20" cy="20" r="8" fill="white"/>
+                                <circle cx="20" cy="20" r="4" fill="#F59E0B"/>
+                            </svg>
+                        `),
+                        scaledSize: new google.maps.Size(40, 40),
+                        anchor: new google.maps.Point(20, 40)
+                    }
+                });
+
+                // Info window ekle
+                const infoWindow = new google.maps.InfoWindow({
+                    content: `
+                        <div style="padding: 10px; max-width: 200px;">
+                            <h3 style="margin: 0 0 5px 0; color: #F59E0B; font-weight: bold;">Jaxophone</h3>
+                            <p style="margin: 0; font-size: 14px;">Müzik Mağazası</p>
+                            <p style="margin: 5px 0 0 0; font-size: 12px; color: #666;">
+                                Maslak Mahallesi, Büyükdere Caddesi<br>
+                                No: 123, Sarıyer/İstanbul
+                            </p>
+                        </div>
+                    `
+                });
+
+                // Marker'a tıklandığında info window'u göster
+                marker.addListener('click', () => {
+                    infoWindow.open(map, marker);
+                });
+
+                // Map instance'ını ref'e kaydet
+                mapInstanceRef.current = map;
+                setMapLoaded(true);
+
+            } catch (error) {
+                console.error('Google Maps yüklenirken hata:', error);
+                setMapError('Harita yüklenirken bir hata oluştu. Lütfen sayfayı yenileyin.');
+            }
+        };
+
+        // API key varsa map'i yükle
+        if (GOOGLE_MAPS_API_KEY !== 'YOUR_GOOGLE_MAPS_API_KEY') {
+            initMap();
+        } else {
+            setMapError('Google Maps API anahtarı gerekli. Lütfen API anahtarınızı ekleyin.');
+        }
+    }, []);
+
+    // API isteği örneği - Form gönderimi
+    const submitFormWithAPI = async (formData: any) => {
+        try {
+            // API endpoint'i (örnek)
+            const response = await fetch('/api/contact', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const result = await response.json();
+            return result;
+
+        } catch (error) {
+            console.error('API isteği hatası:', error);
+            throw error;
+        }
+    };
+
+    // Weather API örneği - Hava durumu bilgisi
+    const getWeatherInfo = async () => {
+        try {
+            // OpenWeatherMap API örneği (ücretsiz)
+            const API_KEY = 'YOUR_OPENWEATHER_API_KEY'; // Gerçek API key gerekli
+            const city = 'Istanbul';
+
+            const response = await fetch(
+                `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric&lang=tr`
+            );
+
+            if (!response.ok) {
+                throw new Error(`Weather API error! status: ${response.status}`);
+            }
+
+            const weatherData = await response.json();
+            return weatherData;
+
+        } catch (error) {
+            console.error('Hava durumu API hatası:', error);
+            return null;
+        }
     };
 
     return (
@@ -284,15 +430,72 @@ export default function ContactPage() {
                     <div className="mt-12">
                         <div className="bg-white rounded-xl shadow-lg p-8">
                             <h2 className="text-2xl font-bold text-gray-900 mb-6">Konumumuz</h2>
-                            <div className="w-full h-96 bg-gray-200 rounded-lg flex items-center justify-center">
-                                <div className="text-center">
-                                    <MapPin className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                                    <p className="text-gray-600">
-                                        Harita entegrasyonu için Google Maps API kullanılabilir
-                                    </p>
-                                    <p className="text-sm text-gray-500 mt-2">
-                                        Maslak Mahallesi, Büyükdere Caddesi No: 123, Sarıyer/İstanbul
-                                    </p>
+
+                            {mapError ? (
+                                <div className="w-full h-96 bg-gray-200 rounded-lg flex items-center justify-center">
+                                    <div className="text-center">
+                                        <MapPin className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                                        <p className="text-gray-600 mb-2">{mapError}</p>
+                                        <p className="text-sm text-gray-500">
+                                            Maslak Mahallesi, Büyükdere Caddesi No: 123, Sarıyer/İstanbul
+                                        </p>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="relative">
+                                    <div
+                                        ref={mapRef}
+                                        className="w-full h-96 rounded-lg"
+                                        style={{ minHeight: '400px' }}
+                                    />
+                                    {!mapLoaded && (
+                                        <div className="absolute inset-0 bg-gray-200 rounded-lg flex items-center justify-center">
+                                            <div className="text-center">
+                                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-600 mx-auto mb-2"></div>
+                                                <p className="text-gray-600">Harita yükleniyor...</p>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* API Kullanım Örnekleri */}
+                            <div className="mt-8 p-6 bg-blue-50 rounded-lg">
+                                <h3 className="text-lg font-semibold text-blue-900 mb-4">🔧 API Kullanım Örnekleri</h3>
+                                <div className="space-y-4 text-sm">
+                                    <div>
+                                        <h4 className="font-medium text-blue-800 mb-2">1. Form Gönderimi API'si:</h4>
+                                        <pre className="bg-white p-3 rounded text-xs overflow-x-auto">
+                                            {`// POST /api/contact
+const response = await fetch('/api/contact', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(formData)
+});`}
+                                        </pre>
+                                    </div>
+
+                                    <div>
+                                        <h4 className="font-medium text-blue-800 mb-2">2. Hava Durumu API'si:</h4>
+                                        <pre className="bg-white p-3 rounded text-xs overflow-x-auto">
+                                            {`// OpenWeatherMap API
+const response = await fetch(
+    \`https://api.openweathermap.org/data/2.5/weather?q=Istanbul&appid=\${API_KEY}&units=metric&lang=tr\`
+);`}
+                                        </pre>
+                                    </div>
+
+                                    <div>
+                                        <h4 className="font-medium text-blue-800 mb-2">3. Google Maps API:</h4>
+                                        <pre className="bg-white p-3 rounded text-xs overflow-x-auto">
+                                            {`// Google Maps JavaScript API
+const loader = new Loader({
+    apiKey: 'YOUR_API_KEY',
+    version: 'weekly',
+    libraries: ['places']
+});`}
+                                        </pre>
+                                    </div>
                                 </div>
                             </div>
                         </div>
