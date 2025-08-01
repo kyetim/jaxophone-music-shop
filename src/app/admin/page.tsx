@@ -46,6 +46,7 @@ export default function AdminDashboard() {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
 
     // Form state for adding/editing products
     const [formData, setFormData] = useState({
@@ -58,6 +59,10 @@ export default function AdminDashboard() {
         brand: '',
         status: 'active' as 'active' | 'inactive'
     });
+
+    // File upload state
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [uploadPreview, setUploadPreview] = useState<string>('');
 
     // Categories for products
     const categories = [
@@ -160,6 +165,8 @@ export default function AdminDashboard() {
             brand: '',
             status: 'active'
         });
+        setSelectedFile(null);
+        setUploadPreview('');
     };
 
     // Open add product modal
@@ -253,6 +260,59 @@ export default function AdminDashboard() {
         } catch (error) {
             console.error('Error deleting product:', error);
         }
+    };
+
+    // Handle file selection
+    const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setSelectedFile(file);
+
+            // Preview oluştur
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                setUploadPreview(e.target?.result as string);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    // Upload file
+    const handleFileUpload = async () => {
+        if (!selectedFile) return;
+
+        setIsUploading(true);
+        try {
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+
+            const response = await fetch('/api/upload', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                setFormData(prev => ({ ...prev, image: result.url }));
+                alert('Dosya başarıyla yüklendi!');
+                setSelectedFile(null);
+                setUploadPreview('');
+            } else {
+                alert(`Yükleme hatası: ${result.error}`);
+            }
+        } catch (error) {
+            console.error('Upload error:', error);
+            alert('Dosya yüklenirken bir hata oluştu.');
+        } finally {
+            setIsUploading(false);
+        }
+    };
+
+    // Clear file selection
+    const clearFileSelection = () => {
+        setSelectedFile(null);
+        setUploadPreview('');
     };
 
     // Modal component
@@ -371,23 +431,103 @@ export default function AdminDashboard() {
 
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Ürün Görseli URL
+                                Ürün Görseli
                             </label>
-                            <div className="flex items-center space-x-2">
-                                <input
-                                    type="url"
-                                    name="image"
-                                    value={formData.image}
-                                    onChange={handleInputChange}
-                                    placeholder="https://example.com/image.jpg"
-                                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                                />
-                                <button
-                                    type="button"
-                                    className="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
-                                >
-                                    <ImageIcon className="h-4 w-4" />
-                                </button>
+
+                            {/* Mevcut görsel gösterimi */}
+                            {formData.image && !uploadPreview && (
+                                <div className="mb-3">
+                                    <img
+                                        src={formData.image}
+                                        alt="Mevcut görsel"
+                                        className="w-20 h-20 object-cover rounded-lg border"
+                                        onError={(e) => {
+                                            e.currentTarget.style.display = 'none';
+                                        }}
+                                    />
+                                </div>
+                            )}
+
+                            {/* Yüklenecek dosya önizlemesi */}
+                            {uploadPreview && (
+                                <div className="mb-3">
+                                    <img
+                                        src={uploadPreview}
+                                        alt="Yüklenecek görsel"
+                                        className="w-20 h-20 object-cover rounded-lg border"
+                                    />
+                                </div>
+                            )}
+
+                            <div className="space-y-3">
+                                {/* Dosya seçimi */}
+                                <div className="flex items-center space-x-2">
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleFileSelect}
+                                        className="hidden"
+                                        id="file-upload"
+                                    />
+                                    <label
+                                        htmlFor="file-upload"
+                                        className="flex items-center space-x-2 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 cursor-pointer"
+                                    >
+                                        <ImageIcon className="h-4 w-4" />
+                                        <span>Dosya Seç</span>
+                                    </label>
+
+                                    {selectedFile && (
+                                        <span className="text-sm text-gray-600">
+                                            {selectedFile.name}
+                                        </span>
+                                    )}
+                                </div>
+
+                                {/* Dosya yükleme butonu */}
+                                {selectedFile && (
+                                    <div className="flex items-center space-x-2">
+                                        <button
+                                            type="button"
+                                            onClick={handleFileUpload}
+                                            disabled={isUploading}
+                                            className="flex items-center space-x-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                                        >
+                                            {isUploading ? (
+                                                <>
+                                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                                                    <span>Yükleniyor...</span>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Upload className="h-4 w-4" />
+                                                    <span>Yükle</span>
+                                                </>
+                                            )}
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            onClick={clearFileSelection}
+                                            className="px-3 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200"
+                                        >
+                                            İptal
+                                        </button>
+                                    </div>
+                                )}
+
+                                {/* URL ile görsel ekleme */}
+                                <div className="flex items-center space-x-2">
+                                    <input
+                                        type="url"
+                                        name="image"
+                                        value={formData.image}
+                                        onChange={handleInputChange}
+                                        placeholder="https://example.com/image.jpg"
+                                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                    />
+                                    <span className="text-sm text-gray-500">veya URL</span>
+                                </div>
                             </div>
                         </div>
 
@@ -578,8 +718,8 @@ export default function AdminDashboard() {
                                                         </td>
                                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                                             <span className={`px-2 py-1 text-xs font-medium rounded-full ${product.stock > 10 ? 'bg-green-100 text-green-800' :
-                                                                    product.stock > 0 ? 'bg-yellow-100 text-yellow-800' :
-                                                                        'bg-red-100 text-red-800'
+                                                                product.stock > 0 ? 'bg-yellow-100 text-yellow-800' :
+                                                                    'bg-red-100 text-red-800'
                                                                 }`}>
                                                                 {product.stock}
                                                             </span>
