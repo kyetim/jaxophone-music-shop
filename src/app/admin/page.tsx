@@ -272,10 +272,10 @@ const ProductModal = ({
                                     name="image"
                                     value={formData.image}
                                     onChange={onInputChange}
-                                    placeholder="https://example.com/image.jpg"
+                                    placeholder="https://example.com/image.jpg (opsiyonel)"
                                     className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                                 />
-                                <span className="text-sm text-gray-500">veya URL</span>
+                                <span className="text-sm text-gray-500">veya URL (opsiyonel)</span>
                             </div>
                         </div>
                     </div>
@@ -484,15 +484,33 @@ export default function AdminDashboard() {
         setIsLoading(true);
 
         try {
+            // Form validation
+            if (!formData.name.trim()) {
+                alert('Lütfen ürün adını giriniz.');
+                return;
+            }
+            if (!formData.category) {
+                alert('Lütfen kategori seçiniz.');
+                return;
+            }
+            if (!formData.price || parseFloat(formData.price) <= 0) {
+                alert('Lütfen geçerli bir fiyat giriniz.');
+                return;
+            }
+            if (!formData.stock || parseInt(formData.stock) < 0) {
+                alert('Lütfen geçerli bir stok miktarı giriniz.');
+                return;
+            }
+
             const newProduct: Product = {
                 id: Date.now().toString(),
-                name: formData.name,
+                name: formData.name.trim(),
                 category: formData.category,
                 price: parseFloat(formData.price),
                 stock: parseInt(formData.stock),
-                description: formData.description,
-                image: formData.image,
-                brand: formData.brand,
+                description: formData.description.trim(),
+                image: formData.image.trim() || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0yMCAxMkMyMi4yMDkxIDEyIDI0IDEzLjc5MDkgMjQgMTZDMjQgMTguMjA5MSAyMi4yMDkxIDIwIDIwIDIwQzE3Ljc5MDkgMjAgMTYgMTguMjA5MSAxNiAxNkMxNiAxMy43OTA5IDE3Ljc5MDkgMTIgMjAgMTJaIiBmaWxsPSIjOUI5QkEwIi8+CjxwYXRoIGQ9Ik0yOCAyOEMyOCAyOS4xMDQ2IDI3LjEwNDYgMzAgMjYgMzBIMTRDMTIuODk1NCAzMCAxMiAyOS4xMDQ2IDEyIDI4VjI2QzEyIDI0Ljg5NTQgMTIuODk1NCAyNCAxNCAyNEgyNkMyNy4xMDQ2IDI0IDI4IDI0Ljg5NTQgMjggMjZWMjhaIiBmaWxsPSIjOUI5QkEwIi8+Cjwvc3ZnPgo=',
+                brand: formData.brand.trim(),
                 status: formData.status,
                 createdAt: new Date()
             };
@@ -500,8 +518,10 @@ export default function AdminDashboard() {
             setProducts(prev => [...prev, newProduct]);
             setIsAddModalOpen(false);
             resetForm();
+            alert('Ürün başarıyla eklendi!');
         } catch (error) {
             console.error('Error adding product:', error);
+            alert('Ürün eklenirken bir hata oluştu.');
         } finally {
             setIsLoading(false);
         }
@@ -515,15 +535,33 @@ export default function AdminDashboard() {
         setIsLoading(true);
 
         try {
+            // Form validation
+            if (!formData.name.trim()) {
+                alert('Lütfen ürün adını giriniz.');
+                return;
+            }
+            if (!formData.category) {
+                alert('Lütfen kategori seçiniz.');
+                return;
+            }
+            if (!formData.price || parseFloat(formData.price) <= 0) {
+                alert('Lütfen geçerli bir fiyat giriniz.');
+                return;
+            }
+            if (!formData.stock || parseInt(formData.stock) < 0) {
+                alert('Lütfen geçerli bir stok miktarı giriniz.');
+                return;
+            }
+
             const updatedProduct: Product = {
                 ...selectedProduct,
-                name: formData.name,
+                name: formData.name.trim(),
                 category: formData.category,
                 price: parseFloat(formData.price),
                 stock: parseInt(formData.stock),
-                description: formData.description,
-                image: formData.image,
-                brand: formData.brand,
+                description: formData.description.trim(),
+                image: formData.image.trim() || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0yMCAxMkMyMi4yMDkxIDEyIDI0IDEzLjc5MDkgMjQgMTZDMjQgMTguMjA5MSAyMi4yMDkxIDIwIDIwIDIwQzE3Ljc5MDkgMjAgMTYgMTguMjA5MSAxNiAxNkMxNiAxMy43OTA5IDE3Ljc5MDkgMTIgMjAgMTJaIiBmaWxsPSIjOUI5QkEwIi8+CjxwYXRoIGQ9Ik0yOCAyOEMyOCAyOS4xMDQ2IDI3LjEwNDYgMzAgMjYgMzBIMTRDMTIuODk1NCAzMCAxMiAyOS4xMDQ2IDEyIDI4VjI2QzEyIDI0Ljg5NTQgMTIuODk1NCAyNCAxNCAyNEgyNkMyNy4xMDQ2IDI0IDI4IDI0Ljg5NTQgMjggMjZWMjhaIiBmaWxsPSIjOUI5QkEwIi8+Cjwvc3ZnPgo=',
+                brand: formData.brand.trim(),
                 status: formData.status
             };
 
@@ -531,8 +569,10 @@ export default function AdminDashboard() {
             setIsEditModalOpen(false);
             setSelectedProduct(null);
             resetForm();
+            alert('Ürün başarıyla güncellendi!');
         } catch (error) {
             console.error('Error updating product:', error);
+            alert('Ürün güncellenirken bir hata oluştu.');
         } finally {
             setIsLoading(false);
         }
@@ -582,7 +622,7 @@ export default function AdminDashboard() {
 
             if (response.ok) {
                 setFormData(prev => ({ ...prev, image: result.url }));
-                alert('Dosya başarıyla yüklendi!');
+                alert('Dosya başarıyla yüklendi! Görsel URL\'si forma eklendi.');
                 setSelectedFile(null);
                 setUploadPreview('');
             } else {
@@ -590,7 +630,7 @@ export default function AdminDashboard() {
             }
         } catch (error) {
             console.error('Upload error:', error);
-            alert('Dosya yüklenirken bir hata oluştu.');
+            alert('Dosya yüklenirken bir hata oluştu. Lütfen tekrar deneyin.');
         } finally {
             setIsUploading(false);
         }
