@@ -72,8 +72,8 @@ export default function ContactPage() {
                 const google = await loader.load();
                 console.log('Google Maps API loaded successfully');
 
-                // Jaxophone mağazasının koordinatları (İstanbul, Maslak)
-                const jaxophoneLocation = { lat: 41.1124, lng: 29.0208 };
+                // Jaxophone mağazasının koordinatları (Mersin, Yenişehir)
+                const jaxophoneLocation = { lat: 36.8121, lng: 34.6415 };
                 console.log('Creating map with location:', jaxophoneLocation);
 
                 const map = new google.maps.Map(mapRef.current, {
@@ -123,8 +123,8 @@ export default function ContactPage() {
                             <h3 style="margin: 0 0 5px 0; color: #F59E0B; font-weight: bold;">Jaxophone</h3>
                             <p style="margin: 0; font-size: 14px;">Müzik Mağazası</p>
                             <p style="margin: 5px 0 0 0; font-size: 12px; color: #666;">
-                                Maslak Mahallesi, Büyükdere Caddesi<br>
-                                No: 123, Sarıyer/İstanbul
+                                Mersin/Yenişehir Mahallesi, Yenişehir Caddesi<br>
+                                No: 456, Mersin/Türkiye
                             </p>
                         </div>
                     `
@@ -236,8 +236,8 @@ export default function ContactPage() {
                                         <div>
                                             <h3 className="font-semibold text-gray-900">Adres</h3>
                                             <p className="text-gray-600 mt-1">
-                                                Maslak Mahallesi, Büyükdere Caddesi<br />
-                                                No: 123, Sarıyer/İstanbul
+                                                Mersin/Yenişehir Mahallesi, Yenişehir Caddesi<br />
+                                                No: 456, Mersin/Türkiye
                                             </p>
                                         </div>
                                     </div>
@@ -468,14 +468,14 @@ export default function ContactPage() {
                                             <p>• Billing hesabınızın etkin olduğunu kontrol edin</p>
                                         </div>
                                         <p className="text-sm text-gray-500 mt-4">
-                                            Maslak Mahallesi, Büyükdere Caddesi No: 123, Sarıyer/İstanbul
+                                            Mersin/Yenişehir Mahallesi, Yenişehir Caddesi No: 456, Mersin/Türkiye
                                         </p>
 
                                         {/* OpenStreetMap Fallback */}
                                         <div className="mt-6">
                                             <p className="text-sm text-gray-600 mb-2">Alternatif harita:</p>
                                             <iframe
-                                                src="https://www.openstreetmap.org/export/embed.html?bbox=29.0158,41.1074,29.0258,41.1174&layer=mapnik&marker=41.1124,29.0208"
+                                                src="https://www.openstreetmap.org/export/embed.html?bbox=34.6315,36.8021,34.6515,36.8221&layer=mapnik&marker=36.8121,34.6415"
                                                 width="100%"
                                                 height="300"
                                                 frameBorder="0"
