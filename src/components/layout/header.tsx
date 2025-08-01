@@ -596,6 +596,39 @@ export function Header() {
                         >
                             Hakkımızda
                         </Link>
+
+                        <Link
+                            href="/contact"
+                            className="block py-2 text-gray-700 hover:text-amber-600 transition-colors cursor-pointer"
+                            onClick={(e) => {
+                                handleNavClick('/contact', e);
+                                setIsMobileMenuOpen(false);
+                            }}
+                        >
+                            İletişim
+                        </Link>
+
+                        <Link
+                            href="/blog"
+                            className="block py-2 text-gray-700 hover:text-amber-600 transition-colors cursor-pointer"
+                            onClick={(e) => {
+                                handleNavClick('/blog', e);
+                                setIsMobileMenuOpen(false);
+                            }}
+                        >
+                            Blog
+                        </Link>
+
+                        <Link
+                            href="/installment"
+                            className="block py-2 text-gray-700 hover:text-amber-600 transition-colors cursor-pointer"
+                            onClick={(e) => {
+                                handleNavClick('/installment', e);
+                                setIsMobileMenuOpen(false);
+                            }}
+                        >
+                            Sipariş Takibi
+                        </Link>
                     </div>
                 </div>
             )}
