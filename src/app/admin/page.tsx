@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Header } from '@/components/layout/header';
 import { Button } from '@/components/ui/button';
 import {
@@ -37,6 +37,293 @@ interface Product {
     status: 'active' | 'inactive';
     createdAt: Date;
 }
+
+// ProductModal component moved outside to prevent re-renders
+const ProductModal = ({
+    isOpen,
+    onClose,
+    onSubmit,
+    title,
+    submitText,
+    formData,
+    onInputChange,
+    categories,
+    selectedFile,
+    uploadPreview,
+    onFileSelect,
+    onFileUpload,
+    onClearFileSelection,
+    isUploading,
+    isLoading
+}: {
+    isOpen: boolean;
+    onClose: () => void;
+    onSubmit: (e: React.FormEvent) => void;
+    title: string;
+    submitText: string;
+    formData: any;
+    onInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
+    categories: string[];
+    selectedFile: File | null;
+    uploadPreview: string;
+    onFileSelect: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    onFileUpload: () => void;
+    onClearFileSelection: () => void;
+    isUploading: boolean;
+    isLoading: boolean;
+}) => {
+    if (!isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+                <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-xl font-semibold">{title}</h2>
+                    <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+                        <X className="h-6 w-6" />
+                    </button>
+                </div>
+
+                <form onSubmit={onSubmit} className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Ürün Adı *
+                            </label>
+                            <input
+                                type="text"
+                                name="name"
+                                value={formData.name}
+                                onChange={onInputChange}
+                                required
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Kategori *
+                            </label>
+                            <select
+                                name="category"
+                                value={formData.category}
+                                onChange={onInputChange}
+                                required
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                            >
+                                <option value="">Kategori Seçin</option>
+                                {categories.map(category => (
+                                    <option key={category} value={category}>{category}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Fiyat (₺) *
+                            </label>
+                            <input
+                                type="number"
+                                name="price"
+                                value={formData.price}
+                                onChange={onInputChange}
+                                required
+                                min="0"
+                                step="0.01"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Stok *
+                            </label>
+                            <input
+                                type="number"
+                                name="stock"
+                                value={formData.stock}
+                                onChange={onInputChange}
+                                required
+                                min="0"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Marka
+                            </label>
+                            <input
+                                type="text"
+                                name="brand"
+                                value={formData.brand}
+                                onChange={onInputChange}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Durum
+                            </label>
+                            <select
+                                name="status"
+                                value={formData.status}
+                                onChange={onInputChange}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                            >
+                                <option value="active">Aktif</option>
+                                <option value="inactive">Pasif</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Ürün Görseli
+                        </label>
+
+                        {/* Mevcut görsel gösterimi */}
+                        {formData.image && !uploadPreview && (
+                            <div className="mb-3">
+                                <img
+                                    src={formData.image}
+                                    alt="Mevcut görsel"
+                                    className="w-20 h-20 object-cover rounded-lg border"
+                                    onError={(e) => {
+                                        e.currentTarget.style.display = 'none';
+                                    }}
+                                />
+                            </div>
+                        )}
+
+                        {/* Yüklenecek dosya önizlemesi */}
+                        {uploadPreview && (
+                            <div className="mb-3">
+                                <img
+                                    src={uploadPreview}
+                                    alt="Yüklenecek görsel"
+                                    className="w-20 h-20 object-cover rounded-lg border"
+                                />
+                            </div>
+                        )}
+
+                        <div className="space-y-3">
+                            {/* Dosya seçimi */}
+                            <div className="flex items-center space-x-2">
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={onFileSelect}
+                                    className="hidden"
+                                    id="file-upload"
+                                />
+                                <label
+                                    htmlFor="file-upload"
+                                    className="flex items-center space-x-2 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 cursor-pointer"
+                                >
+                                    <ImageIcon className="h-4 w-4" />
+                                    <span>Dosya Seç</span>
+                                </label>
+
+                                {selectedFile && (
+                                    <span className="text-sm text-gray-600">
+                                        {selectedFile.name}
+                                    </span>
+                                )}
+                            </div>
+
+                            {/* Dosya yükleme butonu */}
+                            {selectedFile && (
+                                <div className="flex items-center space-x-2">
+                                    <button
+                                        type="button"
+                                        onClick={onFileUpload}
+                                        disabled={isUploading}
+                                        className="flex items-center space-x-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                                    >
+                                        {isUploading ? (
+                                            <>
+                                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                                                <span>Yükleniyor...</span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Upload className="h-4 w-4" />
+                                                <span>Yükle</span>
+                                            </>
+                                        )}
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        onClick={onClearFileSelection}
+                                        className="px-3 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200"
+                                    >
+                                        İptal
+                                    </button>
+                                </div>
+                            )}
+
+                            {/* URL ile görsel ekleme */}
+                            <div className="flex items-center space-x-2">
+                                <input
+                                    type="url"
+                                    name="image"
+                                    value={formData.image}
+                                    onChange={onInputChange}
+                                    placeholder="https://example.com/image.jpg"
+                                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                />
+                                <span className="text-sm text-gray-500">veya URL</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Açıklama
+                        </label>
+                        <textarea
+                            name="description"
+                            value={formData.description}
+                            onChange={onInputChange}
+                            rows={3}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                        />
+                    </div>
+
+                    <div className="flex items-center justify-end space-x-3 pt-4">
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
+                        >
+                            İptal
+                        </button>
+                        <button
+                            type="submit"
+                            disabled={isLoading}
+                            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 flex items-center space-x-2"
+                        >
+                            {isLoading ? (
+                                <>
+                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                                    <span>Kaydediliyor...</span>
+                                </>
+                            ) : (
+                                <>
+                                    <Save className="h-4 w-4" />
+                                    <span>{submitText}</span>
+                                </>
+                            )}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    );
+};
 
 export default function AdminDashboard() {
     const [activeTab, setActiveTab] = useState('products');
@@ -145,16 +432,16 @@ export default function AdminDashboard() {
     );
 
     // Handle form input changes
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({
             ...prev,
             [name]: value
         }));
-    };
+    }, []);
 
     // Reset form
-    const resetForm = () => {
+    const resetForm = useCallback(() => {
         setFormData({
             name: '',
             category: '',
@@ -167,16 +454,16 @@ export default function AdminDashboard() {
         });
         setSelectedFile(null);
         setUploadPreview('');
-    };
+    }, []);
 
     // Open add product modal
-    const openAddModal = () => {
+    const openAddModal = useCallback(() => {
         resetForm();
         setIsAddModalOpen(true);
-    };
+    }, [resetForm]);
 
     // Open edit product modal
-    const openEditModal = (product: Product) => {
+    const openEditModal = useCallback((product: Product) => {
         setSelectedProduct(product);
         setFormData({
             name: product.name,
@@ -189,10 +476,10 @@ export default function AdminDashboard() {
             status: product.status
         });
         setIsEditModalOpen(true);
-    };
+    }, []);
 
     // Add new product
-    const handleAddProduct = async (e: React.FormEvent) => {
+    const handleAddProduct = useCallback(async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
 
@@ -218,10 +505,10 @@ export default function AdminDashboard() {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [formData, resetForm]);
 
     // Update product
-    const handleUpdateProduct = async (e: React.FormEvent) => {
+    const handleUpdateProduct = useCallback(async (e: React.FormEvent) => {
         e.preventDefault();
         if (!selectedProduct) return;
 
@@ -249,10 +536,10 @@ export default function AdminDashboard() {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [formData, selectedProduct, resetForm]);
 
     // Delete product
-    const handleDeleteProduct = async (productId: string) => {
+    const handleDeleteProduct = useCallback(async (productId: string) => {
         if (!confirm('Bu ürünü silmek istediğinizden emin misiniz?')) return;
 
         try {
@@ -260,10 +547,10 @@ export default function AdminDashboard() {
         } catch (error) {
             console.error('Error deleting product:', error);
         }
-    };
+    }, []);
 
     // Handle file selection
-    const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
             setSelectedFile(file);
@@ -275,10 +562,10 @@ export default function AdminDashboard() {
             };
             reader.readAsDataURL(file);
         }
-    };
+    }, []);
 
     // Upload file
-    const handleFileUpload = async () => {
+    const handleFileUpload = useCallback(async () => {
         if (!selectedFile) return;
 
         setIsUploading(true);
@@ -307,274 +594,13 @@ export default function AdminDashboard() {
         } finally {
             setIsUploading(false);
         }
-    };
+    }, [selectedFile]);
 
     // Clear file selection
-    const clearFileSelection = () => {
+    const clearFileSelection = useCallback(() => {
         setSelectedFile(null);
         setUploadPreview('');
-    };
-
-    // Modal component
-    const ProductModal = ({ isOpen, onClose, onSubmit, title, submitText }: {
-        isOpen: boolean;
-        onClose: () => void;
-        onSubmit: (e: React.FormEvent) => void;
-        title: string;
-        submitText: string;
-    }) => {
-        if (!isOpen) return null;
-
-        return (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-                    <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-xl font-semibold">{title}</h2>
-                        <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
-                            <X className="h-6 w-6" />
-                        </button>
-                    </div>
-
-                    <form onSubmit={onSubmit} className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Ürün Adı *
-                                </label>
-                                <input
-                                    type="text"
-                                    name="name"
-                                    value={formData.name}
-                                    onChange={handleInputChange}
-                                    required
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Kategori *
-                                </label>
-                                <select
-                                    name="category"
-                                    value={formData.category}
-                                    onChange={handleInputChange}
-                                    required
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                                >
-                                    <option value="">Kategori Seçin</option>
-                                    {categories.map(category => (
-                                        <option key={category} value={category}>{category}</option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Fiyat (₺) *
-                                </label>
-                                <input
-                                    type="number"
-                                    name="price"
-                                    value={formData.price}
-                                    onChange={handleInputChange}
-                                    required
-                                    min="0"
-                                    step="0.01"
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Stok *
-                                </label>
-                                <input
-                                    type="number"
-                                    name="stock"
-                                    value={formData.stock}
-                                    onChange={handleInputChange}
-                                    required
-                                    min="0"
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Marka
-                                </label>
-                                <input
-                                    type="text"
-                                    name="brand"
-                                    value={formData.brand}
-                                    onChange={handleInputChange}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Durum
-                                </label>
-                                <select
-                                    name="status"
-                                    value={formData.status}
-                                    onChange={handleInputChange}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                                >
-                                    <option value="active">Aktif</option>
-                                    <option value="inactive">Pasif</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Ürün Görseli
-                            </label>
-
-                            {/* Mevcut görsel gösterimi */}
-                            {formData.image && !uploadPreview && (
-                                <div className="mb-3">
-                                    <img
-                                        src={formData.image}
-                                        alt="Mevcut görsel"
-                                        className="w-20 h-20 object-cover rounded-lg border"
-                                        onError={(e) => {
-                                            e.currentTarget.style.display = 'none';
-                                        }}
-                                    />
-                                </div>
-                            )}
-
-                            {/* Yüklenecek dosya önizlemesi */}
-                            {uploadPreview && (
-                                <div className="mb-3">
-                                    <img
-                                        src={uploadPreview}
-                                        alt="Yüklenecek görsel"
-                                        className="w-20 h-20 object-cover rounded-lg border"
-                                    />
-                                </div>
-                            )}
-
-                            <div className="space-y-3">
-                                {/* Dosya seçimi */}
-                                <div className="flex items-center space-x-2">
-                                    <input
-                                        type="file"
-                                        accept="image/*"
-                                        onChange={handleFileSelect}
-                                        className="hidden"
-                                        id="file-upload"
-                                    />
-                                    <label
-                                        htmlFor="file-upload"
-                                        className="flex items-center space-x-2 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 cursor-pointer"
-                                    >
-                                        <ImageIcon className="h-4 w-4" />
-                                        <span>Dosya Seç</span>
-                                    </label>
-
-                                    {selectedFile && (
-                                        <span className="text-sm text-gray-600">
-                                            {selectedFile.name}
-                                        </span>
-                                    )}
-                                </div>
-
-                                {/* Dosya yükleme butonu */}
-                                {selectedFile && (
-                                    <div className="flex items-center space-x-2">
-                                        <button
-                                            type="button"
-                                            onClick={handleFileUpload}
-                                            disabled={isUploading}
-                                            className="flex items-center space-x-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
-                                        >
-                                            {isUploading ? (
-                                                <>
-                                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                                                    <span>Yükleniyor...</span>
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <Upload className="h-4 w-4" />
-                                                    <span>Yükle</span>
-                                                </>
-                                            )}
-                                        </button>
-
-                                        <button
-                                            type="button"
-                                            onClick={clearFileSelection}
-                                            className="px-3 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200"
-                                        >
-                                            İptal
-                                        </button>
-                                    </div>
-                                )}
-
-                                {/* URL ile görsel ekleme */}
-                                <div className="flex items-center space-x-2">
-                                    <input
-                                        type="url"
-                                        name="image"
-                                        value={formData.image}
-                                        onChange={handleInputChange}
-                                        placeholder="https://example.com/image.jpg"
-                                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                                    />
-                                    <span className="text-sm text-gray-500">veya URL</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Açıklama
-                            </label>
-                            <textarea
-                                name="description"
-                                value={formData.description}
-                                onChange={handleInputChange}
-                                rows={3}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                            />
-                        </div>
-
-                        <div className="flex items-center justify-end space-x-3 pt-4">
-                            <button
-                                type="button"
-                                onClick={onClose}
-                                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
-                            >
-                                İptal
-                            </button>
-                            <button
-                                type="submit"
-                                disabled={isLoading}
-                                className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 flex items-center space-x-2"
-                            >
-                                {isLoading ? (
-                                    <>
-                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                                        <span>Kaydediliyor...</span>
-                                    </>
-                                ) : (
-                                    <>
-                                        <Save className="h-4 w-4" />
-                                        <span>{submitText}</span>
-                                    </>
-                                )}
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        );
-    };
+    }, []);
 
     return (
         <>
@@ -817,6 +843,16 @@ export default function AdminDashboard() {
                 onSubmit={handleAddProduct}
                 title="Yeni Ürün Ekle"
                 submitText="Ürün Ekle"
+                formData={formData}
+                onInputChange={handleInputChange}
+                categories={categories}
+                selectedFile={selectedFile}
+                uploadPreview={uploadPreview}
+                onFileSelect={handleFileSelect}
+                onFileUpload={handleFileUpload}
+                onClearFileSelection={clearFileSelection}
+                isUploading={isUploading}
+                isLoading={isLoading}
             />
 
             {/* Edit Product Modal */}
@@ -829,6 +865,16 @@ export default function AdminDashboard() {
                 onSubmit={handleUpdateProduct}
                 title="Ürün Düzenle"
                 submitText="Güncelle"
+                formData={formData}
+                onInputChange={handleInputChange}
+                categories={categories}
+                selectedFile={selectedFile}
+                uploadPreview={uploadPreview}
+                onFileSelect={handleFileSelect}
+                onFileUpload={handleFileUpload}
+                onClearFileSelection={clearFileSelection}
+                isUploading={isUploading}
+                isLoading={isLoading}
             />
         </>
     );
