@@ -5,11 +5,17 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(request: NextRequest) {
     try {
+        console.log('Contact form API called');
+        console.log('RESEND_API_KEY present:', !!process.env.RESEND_API_KEY);
+
         const body = await request.json();
         const { name, email, phone, subject, message } = body;
 
+        console.log('Form data received:', { name, email, phone, subject, message: message?.substring(0, 50) + '...' });
+
         // Validation
         if (!name || !email || !subject || !message) {
+            console.log('Validation failed - missing required fields');
             return NextResponse.json(
                 { error: 'Gerekli alanlar eksik' },
                 { status: 400 }
@@ -19,16 +25,19 @@ export async function POST(request: NextRequest) {
         // Email validation
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
+            console.log('Email validation failed');
             return NextResponse.json(
                 { error: 'Geçersiz e-posta adresi' },
                 { status: 400 }
             );
         }
 
+        console.log('Attempting to send email with Resend...');
+
         // Send email using Resend
         const { data, error } = await resend.emails.send({
             from: 'Jaxophone İletişim <noreply@jaxophone.com>',
-            to: ['info@jaxophone.com'], // Buraya kendi e-posta adresinizi yazın
+            to: ['kyetim.busi@gmail.com'], // Buraya kendi e-posta adresinizi yazın
             subject: `Yeni İletişim Formu: ${subject}`,
             html: `
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9;">
@@ -77,12 +86,29 @@ export async function POST(request: NextRequest) {
         });
 
         if (error) {
-            console.error('Resend error:', error);
+            console.error('Resend API error details:', error);
+            console.error('Error message:', error.message);
+
+            // Daha detaylı hata mesajları
+            let errorMessage = 'E-posta gönderilirken bir hata oluştu';
+
+            if (error.message?.includes('401')) {
+                errorMessage = 'API anahtarı geçersiz. Lütfen Resend API anahtarınızı kontrol edin.';
+            } else if (error.message?.includes('403')) {
+                errorMessage = 'E-posta gönderme yetkiniz yok. Resend hesabınızı kontrol edin.';
+            } else if (error.message?.includes('422')) {
+                errorMessage = 'E-posta formatı geçersiz. Lütfen e-posta adreslerini kontrol edin.';
+            } else if (error.message) {
+                errorMessage = `Resend Hatası: ${error.message}`;
+            }
+
             return NextResponse.json(
-                { error: 'E-posta gönderilirken bir hata oluştu' },
+                { error: errorMessage },
                 { status: 500 }
             );
         }
+
+        console.log('Email sent successfully:', data);
 
         // Success response
         return NextResponse.json(
@@ -96,6 +122,9 @@ export async function POST(request: NextRequest) {
 
     } catch (error) {
         console.error('Contact form error:', error);
+        console.error('Error type:', typeof error);
+        console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+
         return NextResponse.json(
             { error: 'Sunucu hatası oluştu' },
             { status: 500 }
