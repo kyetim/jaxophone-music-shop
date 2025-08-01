@@ -22,7 +22,7 @@ export default function ContactPage() {
     const mapInstanceRef = useRef<google.maps.Map | null>(null);
 
     // Google Maps API Key - Gerçek projede environment variable kullanın
-    const GOOGLE_MAPS_API_KEY = 'YOUR_GOOGLE_MAPS_API_KEY'; // Buraya gerçek API key'inizi ekleyin
+    const GOOGLE_MAPS_API_KEY = 'AIzaSyA0xOAw5mV9_Z10jpZjmj6mWQEo-GZrH5I'; // Buraya gerçek API key'inizi ekleyin
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -53,7 +53,13 @@ export default function ContactPage() {
     // Google Maps initialization
     useEffect(() => {
         const initMap = async () => {
-            if (!mapRef.current) return;
+            if (!mapRef.current) {
+                console.log('Map ref not found');
+                return;
+            }
+
+            console.log('Initializing Google Maps...');
+            console.log('API Key:', GOOGLE_MAPS_API_KEY ? 'Present' : 'Missing');
 
             try {
                 const loader = new Loader({
@@ -62,14 +68,18 @@ export default function ContactPage() {
                     libraries: ['places']
                 });
 
+                console.log('Loading Google Maps API...');
                 const google = await loader.load();
+                console.log('Google Maps API loaded successfully');
 
                 // Jaxophone mağazasının koordinatları (İstanbul, Maslak)
                 const jaxophoneLocation = { lat: 41.1124, lng: 29.0208 };
+                console.log('Creating map with location:', jaxophoneLocation);
 
                 const map = new google.maps.Map(mapRef.current, {
                     center: jaxophoneLocation,
                     zoom: 15,
+                    mapTypeId: google.maps.MapTypeId.ROADMAP,
                     styles: [
                         {
                             featureType: 'poi.business',
@@ -82,6 +92,8 @@ export default function ContactPage() {
                         }
                     ]
                 });
+
+                console.log('Map created successfully');
 
                 // Mağaza marker'ı ekle
                 const marker = new google.maps.Marker({
@@ -101,6 +113,8 @@ export default function ContactPage() {
                         anchor: new google.maps.Point(20, 40)
                     }
                 });
+
+                console.log('Marker added successfully');
 
                 // Info window ekle
                 const infoWindow = new google.maps.InfoWindow({
@@ -124,17 +138,20 @@ export default function ContactPage() {
                 // Map instance'ını ref'e kaydet
                 mapInstanceRef.current = map;
                 setMapLoaded(true);
+                console.log('Map initialization completed successfully');
 
             } catch (error) {
                 console.error('Google Maps yüklenirken hata:', error);
-                setMapError('Harita yüklenirken bir hata oluştu. Lütfen sayfayı yenileyin.');
+                setMapError(`Harita yüklenirken bir hata oluştu: ${error instanceof Error ? error.message : 'Bilinmeyen hata'}`);
             }
         };
 
         // API key varsa map'i yükle
-        if (GOOGLE_MAPS_API_KEY !== 'YOUR_GOOGLE_MAPS_API_KEY') {
+        if (GOOGLE_MAPS_API_KEY) {
+            console.log('Starting map initialization...');
             initMap();
         } else {
+            console.log('API key missing or invalid');
             setMapError('Google Maps API anahtarı gerekli. Lütfen API anahtarınızı ekleyin.');
         }
     }, []);
@@ -429,23 +446,53 @@ export default function ContactPage() {
                     {/* Map Section */}
                     <div className="mt-12">
                         <div className="bg-white rounded-xl shadow-lg p-8">
-                            <h2 className="text-2xl font-bold text-gray-900 mb-6">Konumumuz</h2>
+                            <div className="flex items-center justify-between mb-6">
+                                <h2 className="text-2xl font-bold text-gray-900">Konumumuz</h2>
+                                <button
+                                    onClick={() => window.location.reload()}
+                                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                                >
+                                    Haritayı Yenile
+                                </button>
+                            </div>
 
                             {mapError ? (
                                 <div className="w-full h-96 bg-gray-200 rounded-lg flex items-center justify-center">
                                     <div className="text-center">
                                         <MapPin className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                                        <p className="text-gray-600 mb-2">{mapError}</p>
-                                        <p className="text-sm text-gray-500">
+                                        <p className="text-gray-600 mb-2 font-medium">Harita Yüklenemedi</p>
+                                        <p className="text-sm text-gray-500 mb-4">{mapError}</p>
+                                        <div className="space-y-2 text-xs text-gray-600">
+                                            <p>• Google Maps API anahtarınızın doğru olduğundan emin olun</p>
+                                            <p>• Google Cloud Console'da Maps JavaScript API'nin etkin olduğunu kontrol edin</p>
+                                            <p>• Billing hesabınızın etkin olduğunu kontrol edin</p>
+                                        </div>
+                                        <p className="text-sm text-gray-500 mt-4">
                                             Maslak Mahallesi, Büyükdere Caddesi No: 123, Sarıyer/İstanbul
                                         </p>
+
+                                        {/* OpenStreetMap Fallback */}
+                                        <div className="mt-6">
+                                            <p className="text-sm text-gray-600 mb-2">Alternatif harita:</p>
+                                            <iframe
+                                                src="https://www.openstreetmap.org/export/embed.html?bbox=29.0158,41.1074,29.0258,41.1174&layer=mapnik&marker=41.1124,29.0208"
+                                                width="100%"
+                                                height="300"
+                                                frameBorder="0"
+                                                scrolling="no"
+                                                marginHeight={0}
+                                                marginWidth={0}
+                                                title="Jaxophone Konumu"
+                                                className="rounded-lg"
+                                            />
+                                        </div>
                                     </div>
                                 </div>
                             ) : (
                                 <div className="relative">
                                     <div
                                         ref={mapRef}
-                                        className="w-full h-96 rounded-lg"
+                                        className="w-full h-96 rounded-lg border-2 border-gray-200"
                                         style={{ minHeight: '400px' }}
                                     />
                                     {!mapLoaded && (
@@ -453,6 +500,7 @@ export default function ContactPage() {
                                             <div className="text-center">
                                                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-600 mx-auto mb-2"></div>
                                                 <p className="text-gray-600">Harita yükleniyor...</p>
+                                                <p className="text-xs text-gray-500 mt-1">Bu işlem birkaç saniye sürebilir</p>
                                             </div>
                                         </div>
                                     )}
