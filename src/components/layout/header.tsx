@@ -346,6 +346,7 @@ export function Header() {
                     <div className="flex items-center justify-between text-sm text-gray-600">
                         <div className="flex items-center space-x-6">
                             <Link href="/about" className="hover:text-amber-600 transition-colors">Hakkımızda</Link>
+                            <Link href="/products" className="hover:text-amber-600 transition-colors">Ürünler</Link>
                             <Link href="/blog" className="hover:text-amber-600 transition-colors">Blog</Link>
                             <Link href="/admin" className="hover:text-amber-600 transition-colors">Admin Dashboard</Link>
                             <Link href="/installment" className="hover:text-amber-600 transition-colors">Sipariş Takibi</Link>
@@ -595,6 +596,17 @@ export function Header() {
                             }}
                         >
                             Hakkımızda
+                        </Link>
+
+                        <Link
+                            href="/products"
+                            className="block py-2 text-gray-700 hover:text-amber-600 transition-colors cursor-pointer"
+                            onClick={(e) => {
+                                handleNavClick('/products', e);
+                                setIsMobileMenuOpen(false);
+                            }}
+                        >
+                            Ürünler
                         </Link>
 
                         <Link

@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Header } from '@/components/layout/header';
 import { Button } from '@/components/ui/button';
+import { ProductService } from '@/lib/firestore';
 import {
     Users,
     Package,
@@ -28,14 +29,18 @@ import {
 interface Product {
     id: string;
     name: string;
-    category: string;
-    price: number;
-    stock: number;
     description: string;
-    image: string;
+    price: number;
+    originalPrice?: number;
+    imageUrl: string;
+    imageWebp?: string;
+    category: string;
     brand: string;
-    status: 'active' | 'inactive';
-    createdAt: Date;
+    inStock: boolean;
+    stockQuantity: number;
+    rating: number;
+    reviewCount: number;
+    tags: string[];
 }
 
 // ProductModal component moved outside to prevent re-renders
@@ -140,8 +145,8 @@ const ProductModal = ({
                             </label>
                             <input
                                 type="number"
-                                name="stock"
-                                value={formData.stock}
+                                name="stockQuantity"
+                                value={formData.stockQuantity}
                                 onChange={onInputChange}
                                 required
                                 min="0"
@@ -167,13 +172,15 @@ const ProductModal = ({
                                 Durum
                             </label>
                             <select
-                                name="status"
-                                value={formData.status}
-                                onChange={onInputChange}
+                                name="inStock"
+                                value={formData.inStock.toString()}
+                                onChange={(e) => onInputChange({
+                                    target: { name: 'inStock', value: e.target.value === 'true' }
+                                } as any)}
                                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                             >
-                                <option value="active">Aktif</option>
-                                <option value="inactive">Pasif</option>
+                                <option value="true">Aktif</option>
+                                <option value="false">Pasif</option>
                             </select>
                         </div>
                     </div>
@@ -184,10 +191,10 @@ const ProductModal = ({
                         </label>
 
                         {/* Mevcut görsel gösterimi */}
-                        {formData.image && !uploadPreview && (
+                        {formData.imageUrl && !uploadPreview && (
                             <div className="mb-3">
                                 <img
-                                    src={formData.image}
+                                    src={formData.imageUrl}
                                     alt="Mevcut görsel"
                                     className="w-20 h-20 object-cover rounded-lg border"
                                     onError={(e) => {
@@ -269,8 +276,8 @@ const ProductModal = ({
                             <div className="flex items-center space-x-2">
                                 <input
                                     type="url"
-                                    name="image"
-                                    value={formData.image}
+                                    name="imageUrl"
+                                    value={formData.imageUrl}
                                     onChange={onInputChange}
                                     placeholder="https://example.com/image.jpg (opsiyonel)"
                                     className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
@@ -340,11 +347,11 @@ export default function AdminDashboard() {
         name: '',
         category: '',
         price: '',
-        stock: '',
+        stockQuantity: '',
         description: '',
-        image: '',
+        imageUrl: '',
         brand: '',
-        status: 'active' as 'active' | 'inactive'
+        inStock: true
     });
 
     // File upload state
@@ -367,61 +374,18 @@ export default function AdminDashboard() {
         'OUTLET'
     ];
 
-    // Mock data for demonstration
-    const mockProducts: Product[] = [
-        {
-            id: '1',
-            name: 'Yamaha F310 Akustik Gitar',
-            category: 'Gitar',
-            price: 2850,
-            stock: 15,
-            description: 'Başlangıç seviyesi için ideal akustik gitar',
-            image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0yMCAxMkMyMi4yMDkxIDEyIDI0IDEzLjc5MDkgMjQgMTZDMjQgMTguMjA5MSAyMi4yMDkxIDIwIDIwIDIwQzE3Ljc5MDkgMjAgMTYgMTguMjA5MSAxNiAxNkMxNiAxMy43OTA5IDE3Ljc5MDkgMTIgMjAgMTJaIiBmaWxsPSIjOUI5QkEwIi8+CjxwYXRoIGQ9Ik0yOCAyOEMyOCAyOS4xMDQ2IDI3LjEwNDYgMzAgMjYgMzBIMTRDMTIuODk1NCAzMCAxMiAyOS4xMDQ2IDEyIDI4VjI2QzEyIDI0Ljg5NTQgMTIuODk1NCAyNCAxNCAyNEgyNkMyNy4xMDQ2IDI0IDI4IDI0Ljg5NTQgMjggMjZWMjhaIiBmaWxsPSIjOUI5QkEwIi8+Cjwvc3ZnPgo=',
-            brand: 'Yamaha',
-            status: 'active',
-            createdAt: new Date('2024-01-01')
-        },
-        {
-            id: '2',
-            name: 'Roland FP-30 Dijital Piyano',
-            category: 'Piyano',
-            price: 15500,
-            stock: 8,
-            description: 'Profesyonel dijital piyano',
-            image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0yMCAxMkMyMi4yMDkxIDEyIDI0IDEzLjc5MDkgMjQgMTZDMjQgMTguMjA5MSAyMi4yMDkxIDIwIDIwIDIwQzE3Ljc5MDkgMjAgMTYgMTguMjA5MSAxNiAxNkMxNiAxMy43OTA5IDE3Ljc5MDkgMTIgMjAgMTJaIiBmaWxsPSIjOUI5QkEwIi8+CjxwYXRoIGQ9Ik0yOCAyOEMyOCAyOS4xMDQ2IDI3LjEwNDYgMzAgMjYgMzBIMTRDMTIuODk1NCAzMCAxMiAyOS4xMDQ2IDEyIDI4VjI2QzEyIDI0Ljg5NTQgMTIuODk1NCAyNCAxNCAyNEgyNkMyNy4xMDQ2IDI0IDI4IDI0Ljg5NTQgMjggMjZWMjhaIiBmaWxsPSIjOUI5QkEwIi8+Cjwvc3ZnPgo=',
-            brand: 'Roland',
-            status: 'active',
-            createdAt: new Date('2024-01-02')
-        },
-        {
-            id: '3',
-            name: 'Fender Stratocaster Elektro Gitar',
-            category: 'Gitar',
-            price: 8750,
-            stock: 5,
-            description: 'Klasik elektro gitar',
-            image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0yMCAxMkMyMi4yMDkxIDEyIDI0IDEzLjc5MDkgMjQgMTZDMjQgMTguMjA5MSAyMi4yMDkxIDIwIDIwIDIwQzE3Ljc5MDkgMjAgMTYgMTguMjA5MSAxNiAxNkMxNiAxMy43OTA5IDE3Ljc5MDkgMTIgMjAgMTJaIiBmaWxsPSIjOUI5QkEwIi8+CjxwYXRoIGQ9Ik0yOCAyOEMyOCAyOS4xMDQ2IDI3LjEwNDYgMzAgMjYgMzBIMTRDMTIuODk1NCAzMCAxMiAyOS4xMDQ2IDEyIDI4VjI2QzEyIDI0Ljg5NTQgMTIuODk1NCAyNCAxNCAyNEgyNkMyNy4xMDQ2IDI0IDI4IDI0Ljg5NTQgMjggMjZWMjhaIiBmaWxsPSIjOUI5QkEwIi8+Cjwvc3ZnPgo=',
-            brand: 'Fender',
-            status: 'active',
-            createdAt: new Date('2024-01-03')
-        },
-        {
-            id: '4',
-            name: 'Boss Katana 50 Amfi',
-            category: 'Amfi',
-            price: 3200,
-            stock: 12,
-            description: 'Güçlü ve kompakt gitar amfisi',
-            image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0yMCAxMkMyMi4yMDkxIDEyIDI0IDEzLjc5MDkgMjQgMTZDMjQgMTguMjA5MSAyMi4yMDkxIDIwIDIwIDIwQzE3Ljc5MDkgMjAgMTYgMTguMjA5MSAxNiAxNkMxNiAxMy43OTA5IDE3Ljc5MDkgMTIgMjAgMTJaIiBmaWxsPSIjOUI5QkEwIi8+CjxwYXRoIGQ9Ik0yOCAyOEMyOCAyOS4xMDQ2IDI3LjEwNDYgMzAgMjYgMzBIMTRDMTIuODk1NCAzMCAxMiAyOS4xMDQ2IDEyIDI4VjI2QzEyIDI0Ljg5NTQgMTIuODk1NCAyNCAxNCAyNEgyNkMyNy4xMDQ2IDI0IDI4IDI0Ljg5NTQgMjggMjZWMjhaIiBmaWxsPSIjOUI5QkEwIi8+Cjwvc3ZnPgo=',
-            brand: 'Boss',
-            status: 'active',
-            createdAt: new Date('2024-01-04')
-        }
-    ];
-
     useEffect(() => {
-        // Load products (in real app, this would be from API)
-        setProducts(mockProducts);
+        // Load products from database
+        const loadProducts = async () => {
+            try {
+                const products = await ProductService.getAll();
+                setProducts(products);
+            } catch (error) {
+                console.error('Error loading products:', error);
+                alert('Ürünler yüklenirken bir hata oluştu.');
+            }
+        };
+        loadProducts();
     }, []);
 
     // Filter products based on search term
@@ -446,11 +410,11 @@ export default function AdminDashboard() {
             name: '',
             category: '',
             price: '',
-            stock: '',
+            stockQuantity: '',
             description: '',
-            image: '',
+            imageUrl: '',
             brand: '',
-            status: 'active'
+            inStock: true
         });
         setSelectedFile(null);
         setUploadPreview('');
@@ -469,11 +433,11 @@ export default function AdminDashboard() {
             name: product.name,
             category: product.category,
             price: product.price.toString(),
-            stock: product.stock.toString(),
+            stockQuantity: product.stockQuantity.toString(),
             description: product.description,
-            image: product.image,
+            imageUrl: product.imageUrl,
             brand: product.brand,
-            status: product.status
+            inStock: product.inStock
         });
         setIsEditModalOpen(true);
     }, []);
@@ -497,24 +461,27 @@ export default function AdminDashboard() {
                 alert('Lütfen geçerli bir fiyat giriniz.');
                 return;
             }
-            if (!formData.stock || parseInt(formData.stock) < 0) {
+            if (!formData.stockQuantity || parseInt(formData.stockQuantity) < 0) {
                 alert('Lütfen geçerli bir stok miktarı giriniz.');
                 return;
             }
 
-            const newProduct: Product = {
-                id: Date.now().toString(),
+            const newProductData = {
                 name: formData.name.trim(),
                 category: formData.category,
                 price: parseFloat(formData.price),
-                stock: parseInt(formData.stock),
+                stockQuantity: parseInt(formData.stockQuantity),
                 description: formData.description.trim(),
-                image: formData.image.trim() || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0yMCAxMkMyMi4yMDkxIDEyIDI0IDEzLjc5MDkgMjQgMTZDMjQgMTguMjA5MSAyMi4yMDkxIDIwIDIwIDIwQzE3Ljc5MDkgMjAgMTYgMTguMjA5MSAxNiAxNkMxNiAxMy43OTA5IDE3Ljc5MDkgMTIgMjAgMTJaIiBmaWxsPSIjOUI5QkEwIi8+CjxwYXRoIGQ9Ik0yOCAyOEMyOCAyOS4xMDQ2IDI3LjEwNDYgMzAgMjYgMzBIMTRDMTIuODk1NCAzMCAxMiAyOS4xMDQ2IDEyIDI4VjI2QzEyIDI0Ljg5NTQgMTIuODk1NCAyNCAxNCAyNEgyNkMyNy4xMDQ2IDI0IDI4IDI0Ljg5NTQgMjggMjZWMjhaIiBmaWxsPSIjOUI5QkEwIi8+Cjwvc3ZnPgo=',
+                imageUrl: formData.imageUrl.trim() || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0yMCAxMkMyMi4yMDkxIDEyIDI0IDEzLjc5MDkgMjQgMTZDMjQgMTguMjA5MSAyMi4yMDkxIDIwIDIwIDIwQzE3Ljc5MDkgMjAgMTYgMTguMjA5MSAxNiAxNkMxNiAxMy43OTA5IDE3Ljc5MDkgMTIgMjAgMTJaIiBmaWxsPSIjOUI5QkEwIi8+CjxwYXRoIGQ9Ik0yOCAyOEMyOCAyOS4xMDQ2IDI3LjEwNDYgMzAgMjYgMzBIMTRDMTIuODk1NCAzMCAxMiAyOS4xMDQ2IDEyIDI4VjI2QzEyIDI0Ljg5NTQgMTIuODk1NCAyNCAxNCAyNEgyNkMyNy4xMDQ2IDI0IDI4IDI0Ljg5NTQgMjggMjZWMjhaIiBmaWxsPSIjOUI5QkEwIi8+Cjwvc3ZnPgo=',
                 brand: formData.brand.trim(),
-                status: formData.status,
-                createdAt: new Date()
+                inStock: formData.inStock,
+                rating: 0,
+                reviewCount: 0,
+                tags: []
             };
 
+            const newProductId = await ProductService.create(newProductData);
+            const newProduct = { id: newProductId, ...newProductData };
             setProducts(prev => [...prev, newProduct]);
             setIsAddModalOpen(false);
             resetForm();
@@ -548,23 +515,24 @@ export default function AdminDashboard() {
                 alert('Lütfen geçerli bir fiyat giriniz.');
                 return;
             }
-            if (!formData.stock || parseInt(formData.stock) < 0) {
+            if (!formData.stockQuantity || parseInt(formData.stockQuantity) < 0) {
                 alert('Lütfen geçerli bir stok miktarı giriniz.');
                 return;
             }
 
-            const updatedProduct: Product = {
-                ...selectedProduct,
+            const updatedProductData = {
                 name: formData.name.trim(),
                 category: formData.category,
                 price: parseFloat(formData.price),
-                stock: parseInt(formData.stock),
+                stockQuantity: parseInt(formData.stockQuantity),
                 description: formData.description.trim(),
-                image: formData.image.trim() || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0yMCAxMkMyMi4yMDkxIDEyIDI0IDEzLjc5MDkgMjQgMTZDMjQgMTguMjA5MSAyMi4yMDkxIDIwIDIwIDIwQzE3Ljc5MDkgMjAgMTYgMTguMjA5MSAxNiAxNkMxNiAxMy43OTA5IDE3Ljc5MDkgMTIgMjAgMTJaIiBmaWxsPSIjOUI5QkEwIi8+CjxwYXRoIGQ9Ik0yOCAyOEMyOCAyOS4xMDQ2IDI3LjEwNDYgMzAgMjYgMzBIMTRDMTIuODk1NCAzMCAxMiAyOS4xMDQ2IDEyIDI4VjI2QzEyIDI0Ljg5NTQgMTIuODk1NCAyNCAxNCAyNEgyNkMyNy4xMDQ2IDI0IDI4IDI0Ljg5NTQgMjggMjZWMjhaIiBmaWxsPSIjOUI5QkEwIi8+Cjwvc3ZnPgo=',
+                imageUrl: formData.imageUrl.trim() || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0yMCAxMkMyMi4yMDkxIDEyIDI0IDEzLjc5MDkgMjQgMTZDMjQgMTguMjA5MSAyMi4yMDkxIDIwIDIwIDIwQzE3Ljc5MDkgMjAgMTYgMTguMjA5MSAxNiAxNkMxNiAxMy43OTA5IDE3Ljc5MDkgMTIgMjAgMTJaIiBmaWxsPSIjOUI5QkEwIi8+CjxwYXRoIGQ9Ik0yOCAyOEMyOCAyOS4xMDQ2IDI3LjEwNDYgMzAgMjYgMzBIMTRDMTIuODk1NCAzMCAxMiAyOS4xMDQ2IDEyIDI4VjI2QzEyIDI0Ljg5NTQgMTIuODk1NCAyNCAxNCAyNEgyNkMyNy4xMDQ2IDI0IDI4IDI0Ljg5NTQgMjggMjZWMjhaIiBmaWxsPSIjOUI5QkEwIi8+Cjwvc3ZnPgo=',
                 brand: formData.brand.trim(),
-                status: formData.status
+                inStock: formData.inStock
             };
 
+            await ProductService.update(selectedProduct.id, updatedProductData);
+            const updatedProduct = { ...selectedProduct, ...updatedProductData };
             setProducts(prev => prev.map(p => p.id === selectedProduct.id ? updatedProduct : p));
             setIsEditModalOpen(false);
             setSelectedProduct(null);
@@ -583,9 +551,11 @@ export default function AdminDashboard() {
         if (!confirm('Bu ürünü silmek istediğinizden emin misiniz?')) return;
 
         try {
+            await ProductService.delete(productId);
             setProducts(prev => prev.filter(p => p.id !== productId));
         } catch (error) {
             console.error('Error deleting product:', error);
+            alert('Ürün silinirken bir hata oluştu.');
         }
     }, []);
 
@@ -621,7 +591,7 @@ export default function AdminDashboard() {
             const result = await response.json();
 
             if (response.ok) {
-                setFormData(prev => ({ ...prev, image: result.url }));
+                setFormData(prev => ({ ...prev, imageUrl: result.url }));
                 alert('Dosya başarıyla yüklendi! Görsel URL\'si forma eklendi.');
                 setSelectedFile(null);
                 setUploadPreview('');
@@ -759,7 +729,7 @@ export default function AdminDashboard() {
                                                                 <div className="h-10 w-10 flex-shrink-0">
                                                                     <img
                                                                         className="h-10 w-10 rounded-lg object-cover"
-                                                                        src={product.image || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0yMCAxMkMyMi4yMDkxIDEyIDI0IDEzLjc5MDkgMjQgMTZDMjQgMTguMjA5MSAyMi4yMDkxIDIwIDIwIDIwQzE3Ljc5MDkgMjAgMTYgMTguMjA5MSAxNiAxNkMxNiAxMy43OTA5IDE3Ljc5MDkgMTIgMjAgMTJaIiBmaWxsPSIjOUI5QkEwIi8+CjxwYXRoIGQ9Ik0yOCAyOEMyOCAyOS4xMDQ2IDI3LjEwNDYgMzAgMjYgMzBIMTRDMTIuODk1NCAzMCAxMiAyOS4xMDQ2IDEyIDI4VjI2QzEyIDI0Ljg5NTQgMTIuODk1NCAyNCAxNCAyNEgyNkMyNy4xMDQ2IDI0IDI4IDI0Ljg5NTQgMjggMjZWMjhaIiBmaWxsPSIjOUI5QkEwIi8+Cjwvc3ZnPgo='}
+                                                                        src={product.imageUrl || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0yMCAxMkMyMi4yMDkxIDEyIDI0IDEzLjc5MDkgMjQgMTZDMjQgMTguMjA5MSAyMi4yMDkxIDIwIDIwIDIwQzE3Ljc5MDkgMjAgMTYgMTguMjA5MSAxNiAxNkMxNiAxMy43OTA5IDE3Ljc5MDkgMTIgMjAgMTJaIiBmaWxsPSIjOUI5QkEwIi8+CjxwYXRoIGQ9Ik0yOCAyOEMyOCAyOS4xMDQ2IDI3LjEwNDYgMzAgMjYgMzBIMTRDMTIuODk1NCAzMCAxMiAyOS4xMDQ2IDEyIDI4VjI2QzEyIDI0Ljg5NTQgMTIuODk1NCAyNCAxNCAyNEgyNkMyNy4xMDQ2IDI0IDI4IDI0Ljg5NTQgMjggMjZWMjhaIiBmaWxsPSIjOUI5QkEwIi8+Cjwvc3ZnPgo='}
                                                                         alt={product.name}
                                                                         onError={(e) => {
                                                                             // Prevent infinite loop by setting a data URL
@@ -784,17 +754,17 @@ export default function AdminDashboard() {
                                                             {product.price.toLocaleString('tr-TR')}₺
                                                         </td>
                                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                            <span className={`px-2 py-1 text-xs font-medium rounded-full ${product.stock > 10 ? 'bg-green-100 text-green-800' :
-                                                                product.stock > 0 ? 'bg-yellow-100 text-yellow-800' :
+                                                            <span className={`px-2 py-1 text-xs font-medium rounded-full ${product.stockQuantity > 10 ? 'bg-green-100 text-green-800' :
+                                                                product.stockQuantity > 0 ? 'bg-yellow-100 text-yellow-800' :
                                                                     'bg-red-100 text-red-800'
                                                                 }`}>
-                                                                {product.stock}
+                                                                {product.stockQuantity}
                                                             </span>
                                                         </td>
                                                         <td className="px-6 py-4 whitespace-nowrap">
-                                                            <span className={`px-2 py-1 text-xs font-medium rounded-full ${product.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                                                            <span className={`px-2 py-1 text-xs font-medium rounded-full ${product.inStock ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                                                                 }`}>
-                                                                {product.status === 'active' ? 'Aktif' : 'Pasif'}
+                                                                {product.inStock ? 'Aktif' : 'Pasif'}
                                                             </span>
                                                         </td>
                                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
