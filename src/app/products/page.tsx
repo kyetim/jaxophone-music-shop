@@ -76,13 +76,13 @@ export default function ProductsPage() {
     const showLoading = isLoading || (isSearchActive && isSearching);
 
     return (
-        <div className="min-h-screen bg-black dark:bg-black">
+        <div className="min-h-screen bg-gray-50 dark:bg-black">
             <Header />
 
             <main className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
                 {/* Page Header */}
                 <div className="mb-8">
-                    <h1 className="text-3xl lg:text-4xl font-bold text-white mb-4">
+                    <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-4">
                         {isSearchActive ? `"${query}" için Sonuçlar` : 'Tüm Ürünler'}
                     </h1>
 
@@ -99,7 +99,7 @@ export default function ProductsPage() {
                             <select
                                 value={sortBy}
                                 onChange={(e) => setSortBy(e.target.value)}
-                                className="px-4 py-2 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 bg-gray-900 text-white cursor-pointer"
+                                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white cursor-pointer"
                             >
                                 <option value="newest">En Yeni</option>
                                 <option value="price-asc">Fiyat (Düşük - Yüksek)</option>
@@ -109,7 +109,7 @@ export default function ProductsPage() {
                             </select>
 
                             {/* View Mode Toggle */}
-                            <div className="flex items-center bg-gray-800 rounded-lg p-1">
+                            <div className="flex items-center bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
                                 <Button
                                     variant={viewMode === 'grid' ? 'default' : 'ghost'}
                                     size="sm"
@@ -132,7 +132,7 @@ export default function ProductsPage() {
 
                     {/* Results Count */}
                     {!showLoading && (
-                        <p className="text-gray-300 mt-4">
+                        <p className="text-gray-600 dark:text-gray-300 mt-4">
                             {isSearchActive
                                 ? `${sortedProducts.length} sonuç bulundu`
                                 : `${sortedProducts.length} ürün gösteriliyor`
@@ -165,11 +165,11 @@ export default function ProductsPage() {
                     </div>
                 ) : (
                     <div className="text-center py-12">
-                        <Search className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                        <h3 className="text-lg font-semibold text-white mb-2">
+                        <Search className="h-12 w-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
                             {isSearchActive ? 'Aradığınız ürün bulunamadı' : 'Henüz ürün bulunmuyor'}
                         </h3>
-                        <p className="text-gray-300 mb-6">
+                        <p className="text-gray-600 dark:text-gray-300 mb-6">
                             {isSearchActive
                                 ? 'Farklı anahtar kelimeler deneyebilir veya filtreleri değiştirebilirsiniz.'
                                 : 'Çok yakında yeni ürünler eklenecek!'
@@ -177,12 +177,12 @@ export default function ProductsPage() {
                         </p>
                         {isSearchActive && (
                             <Button
+                                variant="outline"
                                 onClick={() => {
                                     setQuery('');
                                     search('');
                                 }}
-                                variant="outline"
-                                className="cursor-pointer border-gray-600 text-gray-300 hover:bg-gray-800 hover:text-white"
+                                className="border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
                             >
                                 Tüm Ürünleri Göster
                             </Button>
