@@ -81,10 +81,10 @@ const ProductModal = ({
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="bg-gray-900 rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-gray-800">
                 <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-xl font-semibold">{title}</h2>
-                    <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+                    <h2 className="text-xl font-semibold text-white">{title}</h2>
+                    <button onClick={onClose} className="text-gray-400 hover:text-gray-200">
                         <X className="h-6 w-6" />
                     </button>
                 </div>
@@ -92,7 +92,7 @@ const ProductModal = ({
                 <form onSubmit={onSubmit} className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label className="block text-sm font-medium text-gray-300 mb-1">
                                 Ürün Adı *
                             </label>
                             <input
@@ -101,12 +101,13 @@ const ProductModal = ({
                                 value={formData.name}
                                 onChange={onInputChange}
                                 required
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                className="w-full px-3 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-gray-800 text-white placeholder-gray-400"
+                                placeholder="Ürün adını girin"
                             />
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label className="block text-sm font-medium text-gray-300 mb-1">
                                 Kategori *
                             </label>
                             <select
@@ -114,9 +115,9 @@ const ProductModal = ({
                                 value={formData.category}
                                 onChange={onInputChange}
                                 required
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                className="w-full px-3 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-gray-800 text-white"
                             >
-                                <option value="">Kategori Seçin</option>
+                                <option value="">Kategori seçin</option>
                                 {categories.map(category => (
                                     <option key={category} value={category}>{category}</option>
                                 ))}
@@ -124,7 +125,22 @@ const ProductModal = ({
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label className="block text-sm font-medium text-gray-300 mb-1">
+                                Marka *
+                            </label>
+                            <input
+                                type="text"
+                                name="brand"
+                                value={formData.brand}
+                                onChange={onInputChange}
+                                required
+                                className="w-full px-3 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-gray-800 text-white placeholder-gray-400"
+                                placeholder="Marka adını girin"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-300 mb-1">
                                 Fiyat (₺) *
                             </label>
                             <input
@@ -135,13 +151,14 @@ const ProductModal = ({
                                 required
                                 min="0"
                                 step="0.01"
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                className="w-full px-3 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-gray-800 text-white placeholder-gray-400"
+                                placeholder="0.00"
                             />
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Stok *
+                            <label className="block text-sm font-medium text-gray-300 mb-1">
+                                Stok Miktarı *
                             </label>
                             <input
                                 type="number"
@@ -150,104 +167,103 @@ const ProductModal = ({
                                 onChange={onInputChange}
                                 required
                                 min="0"
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                className="w-full px-3 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-gray-800 text-white placeholder-gray-400"
+                                placeholder="0"
                             />
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Marka
-                            </label>
-                            <input
-                                type="text"
-                                name="brand"
-                                value={formData.brand}
-                                onChange={onInputChange}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Durum
+                            <label className="block text-sm font-medium text-gray-300 mb-1">
+                                Stok Durumu *
                             </label>
                             <select
                                 name="inStock"
                                 value={formData.inStock.toString()}
-                                onChange={(e) => onInputChange({
-                                    target: { name: 'inStock', value: e.target.value === 'true' }
-                                } as any)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                onChange={onInputChange}
+                                required
+                                className="w-full px-3 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-gray-800 text-white"
                             >
-                                <option value="true">Aktif</option>
-                                <option value="false">Pasif</option>
+                                <option value="true">Stokta</option>
+                                <option value="false">Stokta Yok</option>
                             </select>
                         </div>
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Ürün Görseli
+                        <label className="block text-sm font-medium text-gray-300 mb-1">
+                            Açıklama *
                         </label>
+                        <textarea
+                            name="description"
+                            value={formData.description}
+                            onChange={onInputChange}
+                            required
+                            rows={3}
+                            className="w-full px-3 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-gray-800 text-white placeholder-gray-400 resize-none"
+                            placeholder="Ürün açıklamasını girin"
+                        />
+                    </div>
 
-                        {/* Mevcut görsel gösterimi */}
-                        {formData.imageUrl && !uploadPreview && (
-                            <div className="mb-3">
-                                <img
-                                    src={formData.imageUrl}
-                                    alt="Mevcut görsel"
-                                    className="w-20 h-20 object-cover rounded-lg border"
-                                    onError={(e) => {
-                                        e.currentTarget.style.display = 'none';
-                                    }}
-                                />
-                            </div>
-                        )}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-1">
+                            Resim URL *
+                        </label>
+                        <input
+                            type="url"
+                            name="imageUrl"
+                            value={formData.imageUrl}
+                            onChange={onInputChange}
+                            required
+                            className="w-full px-3 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-gray-800 text-white placeholder-gray-400"
+                            placeholder="https://example.com/image.jpg"
+                        />
+                    </div>
 
-                        {/* Yüklenecek dosya önizlemesi */}
-                        {uploadPreview && (
-                            <div className="mb-3">
-                                <img
-                                    src={uploadPreview}
-                                    alt="Yüklenecek görsel"
-                                    className="w-20 h-20 object-cover rounded-lg border"
-                                />
-                            </div>
-                        )}
+                    {/* File Upload Section */}
+                    <div className="border border-gray-700 rounded-lg p-4">
+                        <h3 className="text-lg font-medium text-white mb-4">Dosya Yükleme</h3>
 
-                        <div className="space-y-3">
-                            {/* Dosya seçimi */}
-                            <div className="flex items-center space-x-2">
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-300 mb-2">
+                                    Ürün Resmi Seçin
+                                </label>
                                 <input
                                     type="file"
                                     accept="image/*"
                                     onChange={onFileSelect}
-                                    className="hidden"
-                                    id="file-upload"
+                                    className="w-full px-3 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-gray-800 text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-amber-600 file:text-white hover:file:bg-amber-700"
                                 />
-                                <label
-                                    htmlFor="file-upload"
-                                    className="flex items-center space-x-2 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 cursor-pointer"
-                                >
-                                    <ImageIcon className="h-4 w-4" />
-                                    <span>Dosya Seç</span>
-                                </label>
-
-                                {selectedFile && (
-                                    <span className="text-sm text-gray-600">
-                                        {selectedFile.name}
-                                    </span>
-                                )}
                             </div>
 
-                            {/* Dosya yükleme butonu */}
                             {selectedFile && (
-                                <div className="flex items-center space-x-2">
-                                    <button
+                                <div className="space-y-2">
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-sm text-gray-300">Seçilen dosya: {selectedFile.name}</span>
+                                        <button
+                                            type="button"
+                                            onClick={onClearFileSelection}
+                                            className="text-red-400 hover:text-red-300 text-sm"
+                                        >
+                                            <X className="h-4 w-4" />
+                                        </button>
+                                    </div>
+
+                                    {uploadPreview && (
+                                        <div className="mt-2">
+                                            <img
+                                                src={uploadPreview}
+                                                alt="Preview"
+                                                className="w-32 h-32 object-cover rounded-lg border border-gray-600"
+                                            />
+                                        </div>
+                                    )}
+
+                                    <Button
                                         type="button"
                                         onClick={onFileUpload}
                                         disabled={isUploading}
-                                        className="flex items-center space-x-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                                        className="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2"
                                     >
                                         {isUploading ? (
                                             <>
@@ -257,61 +273,28 @@ const ProductModal = ({
                                         ) : (
                                             <>
                                                 <Upload className="h-4 w-4" />
-                                                <span>Yükle</span>
+                                                <span>Dosyayı Yükle</span>
                                             </>
                                         )}
-                                    </button>
-
-                                    <button
-                                        type="button"
-                                        onClick={onClearFileSelection}
-                                        className="px-3 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200"
-                                    >
-                                        İptal
-                                    </button>
+                                    </Button>
                                 </div>
                             )}
-
-                            {/* URL ile görsel ekleme */}
-                            <div className="flex items-center space-x-2">
-                                <input
-                                    type="url"
-                                    name="imageUrl"
-                                    value={formData.imageUrl}
-                                    onChange={onInputChange}
-                                    placeholder="https://example.com/image.jpg (opsiyonel)"
-                                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                                />
-                                <span className="text-sm text-gray-500">veya URL (opsiyonel)</span>
-                            </div>
                         </div>
                     </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Açıklama
-                        </label>
-                        <textarea
-                            name="description"
-                            value={formData.description}
-                            onChange={onInputChange}
-                            rows={3}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                        />
-                    </div>
-
-                    <div className="flex items-center justify-end space-x-3 pt-4">
-                        <button
+                    <div className="flex justify-end space-x-3 pt-4">
+                        <Button
                             type="button"
                             onClick={onClose}
-                            className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
+                            variant="outline"
+                            className="border-gray-600 text-gray-300 hover:bg-gray-800 hover:text-white"
                         >
                             İptal
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                             type="submit"
                             disabled={isLoading}
-                            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 flex items-center space-x-2"
+                            className="bg-amber-600 hover:bg-amber-700 text-white px-6 py-2 rounded-lg flex items-center space-x-2"
                         >
                             {isLoading ? (
                                 <>
@@ -324,7 +307,7 @@ const ProductModal = ({
                                     <span>{submitText}</span>
                                 </>
                             )}
-                        </button>
+                        </Button>
                     </div>
                 </form>
             </div>
@@ -615,7 +598,7 @@ export default function AdminDashboard() {
     return (
         <>
             <Header />
-            <div className="min-h-screen bg-gray-50">
+            <div className="min-h-screen bg-black dark:bg-black">
                 {/* Hero Section */}
                 <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-16">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -630,8 +613,8 @@ export default function AdminDashboard() {
 
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                     {/* Navigation Tabs */}
-                    <div className="bg-white rounded-xl shadow-lg mb-8">
-                        <div className="border-b border-gray-200">
+                    <div className="bg-gray-900 rounded-xl shadow-lg mb-8 border border-gray-800">
+                        <div className="border-b border-gray-700">
                             <nav className="flex space-x-8 px-6">
                                 {[
                                     { id: 'overview', name: 'Genel Bakış', icon: BarChart3 },
@@ -647,8 +630,8 @@ export default function AdminDashboard() {
                                             key={tab.id}
                                             onClick={() => setActiveTab(tab.id)}
                                             className={`flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-sm ${activeTab === tab.id
-                                                ? 'border-indigo-500 text-indigo-600'
-                                                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                                ? 'border-amber-500 text-amber-400'
+                                                : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-600'
                                                 }`}
                                         >
                                             <Icon className="h-5 w-5" />
@@ -664,10 +647,10 @@ export default function AdminDashboard() {
                             {activeTab === 'products' && (
                                 <div className="space-y-6">
                                     <div className="flex items-center justify-between">
-                                        <h3 className="text-lg font-semibold text-gray-900">Ürün Yönetimi</h3>
+                                        <h3 className="text-lg font-semibold text-white">Ürün Yönetimi</h3>
                                         <button
                                             onClick={openAddModal}
-                                            className="flex items-center space-x-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700"
+                                            className="flex items-center space-x-2 bg-amber-600 text-white px-4 py-2 rounded-lg hover:bg-amber-700"
                                         >
                                             <Plus className="h-4 w-4" />
                                             <span>Yeni Ürün Ekle</span>
@@ -683,10 +666,10 @@ export default function AdminDashboard() {
                                                 placeholder="Ürün ara..."
                                                 value={searchTerm}
                                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                                className="w-full pl-10 pr-4 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-gray-800 text-white placeholder-gray-400"
                                             />
                                         </div>
-                                        <button className="flex items-center space-x-2 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200">
+                                        <button className="flex items-center space-x-2 bg-gray-800 text-gray-300 px-4 py-2 rounded-lg hover:bg-gray-700 border border-gray-600">
                                             <Filter className="h-4 w-4" />
                                             <span>Filtrele</span>
                                         </button>
@@ -698,32 +681,32 @@ export default function AdminDashboard() {
 
                                     {/* Products Table */}
                                     <div className="overflow-x-auto">
-                                        <table className="min-w-full divide-y divide-gray-200">
-                                            <thead className="bg-gray-50">
+                                        <table className="min-w-full divide-y divide-gray-700">
+                                            <thead className="bg-gray-800">
                                                 <tr>
-                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                                                         Ürün
                                                     </th>
-                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                                                         Kategori
                                                     </th>
-                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                                                         Fiyat
                                                     </th>
-                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                                                         Stok
                                                     </th>
-                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                                                         Durum
                                                     </th>
-                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                                                         İşlemler
                                                     </th>
                                                 </tr>
                                             </thead>
-                                            <tbody className="bg-white divide-y divide-gray-200">
+                                            <tbody className="bg-gray-900 divide-y divide-gray-700">
                                                 {filteredProducts.map((product) => (
-                                                    <tr key={product.id} className="hover:bg-gray-50">
+                                                    <tr key={product.id} className="hover:bg-gray-800">
                                                         <td className="px-6 py-4 whitespace-nowrap">
                                                             <div className="flex items-center">
                                                                 <div className="h-10 w-10 flex-shrink-0">
@@ -738,31 +721,31 @@ export default function AdminDashboard() {
                                                                     />
                                                                 </div>
                                                                 <div className="ml-4">
-                                                                    <div className="text-sm font-medium text-gray-900">
+                                                                    <div className="text-sm font-medium text-white">
                                                                         {product.name}
                                                                     </div>
-                                                                    <div className="text-sm text-gray-500">
+                                                                    <div className="text-sm text-gray-400">
                                                                         {product.brand}
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
                                                             {product.category}
                                                         </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
                                                             {product.price.toLocaleString('tr-TR')}₺
                                                         </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                            <span className={`px-2 py-1 text-xs font-medium rounded-full ${product.stockQuantity > 10 ? 'bg-green-100 text-green-800' :
-                                                                product.stockQuantity > 0 ? 'bg-yellow-100 text-yellow-800' :
-                                                                    'bg-red-100 text-red-800'
+                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
+                                                            <span className={`px-2 py-1 text-xs font-medium rounded-full ${product.stockQuantity > 10 ? 'bg-green-900 text-green-300' :
+                                                                product.stockQuantity > 0 ? 'bg-yellow-900 text-yellow-300' :
+                                                                    'bg-red-900 text-red-300'
                                                                 }`}>
                                                                 {product.stockQuantity}
                                                             </span>
                                                         </td>
                                                         <td className="px-6 py-4 whitespace-nowrap">
-                                                            <span className={`px-2 py-1 text-xs font-medium rounded-full ${product.inStock ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                                                            <span className={`px-2 py-1 text-xs font-medium rounded-full ${product.inStock ? 'bg-green-900 text-green-300' : 'bg-red-900 text-red-300'
                                                                 }`}>
                                                                 {product.inStock ? 'Aktif' : 'Pasif'}
                                                             </span>
@@ -771,14 +754,14 @@ export default function AdminDashboard() {
                                                             <div className="flex items-center space-x-2">
                                                                 <button
                                                                     onClick={() => openEditModal(product)}
-                                                                    className="text-indigo-600 hover:text-indigo-900"
+                                                                    className="text-amber-400 hover:text-amber-300"
                                                                     title="Düzenle"
                                                                 >
                                                                     <Edit className="h-4 w-4" />
                                                                 </button>
                                                                 <button
                                                                     onClick={() => handleDeleteProduct(product.id)}
-                                                                    className="text-red-600 hover:text-red-900"
+                                                                    className="text-red-400 hover:text-red-300"
                                                                     title="Sil"
                                                                 >
                                                                     <Trash2 className="h-4 w-4" />
@@ -794,8 +777,8 @@ export default function AdminDashboard() {
                                     {filteredProducts.length === 0 && (
                                         <div className="text-center py-12">
                                             <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                                            <h3 className="text-lg font-medium text-gray-900 mb-2">Ürün Bulunamadı</h3>
-                                            <p className="text-gray-500">Arama kriterlerinize uygun ürün bulunamadı.</p>
+                                            <h3 className="text-lg font-medium text-white mb-2">Ürün Bulunamadı</h3>
+                                            <p className="text-gray-400">Arama kriterlerinize uygun ürün bulunamadı.</p>
                                         </div>
                                     )}
                                 </div>
@@ -805,40 +788,40 @@ export default function AdminDashboard() {
                             {activeTab === 'overview' && (
                                 <div className="text-center py-12">
                                     <BarChart3 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                                    <h3 className="text-lg font-medium text-gray-900 mb-2">Genel Bakış</h3>
-                                    <p className="text-gray-500">Genel istatistikler ve özet bilgiler burada görüntülenecek.</p>
+                                    <h3 className="text-lg font-medium text-white mb-2">Genel Bakış</h3>
+                                    <p className="text-gray-400">Genel istatistikler ve özet bilgiler burada görüntülenecek.</p>
                                 </div>
                             )}
 
                             {activeTab === 'orders' && (
                                 <div className="text-center py-12">
                                     <ShoppingCart className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                                    <h3 className="text-lg font-medium text-gray-900 mb-2">Sipariş Yönetimi</h3>
-                                    <p className="text-gray-500">Sipariş takibi ve yönetimi burada görüntülenecek.</p>
+                                    <h3 className="text-lg font-medium text-white mb-2">Sipariş Yönetimi</h3>
+                                    <p className="text-gray-400">Sipariş takibi ve yönetimi burada görüntülenecek.</p>
                                 </div>
                             )}
 
                             {activeTab === 'customers' && (
                                 <div className="text-center py-12">
                                     <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                                    <h3 className="text-lg font-medium text-gray-900 mb-2">Müşteri Yönetimi</h3>
-                                    <p className="text-gray-500">Müşteri bilgileri ve yönetimi burada görüntülenecek.</p>
+                                    <h3 className="text-lg font-medium text-white mb-2">Müşteri Yönetimi</h3>
+                                    <p className="text-gray-400">Müşteri bilgileri ve yönetimi burada görüntülenecek.</p>
                                 </div>
                             )}
 
                             {activeTab === 'reports' && (
                                 <div className="text-center py-12">
                                     <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                                    <h3 className="text-lg font-medium text-gray-900 mb-2">Raporlar</h3>
-                                    <p className="text-gray-500">Satış raporları ve analizler burada görüntülenecek.</p>
+                                    <h3 className="text-lg font-medium text-white mb-2">Raporlar</h3>
+                                    <p className="text-gray-400">Satış raporları ve analizler burada görüntülenecek.</p>
                                 </div>
                             )}
 
                             {activeTab === 'settings' && (
                                 <div className="text-center py-12">
                                     <Settings className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                                    <h3 className="text-lg font-medium text-gray-900 mb-2">Ayarlar</h3>
-                                    <p className="text-gray-500">Sistem ayarları burada yapılandırılacak.</p>
+                                    <h3 className="text-lg font-medium text-white mb-2">Ayarlar</h3>
+                                    <p className="text-gray-400">Sistem ayarları burada yapılandırılacak.</p>
                                 </div>
                             )}
                         </div>

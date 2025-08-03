@@ -201,7 +201,7 @@ export default function ContactPage() {
     return (
         <>
             <Header />
-            <div className="min-h-screen bg-gray-50">
+            <div className="min-h-screen bg-black dark:bg-black">
                 {/* Hero Section */}
                 <div className="bg-gradient-to-r from-amber-600 to-orange-600 text-white py-16">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -218,17 +218,17 @@ export default function ContactPage() {
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
                         {/* Contact Information */}
                         <div className="lg:col-span-1">
-                            <div className="bg-white rounded-xl shadow-lg p-8">
-                                <h2 className="text-2xl font-bold text-gray-900 mb-6">İletişim Bilgileri</h2>
+                            <div className="bg-gray-900 rounded-xl shadow-lg p-8 border border-gray-800">
+                                <h2 className="text-2xl font-bold text-white mb-6">İletişim Bilgileri</h2>
 
                                 <div className="space-y-6">
                                     <div className="flex items-start space-x-4">
-                                        <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
-                                            <MapPin className="h-6 w-6 text-amber-600" />
+                                        <div className="w-12 h-12 bg-amber-900 rounded-full flex items-center justify-center flex-shrink-0">
+                                            <MapPin className="h-6 w-6 text-amber-400" />
                                         </div>
                                         <div>
-                                            <h3 className="font-semibold text-gray-900">Adres</h3>
-                                            <p className="text-gray-600 mt-1">
+                                            <h3 className="font-semibold text-white">Adres</h3>
+                                            <p className="text-gray-300 mt-1">
                                                 Mersin/Yenişehir Mahallesi, Yenişehir Caddesi<br />
                                                 No: 456, Mersin/Türkiye
                                             </p>
@@ -236,18 +236,18 @@ export default function ContactPage() {
                                     </div>
 
                                     <div className="flex items-start space-x-4">
-                                        <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                                            <Phone className="h-6 w-6 text-blue-600" />
+                                        <div className="w-12 h-12 bg-blue-900 rounded-full flex items-center justify-center flex-shrink-0">
+                                            <Phone className="h-6 w-6 text-blue-400" />
                                         </div>
                                         <div>
-                                            <h3 className="font-semibold text-gray-900">Telefon</h3>
-                                            <p className="text-gray-600 mt-1">
-                                                <a href="tel:08509557777" className="hover:text-amber-600 transition-colors">
+                                            <h3 className="font-semibold text-white">Telefon</h3>
+                                            <p className="text-gray-300 mt-1">
+                                                <a href="tel:08509557777" className="hover:text-amber-400 transition-colors">
                                                     0 850 955 77 77
                                                 </a>
                                             </p>
-                                            <p className="text-gray-600">
-                                                <a href="tel:+902123456789" className="hover:text-amber-600 transition-colors">
+                                            <p className="text-gray-300">
+                                                <a href="tel:+902123456789" className="hover:text-amber-400 transition-colors">
                                                     +90 212 345 67 89
                                                 </a>
                                             </p>
@@ -255,18 +255,18 @@ export default function ContactPage() {
                                     </div>
 
                                     <div className="flex items-start space-x-4">
-                                        <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                                            <Mail className="h-6 w-6 text-green-600" />
+                                        <div className="w-12 h-12 bg-green-900 rounded-full flex items-center justify-center flex-shrink-0">
+                                            <Mail className="h-6 w-6 text-green-400" />
                                         </div>
                                         <div>
-                                            <h3 className="font-semibold text-gray-900">E-posta</h3>
-                                            <p className="text-gray-600 mt-1">
-                                                <a href="mailto:info@jaxophone.com" className="hover:text-amber-600 transition-colors">
+                                            <h3 className="font-semibold text-white">E-posta</h3>
+                                            <p className="text-gray-300 mt-1">
+                                                <a href="mailto:info@jaxophone.com" className="hover:text-amber-400 transition-colors">
                                                     info@jaxophone.com
                                                 </a>
                                             </p>
-                                            <p className="text-gray-600">
-                                                <a href="mailto:destek@jaxophone.com" className="hover:text-amber-600 transition-colors">
+                                            <p className="text-gray-300">
+                                                <a href="mailto:destek@jaxophone.com" className="hover:text-amber-400 transition-colors">
                                                     destek@jaxophone.com
                                                 </a>
                                             </p>
@@ -274,12 +274,12 @@ export default function ContactPage() {
                                     </div>
 
                                     <div className="flex items-start space-x-4">
-                                        <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
-                                            <Clock className="h-6 w-6 text-purple-600" />
+                                        <div className="w-12 h-12 bg-purple-900 rounded-full flex items-center justify-center flex-shrink-0">
+                                            <Clock className="h-6 w-6 text-purple-400" />
                                         </div>
                                         <div>
-                                            <h3 className="font-semibold text-gray-900">Çalışma Saatleri</h3>
-                                            <div className="text-gray-600 mt-1 space-y-1">
+                                            <h3 className="font-semibold text-white">Çalışma Saatleri</h3>
+                                            <div className="text-gray-300 mt-1 space-y-1">
                                                 <p>Pazartesi - Cuma: 09:00 - 18:00</p>
                                                 <p>Cumartesi: 10:00 - 17:00</p>
                                                 <p>Pazar: 12:00 - 17:00</p>
@@ -289,8 +289,8 @@ export default function ContactPage() {
                                 </div>
 
                                 {/* Social Media */}
-                                <div className="mt-8 pt-8 border-t border-gray-200">
-                                    <h3 className="font-semibold text-gray-900 mb-4">Sosyal Medya</h3>
+                                <div className="mt-8 pt-8 border-t border-gray-700">
+                                    <h3 className="font-semibold text-white mb-4">Sosyal Medya</h3>
                                     <div className="flex space-x-4">
                                         <a href="#" className="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center hover:bg-blue-700 transition-colors">
                                             <span className="text-sm font-bold">f</span>
@@ -311,16 +311,16 @@ export default function ContactPage() {
 
                         {/* Contact Form */}
                         <div className="lg:col-span-2">
-                            <div className="bg-white rounded-xl shadow-lg p-8">
+                            <div className="bg-gray-900 rounded-xl shadow-lg p-8 border border-gray-800">
                                 <div className="flex items-center space-x-3 mb-6">
-                                    <MessageSquare className="h-8 w-8 text-amber-600" />
-                                    <h2 className="text-2xl font-bold text-gray-900">Bize Yazın</h2>
+                                    <MessageSquare className="h-8 w-8 text-amber-400" />
+                                    <h2 className="text-2xl font-bold text-white">Bize Yazın</h2>
                                 </div>
 
                                 <form onSubmit={handleSubmit} className="space-y-6">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div>
-                                            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                                            <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">
                                                 Ad Soyad *
                                             </label>
                                             <div className="relative">
@@ -332,14 +332,14 @@ export default function ContactPage() {
                                                     value={formData.name}
                                                     onChange={handleInputChange}
                                                     required
-                                                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                                                    className="w-full pl-10 pr-4 py-3 border border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-gray-800 text-white placeholder-gray-400"
                                                     placeholder="Adınız ve soyadınız"
                                                 />
                                             </div>
                                         </div>
 
                                         <div>
-                                            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                                            <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
                                                 E-posta *
                                             </label>
                                             <div className="relative">
@@ -351,14 +351,14 @@ export default function ContactPage() {
                                                     value={formData.email}
                                                     onChange={handleInputChange}
                                                     required
-                                                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                                                    className="w-full pl-10 pr-4 py-3 border border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-gray-800 text-white placeholder-gray-400"
                                                     placeholder="ornek@email.com"
                                                 />
                                             </div>
                                         </div>
 
                                         <div>
-                                            <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
+                                            <label htmlFor="phone" className="block text-sm font-medium text-gray-300 mb-2">
                                                 Telefon
                                             </label>
                                             <div className="relative">
@@ -369,14 +369,14 @@ export default function ContactPage() {
                                                     name="phone"
                                                     value={formData.phone}
                                                     onChange={handleInputChange}
-                                                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                                                    className="w-full pl-10 pr-4 py-3 border border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-gray-800 text-white placeholder-gray-400"
                                                     placeholder="0555 123 45 67"
                                                 />
                                             </div>
                                         </div>
 
                                         <div>
-                                            <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-2">
+                                            <label htmlFor="subject" className="block text-sm font-medium text-gray-300 mb-2">
                                                 Konu *
                                             </label>
                                             <select
@@ -385,7 +385,7 @@ export default function ContactPage() {
                                                 value={formData.subject}
                                                 onChange={handleInputChange}
                                                 required
-                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                                                className="w-full px-4 py-3 border border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-gray-800 text-white"
                                             >
                                                 <option value="">Konu seçin</option>
                                                 <option value="product-inquiry">Ürün Sorgusu</option>
@@ -399,7 +399,7 @@ export default function ContactPage() {
                                     </div>
 
                                     <div>
-                                        <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
+                                        <label htmlFor="message" className="block text-sm font-medium text-gray-300 mb-2">
                                             Mesajınız *
                                         </label>
                                         <textarea
@@ -409,7 +409,7 @@ export default function ContactPage() {
                                             onChange={handleInputChange}
                                             required
                                             rows={6}
-                                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent resize-none"
+                                            className="w-full px-4 py-3 border border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-gray-800 text-white placeholder-gray-400 resize-none"
                                             placeholder="Mesajınızı buraya yazın..."
                                         ></textarea>
                                     </div>
@@ -438,9 +438,9 @@ export default function ContactPage() {
 
                     {/* Map Section */}
                     <div className="mt-12">
-                        <div className="bg-white rounded-xl shadow-lg p-8">
+                        <div className="bg-gray-900 rounded-xl shadow-lg p-8 border border-gray-800">
                             <div className="flex items-center justify-between mb-6">
-                                <h2 className="text-2xl font-bold text-gray-900">Konumumuz</h2>
+                                <h2 className="text-2xl font-bold text-white">Konumumuz</h2>
                                 <button
                                     onClick={() => window.location.reload()}
                                     className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
@@ -450,23 +450,23 @@ export default function ContactPage() {
                             </div>
 
                             {mapError ? (
-                                <div className="w-full h-96 bg-gray-200 rounded-lg flex items-center justify-center">
+                                <div className="w-full h-96 bg-gray-800 rounded-lg flex items-center justify-center border border-gray-700">
                                     <div className="text-center">
                                         <MapPin className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                                        <p className="text-gray-600 mb-2 font-medium">Harita Yüklenemedi</p>
-                                        <p className="text-sm text-gray-500 mb-4">{mapError}</p>
-                                        <div className="space-y-2 text-xs text-gray-600">
+                                        <p className="text-gray-300 mb-2 font-medium">Harita Yüklenemedi</p>
+                                        <p className="text-sm text-gray-400 mb-4">{mapError}</p>
+                                        <div className="space-y-2 text-xs text-gray-400">
                                             <p>• Google Maps API anahtarınızın doğru olduğundan emin olun</p>
                                             <p>• Google Cloud Console'da Maps JavaScript API'nin etkin olduğunu kontrol edin</p>
                                             <p>• Billing hesabınızın etkin olduğunu kontrol edin</p>
                                         </div>
-                                        <p className="text-sm text-gray-500 mt-4">
+                                        <p className="text-sm text-gray-400 mt-4">
                                             Mersin/Yenişehir Mahallesi, Yenişehir Caddesi No: 456, Mersin/Türkiye
                                         </p>
 
                                         {/* OpenStreetMap Fallback */}
                                         <div className="mt-6">
-                                            <p className="text-sm text-gray-600 mb-2">Alternatif harita:</p>
+                                            <p className="text-sm text-gray-400 mb-2">Alternatif harita:</p>
                                             <iframe
                                                 src="https://www.openstreetmap.org/export/embed.html?bbox=34.6315,36.8021,34.6515,36.8221&layer=mapnik&marker=36.8121,34.6415"
                                                 width="100%"
@@ -485,15 +485,15 @@ export default function ContactPage() {
                                 <div className="relative">
                                     <div
                                         ref={mapRef}
-                                        className="w-full h-96 rounded-lg border-2 border-gray-200"
+                                        className="w-full h-96 rounded-lg border-2 border-gray-700"
                                         style={{ minHeight: '400px' }}
                                     />
                                     {!mapLoaded && (
-                                        <div className="absolute inset-0 bg-gray-200 rounded-lg flex items-center justify-center">
+                                        <div className="absolute inset-0 bg-gray-800 rounded-lg flex items-center justify-center border border-gray-700">
                                             <div className="text-center">
-                                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-600 mx-auto mb-2"></div>
-                                                <p className="text-gray-600">Harita yükleniyor...</p>
-                                                <p className="text-xs text-gray-500 mt-1">Bu işlem birkaç saniye sürebilir</p>
+                                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-400 mx-auto mb-2"></div>
+                                                <p className="text-gray-300">Harita yükleniyor...</p>
+                                                <p className="text-xs text-gray-400 mt-1">Bu işlem birkaç saniye sürebilir</p>
                                             </div>
                                         </div>
                                     )}
