@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import { Playfair_Display } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { ReduxProvider } from '@/components/providers/redux-provider';
 import { LoadingProvider } from '@/components/providers/loading-provider';
 
-const playfair = Playfair_Display({
+const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-playfair",
+  variable: "--font-inter",
   display: 'swap',
 });
 
@@ -25,12 +25,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="tr" className={playfair.variable}>
+    <html lang="tr" className={inter.variable}>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
-      <body className="font-serif antialiased bg-background text-foreground">
+      <body className="font-sans antialiased bg-background text-foreground">
         <ReduxProvider>
           <LoadingProvider>
             {children}
