@@ -370,7 +370,7 @@ export function Header() {
                             <div className="text-3xl font-serif font-bold text-gray-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors duration-300">
                                 jaxophone
                             </div>
-                            <div className="absolute -bottom-1 -right-2 text-xs font-medium text-gray-500 dark:text-gray-400 group-hover:text-amber-500 dark:group-hover:text-amber-300 transition-colors duration-300 tracking-wide">
+                            <div className="absolute -bottom-2 -right-4 text-xs font-medium text-gray-500 dark:text-gray-400 group-hover:text-amber-500 dark:group-hover:text-amber-300 transition-colors duration-300 tracking-wide">
                                 Music Shop
                             </div>
                         </Link>
