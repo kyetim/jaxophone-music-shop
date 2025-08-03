@@ -61,7 +61,7 @@ export function CartSidebar({ isOpen, onClose, onMouseEnter, onMouseLeave }: Car
             {/* Sidebar */}
             <div
                 className={`
-          fixed top-0 right-0 h-full w-80 bg-white dark:bg-gray-900 shadow-2xl z-50 transform transition-transform duration-300 ease-in-out flex flex-col
+          fixed top-0 right-0 h-full w-80 bg-white dark:bg-gray-900 shadow-2xl z-50 transform transition-transform duration-300 ease-in-out flex flex-col hover-smooth
           ${isOpen ? 'translate-x-0' : 'translate-x-full'}
         `}
                 onMouseEnter={onMouseEnter}

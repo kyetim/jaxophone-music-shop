@@ -253,6 +253,56 @@
     box-shadow: 0 0 20px rgba(245, 158, 11, 0.4), 0 0 40px rgba(245, 158, 11, 0.2);
   }
 
+  /* Hover delay utilities for better UX */
+  .hover-delay-100 {
+    transition-delay: 100ms;
+  }
+
+  .hover-delay-200 {
+    transition-delay: 200ms;
+  }
+
+  .hover-delay-300 {
+    transition-delay: 300ms;
+  }
+
+  .hover-delay-500 {
+    transition-delay: 500ms;
+  }
+
+  /* Smooth hover transitions */
+  .hover-smooth {
+    transition: all 0.3s ease-in-out;
+  }
+
+  .hover-smooth-fast {
+    transition: all 0.2s ease-in-out;
+  }
+
+  .hover-smooth-slow {
+    transition: all 0.5s ease-in-out;
+  }
+
+  /* Dropdown hover delay */
+  .dropdown-hover {
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+    transition-delay: 200ms;
+  }
+
+  .dropdown-hover:hover {
+    transition-delay: 0ms;
+  }
+
+  /* Menu item hover delay */
+  .menu-hover {
+    transition: all 0.2s ease-in-out;
+    transition-delay: 150ms;
+  }
+
+  .menu-hover:hover {
+    transition-delay: 0ms;
+  }
+
   /* Floating animation */
   .float {
     animation: float 6s ease-in-out infinite;

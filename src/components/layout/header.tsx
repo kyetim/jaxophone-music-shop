@@ -273,7 +273,7 @@ export function Header() {
         } else {
             categoryHoverTimeoutRef.current = setTimeout(() => {
                 setHoveredCategory(null);
-            }, 150);
+            }, 300);
         }
     };
 
@@ -287,7 +287,7 @@ export function Header() {
         } else {
             cartHoverTimeoutRef.current = setTimeout(() => {
                 setIsCartOpen(false);
-            }, 300);
+            }, 500);
         }
     };
 
@@ -301,7 +301,7 @@ export function Header() {
         } else {
             favoritesHoverTimeoutRef.current = setTimeout(() => {
                 setIsFavoritesOpen(false);
-            }, 300);
+            }, 500);
         }
     };
 
@@ -498,7 +498,7 @@ export function Header() {
                                 {/* Mega Menu Dropdown - Individual positioning for each category */}
                                 {hoveredCategory === category.name && megaMenuCategories[category.name] && (
                                     <div
-                                        className="absolute top-full bg-white text-gray-900 shadow-2xl z-50 border-t-4 border-blue-600 animate-fade-in"
+                                        className="absolute top-full bg-white text-gray-900 shadow-2xl z-50 border-t-4 border-blue-600 animate-fade-in dropdown-hover"
                                         onMouseEnter={() => handleCategoryHover(category.name)}
                                         onMouseLeave={() => handleCategoryHover(null)}
                                         style={{
