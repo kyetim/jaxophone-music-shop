@@ -366,14 +366,12 @@ export function Header() {
                 <div className="max-w-7xl mx-auto px-4">
                     <div className="flex items-center justify-between h-20">
                         {/* Logo */}
-                        <Link href="/" className="flex items-center cursor-pointer group">
-                            <div className="flex flex-col items-start">
-                                <div className="text-3xl font-serif font-bold text-gray-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors duration-300">
-                                    jaxophone
-                                </div>
-                                <div className="text-xs font-medium text-gray-500 dark:text-gray-400 group-hover:text-amber-500 dark:group-hover:text-amber-300 transition-colors duration-300 tracking-wide uppercase">
-                                    music shop
-                                </div>
+                        <Link href="/" className="flex items-center cursor-pointer group relative">
+                            <div className="text-3xl font-serif font-bold text-gray-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors duration-300">
+                                jaxophone
+                            </div>
+                            <div className="absolute -bottom-1 -right-2 text-xs font-medium text-gray-500 dark:text-gray-400 group-hover:text-amber-500 dark:group-hover:text-amber-300 transition-colors duration-300 tracking-wide">
+                                Music Shop
                             </div>
                         </Link>
 
