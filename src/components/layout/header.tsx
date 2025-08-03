@@ -273,7 +273,7 @@ export function Header() {
         } else {
             categoryHoverTimeoutRef.current = setTimeout(() => {
                 setHoveredCategory(null);
-            }, 300);
+            }, 500);
         }
     };
 
@@ -287,7 +287,7 @@ export function Header() {
         } else {
             cartHoverTimeoutRef.current = setTimeout(() => {
                 setIsCartOpen(false);
-            }, 500);
+            }, 800);
         }
     };
 
@@ -301,7 +301,7 @@ export function Header() {
         } else {
             favoritesHoverTimeoutRef.current = setTimeout(() => {
                 setIsFavoritesOpen(false);
-            }, 500);
+            }, 800);
         }
     };
 

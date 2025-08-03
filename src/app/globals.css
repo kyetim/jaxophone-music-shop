@@ -270,6 +270,14 @@
     transition-delay: 500ms;
   }
 
+  .hover-delay-800 {
+    transition-delay: 800ms;
+  }
+
+  .hover-delay-1000 {
+    transition-delay: 1000ms;
+  }
+
   /* Smooth hover transitions */
   .hover-smooth {
     transition: all 0.3s ease-in-out;
@@ -286,7 +294,7 @@
   /* Dropdown hover delay */
   .dropdown-hover {
     transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
-    transition-delay: 200ms;
+    transition-delay: 400ms;
   }
 
   .dropdown-hover:hover {
@@ -296,7 +304,7 @@
   /* Menu item hover delay */
   .menu-hover {
     transition: all 0.2s ease-in-out;
-    transition-delay: 150ms;
+    transition-delay: 300ms;
   }
 
   .menu-hover:hover {
