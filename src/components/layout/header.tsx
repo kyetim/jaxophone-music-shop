@@ -366,7 +366,7 @@ export function Header() {
                     <div className="flex items-center justify-between h-20">
                         {/* Logo */}
                         <Link href="/" className="flex items-center cursor-pointer group">
-                            <div className="text-3xl font-bold text-gray-900 group-hover:text-amber-600 transition-colors duration-300">
+                            <div className="text-3xl font-serif font-bold text-gray-900 group-hover:text-amber-600 transition-colors duration-300">
                                 jaxophone
                             </div>
                         </Link>

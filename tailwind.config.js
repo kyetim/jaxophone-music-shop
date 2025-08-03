@@ -17,6 +17,10 @@ module.exports = {
             },
         },
         extend: {
+            fontFamily: {
+                serif: ['var(--font-playfair)', 'Georgia', 'serif'],
+                sans: ['Inter', 'system-ui', 'sans-serif'],
+            },
             colors: {
                 border: "hsl(var(--border))",
                 input: "hsl(var(--input))",
