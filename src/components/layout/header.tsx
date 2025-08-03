@@ -7,6 +7,7 @@ import { useAppSelector } from '@/store/hooks';
 import { useLoading } from '@/components/providers/loading-provider';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { ShoppingCart, Heart, User, Search, Menu, X, Phone, Bell, Gift, ChevronDown } from 'lucide-react';
 import { CartSidebar } from './cart-sidebar';
 import { FavoritesSidebar } from './favorites-sidebar';
@@ -341,16 +342,16 @@ export function Header() {
             </div>
 
             {/* Secondary Info Bar */}
-            <div className="bg-white border-b border-gray-100 py-2 px-4 hidden md:block">
+            <div className="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 py-2 px-4 hidden md:block">
                 <div className="max-w-7xl mx-auto">
-                    <div className="flex items-center justify-between text-sm text-gray-600">
+                    <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-300">
                         <div className="flex items-center space-x-6">
-                            <Link href="/about" className="hover:text-amber-600 transition-colors">Hakkımızda</Link>
-                            <Link href="/products" className="hover:text-amber-600 transition-colors">Ürünler</Link>
-                            <Link href="/blog" className="hover:text-amber-600 transition-colors">Blog</Link>
-                            <Link href="/admin" className="hover:text-amber-600 transition-colors">Admin Dashboard</Link>
-                            <Link href="/installment" className="hover:text-amber-600 transition-colors">Sipariş Takibi</Link>
-                            <Link href="/contact" className="hover:text-amber-600 transition-colors">İletişim</Link>
+                            <Link href="/about" className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors">Hakkımızda</Link>
+                            <Link href="/products" className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors">Ürünler</Link>
+                            <Link href="/blog" className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors">Blog</Link>
+                            <Link href="/admin" className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors">Admin Dashboard</Link>
+                            <Link href="/installment" className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors">Sipariş Takibi</Link>
+                            <Link href="/contact" className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors">İletişim</Link>
                         </div>
                         <div className="flex items-center space-x-2">
                             <Phone className="h-4 w-4" />
@@ -361,12 +362,12 @@ export function Header() {
             </div>
 
             {/* Main Header - DoReMusic Style */}
-            <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
+            <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-50">
                 <div className="max-w-7xl mx-auto px-4">
                     <div className="flex items-center justify-between h-20">
                         {/* Logo */}
                         <Link href="/" className="flex items-center cursor-pointer group">
-                            <div className="text-3xl font-serif font-bold text-gray-900 group-hover:text-amber-600 transition-colors duration-300">
+                            <div className="text-3xl font-serif font-bold text-gray-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors duration-300">
                                 jaxophone
                             </div>
                         </Link>
@@ -392,7 +393,7 @@ export function Header() {
                             {/* User Account */}
                             <Link
                                 href={isAuthenticated ? "/account" : "/login"}
-                                className="flex items-center space-x-2 text-gray-700 hover:text-amber-600 transition-colors cursor-pointer"
+                                className="flex items-center space-x-2 text-gray-700 dark:text-gray-300 hover:text-amber-600 dark:hover:text-amber-400 transition-colors cursor-pointer"
                                 onClick={(e) => handleNavClick(isAuthenticated ? "/account" : "/login", e)}
                             >
                                 <User className="h-5 w-5" />
@@ -400,7 +401,7 @@ export function Header() {
                                     <div className="font-medium">
                                         {isAuthenticated ? "Hesabım" : "Giriş Yap"}
                                     </div>
-                                    <div className="text-xs text-gray-500">
+                                    <div className="text-xs text-gray-500 dark:text-gray-400">
                                         {isAuthenticated ? "Hoş geldin!" : "veya Üye Ol"}
                                     </div>
                                 </div>
@@ -408,11 +409,14 @@ export function Header() {
 
                             {/* Notifications */}
                             <div className="relative">
-                                <Bell className="h-5 w-5 text-gray-700 hover:text-amber-600 transition-colors cursor-pointer" />
-                                <Badge className="absolute -top-2 -right-2 h-5 w-5 text-xs bg-amber-600 border-white flex items-center justify-center">
+                                <Bell className="h-5 w-5 text-gray-700 dark:text-gray-300 hover:text-amber-600 dark:hover:text-amber-400 transition-colors cursor-pointer" />
+                                <Badge className="absolute -top-2 -right-2 h-5 w-5 text-xs bg-amber-600 border-white dark:border-gray-900 flex items-center justify-center">
                                     1
                                 </Badge>
                             </div>
+
+                            {/* Theme Toggle */}
+                            <ThemeToggle />
 
                             {/* Favorites */}
                             <div
@@ -420,9 +424,9 @@ export function Header() {
                                 onMouseEnter={() => handleFavoritesHover(true)}
                                 onMouseLeave={() => handleFavoritesHover(false)}
                             >
-                                <Heart className={`h-5 w-5 transition-colors ${favoritesCount > 0 ? 'text-red-500 fill-current' : 'text-gray-700 hover:text-red-500'}`} />
+                                <Heart className={`h-5 w-5 transition-colors ${favoritesCount > 0 ? 'text-red-500 fill-current' : 'text-gray-700 dark:text-gray-300 hover:text-red-500'}`} />
                                 {favoritesCount > 0 && (
-                                    <Badge className="absolute -top-2 -right-2 h-5 w-5 text-xs bg-red-500 border-white flex items-center justify-center">
+                                    <Badge className="absolute -top-2 -right-2 h-5 w-5 text-xs bg-red-500 border-white dark:border-gray-900 flex items-center justify-center">
                                         {favoritesCount}
                                     </Badge>
                                 )}
@@ -436,16 +440,16 @@ export function Header() {
                             >
                                 <div className="flex items-center space-x-2">
                                     <div className="relative">
-                                        <ShoppingCart className="h-5 w-5 text-gray-700 hover:text-amber-600 transition-colors" />
+                                        <ShoppingCart className="h-5 w-5 text-gray-700 dark:text-gray-300 hover:text-amber-600 dark:hover:text-amber-400 transition-colors" />
                                         {cartItemCount > 0 && (
-                                            <Badge className="absolute -top-2 -right-2 h-5 w-5 text-xs bg-amber-600 border-white flex items-center justify-center">
+                                            <Badge className="absolute -top-2 -right-2 h-5 w-5 text-xs bg-amber-600 border-white dark:border-gray-900 flex items-center justify-center">
                                                 {cartItemCount}
                                             </Badge>
                                         )}
                                     </div>
                                     <div className="hidden lg:block text-sm">
-                                        <div className="font-medium text-gray-900">Alışveriş</div>
-                                        <div className="text-xs text-gray-500">Sepetim</div>
+                                        <div className="font-medium text-gray-900 dark:text-white">Alışveriş</div>
+                                        <div className="text-xs text-gray-500 dark:text-gray-400">Sepetim</div>
                                     </div>
                                 </div>
                             </div>
@@ -561,7 +565,7 @@ export function Header() {
 
             {/* Mobile Menu */}
             {isMobileMenuOpen && (
-                <div className="lg:hidden bg-white border-b border-gray-200">
+                <div className="lg:hidden bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
                     <div className="px-4 py-4 space-y-4">
                         {/* Mobile Search */}
                         <div className="mb-4">
@@ -576,7 +580,7 @@ export function Header() {
                             <Link
                                 key={category.name}
                                 href={category.href}
-                                className="block py-2 text-gray-700 hover:text-amber-600 transition-colors cursor-pointer"
+                                className="block py-2 text-gray-700 dark:text-gray-300 hover:text-amber-600 dark:hover:text-amber-400 transition-colors cursor-pointer"
                                 onClick={(e) => {
                                     handleNavClick(category.href, e);
                                     setIsMobileMenuOpen(false);
@@ -589,7 +593,7 @@ export function Header() {
                         {/* Additional mobile links */}
                         <Link
                             href="/about"
-                            className="block py-2 text-gray-700 hover:text-amber-600 transition-colors cursor-pointer border-t border-gray-200 pt-4"
+                            className="block py-2 text-gray-700 dark:text-gray-300 hover:text-amber-600 dark:hover:text-amber-400 transition-colors cursor-pointer border-t border-gray-200 dark:border-gray-700 pt-4"
                             onClick={(e) => {
                                 handleNavClick('/about', e);
                                 setIsMobileMenuOpen(false);
@@ -600,7 +604,7 @@ export function Header() {
 
                         <Link
                             href="/products"
-                            className="block py-2 text-gray-700 hover:text-amber-600 transition-colors cursor-pointer"
+                            className="block py-2 text-gray-700 dark:text-gray-300 hover:text-amber-600 dark:hover:text-amber-400 transition-colors cursor-pointer"
                             onClick={(e) => {
                                 handleNavClick('/products', e);
                                 setIsMobileMenuOpen(false);
@@ -611,7 +615,7 @@ export function Header() {
 
                         <Link
                             href="/contact"
-                            className="block py-2 text-gray-700 hover:text-amber-600 transition-colors cursor-pointer"
+                            className="block py-2 text-gray-700 dark:text-gray-300 hover:text-amber-600 dark:hover:text-amber-400 transition-colors cursor-pointer"
                             onClick={(e) => {
                                 handleNavClick('/contact', e);
                                 setIsMobileMenuOpen(false);
@@ -622,7 +626,7 @@ export function Header() {
 
                         <Link
                             href="/blog"
-                            className="block py-2 text-gray-700 hover:text-amber-600 transition-colors cursor-pointer"
+                            className="block py-2 text-gray-700 dark:text-gray-300 hover:text-amber-600 dark:hover:text-amber-400 transition-colors cursor-pointer"
                             onClick={(e) => {
                                 handleNavClick('/blog', e);
                                 setIsMobileMenuOpen(false);
@@ -633,7 +637,7 @@ export function Header() {
 
                         <Link
                             href="/installment"
-                            className="block py-2 text-gray-700 hover:text-amber-600 transition-colors cursor-pointer"
+                            className="block py-2 text-gray-700 dark:text-gray-300 hover:text-amber-600 dark:hover:text-amber-400 transition-colors cursor-pointer"
                             onClick={(e) => {
                                 handleNavClick('/installment', e);
                                 setIsMobileMenuOpen(false);
