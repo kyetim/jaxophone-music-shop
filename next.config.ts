@@ -21,7 +21,6 @@ const nextConfig: NextConfig = {
     scrollRestoration: true,
   },
   // CSS optimizations
-  optimizeFonts: true,
   compress: true,
   poweredByHeader: false,
   // Fix for CSS loading issues
