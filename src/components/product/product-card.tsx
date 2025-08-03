@@ -33,7 +33,7 @@ export function ProductCard({ product }: ProductCardProps) {
     }
 
     return (
-        <Card className="group overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-500 bg-white rounded-2xl cursor-pointer">
+        <Card className="group overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-500 bg-white dark:bg-gray-800 rounded-2xl cursor-pointer">
             <CardContent className="p-0 relative">
                 {/* Product Image */}
                 <div className="relative aspect-square overflow-hidden">
@@ -54,8 +54,8 @@ export function ProductCard({ product }: ProductCardProps) {
                     <button
                         onClick={handleToggleFavorite}
                         className={`absolute top-3 right-3 p-2 rounded-full transition-all duration-300 backdrop-blur-sm cursor-pointer ${isFavorited
-                                ? 'bg-red-500 text-white shadow-lg scale-110'
-                                : 'bg-white/80 text-gray-600 hover:bg-white hover:text-red-500'
+                            ? 'bg-red-500 text-white shadow-lg scale-110'
+                            : 'bg-white/80 dark:bg-gray-800/80 text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-700 hover:text-red-500'
                             }`}
                     >
                         <Heart className={`h-4 w-4 ${isFavorited ? 'fill-current' : ''}`} />
@@ -81,59 +81,59 @@ export function ProductCard({ product }: ProductCardProps) {
                 {/* Product Info */}
                 <div className="p-6 space-y-3">
                     <div className="flex items-center justify-between">
-                        <span className="text-xs font-medium text-amber-600 bg-amber-50 px-2 py-1 rounded-full">
+                        <span className="text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 px-2 py-1 rounded-full">
                             {product.brand}
                         </span>
                         <div className="flex items-center space-x-1">
                             <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-                            <span className="text-xs font-medium text-gray-600">{product.rating}</span>
-                            <span className="text-xs text-gray-400">({product.reviewCount})</span>
+                            <span className="text-xs font-medium text-gray-600 dark:text-gray-300">{product.rating}</span>
+                            <span className="text-xs text-gray-400 dark:text-gray-500">({product.reviewCount})</span>
                         </div>
                     </div>
 
                     <Link href={`/products/${product.id}`}>
-                        <h3 className="font-semibold text-gray-900 text-sm leading-tight hover:text-amber-600 transition-colors duration-200 line-clamp-2">
+                        <h3 className="font-semibold text-gray-900 dark:text-white text-sm leading-tight hover:text-amber-600 dark:hover:text-amber-400 transition-colors duration-200 line-clamp-2">
                             {product.name}
                         </h3>
                     </Link>
 
-                    <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2 leading-relaxed">
                         {product.description}
                     </p>
 
-                    {/* Price */}
-                    <div className="flex items-center justify-between pt-2">
+                    <div className="flex items-center justify-between">
                         <div className="space-y-1">
                             <div className="flex items-center space-x-2">
-                                <span className="text-lg font-bold text-gray-900">
-                                    {product.price.toLocaleString('tr-TR')}₺
+                                <span className="text-lg font-bold text-gray-900 dark:text-white">
+                                    {product.price.toLocaleString('tr-TR')} ₺
                                 </span>
                                 {product.originalPrice && (
-                                    <span className="text-sm text-gray-400 line-through">
-                                        {product.originalPrice.toLocaleString('tr-TR')}₺
+                                    <span className="text-sm text-gray-500 dark:text-gray-400 line-through">
+                                        {product.originalPrice.toLocaleString('tr-TR')} ₺
                                     </span>
                                 )}
                             </div>
-                            {product.inStock && (
-                                <p className="text-xs text-green-600 font-medium">
-                                    ✓ {product.stockQuantity} adet stokta
-                                </p>
-                            )}
+                            <div className="flex items-center space-x-1">
+                                <span className={`text-xs px-2 py-1 rounded-full ${product.inStock
+                                    ? 'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400'
+                                    : 'bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400'
+                                    }`}>
+                                    {product.inStock ? 'Stokta' : 'Stokta Yok'}
+                                </span>
+                            </div>
                         </div>
+
+                        <Button
+                            onClick={handleAddToCart}
+                            disabled={!product.inStock}
+                            size="sm"
+                            className="bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            <ShoppingCart className="h-4 w-4" />
+                        </Button>
                     </div>
                 </div>
             </CardContent>
-
-            <CardFooter className="p-6 pt-0">
-                <Button
-                    className="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                    onClick={handleAddToCart}
-                    disabled={!product.inStock}
-                >
-                    <ShoppingCart className="h-4 w-4 mr-2" />
-                    {product.inStock ? 'Sepete Ekle' : 'Stokta Yok'}
-                </Button>
-            </CardFooter>
         </Card>
     );
 } 

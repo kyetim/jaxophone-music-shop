@@ -168,7 +168,7 @@ export function SearchInput({
                             setIsOpen(true);
                         }
                     }}
-                    className="w-full pl-10 pr-10 py-3 bg-white border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all duration-300 text-gray-900 placeholder:text-gray-500 shadow-elegant hover:shadow-elegant-lg"
+                    className="w-full pl-10 pr-10 py-3 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all duration-300 text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 shadow-elegant hover:shadow-elegant-lg"
                 />
 
                 {/* Clear Button */}
