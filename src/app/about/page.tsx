@@ -153,7 +153,7 @@ export default function AboutPage() {
                                         className="object-cover w-full h-full"
                                     />
                                 </div>
-                                <div className="absolute -bottom-6 -left-6 bg-gray-900 rounded-xl p-6 shadow-xl border border-gray-800">
+                                <div className="absolute -bottom-6 -left-6 bg-gray-900 dark:bg-gray-900 rounded-xl p-6 shadow-xl border border-gray-800 dark:border-gray-800">
                                     <div className="flex items-center gap-3">
                                         <div className="w-12 h-12 bg-gradient-to-r from-amber-600 to-orange-600 rounded-full flex items-center justify-center">
                                             <Music className="h-6 w-6 text-white" />
@@ -170,7 +170,7 @@ export default function AboutPage() {
                 </section>
 
                 {/* Stats Section */}
-                <section className="py-16 bg-gray-900 dark:bg-black">
+                <section className="py-16 bg-gray-100 dark:bg-black">
                     <div className="max-w-7xl mx-auto px-6 lg:px-8">
                         <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
                             {stats.map((stat, index) => (
@@ -178,8 +178,8 @@ export default function AboutPage() {
                                     <div className="w-16 h-16 bg-gradient-to-r from-amber-600 to-orange-600 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
                                         <stat.icon className="h-8 w-8 text-white" />
                                     </div>
-                                    <div className="font-bold text-3xl text-white mb-2">{stat.value}</div>
-                                    <div className="text-gray-300">{stat.label}</div>
+                                    <div className="font-bold text-3xl text-gray-900 dark:text-white mb-2">{stat.value}</div>
+                                    <div className="text-gray-600 dark:text-gray-300">{stat.label}</div>
                                 </div>
                             ))}
                         </div>
@@ -187,42 +187,42 @@ export default function AboutPage() {
                 </section>
 
                 {/* Story Section */}
-                <section className="py-20 bg-gray-800 dark:bg-gray-900">
+                <section className="py-20 bg-white dark:bg-gray-900">
                     <div className="max-w-7xl mx-auto px-6 lg:px-8">
                         <div className="grid lg:grid-cols-2 gap-16 items-center">
                             <div className="space-y-6">
                                 <div className="space-y-4">
-                                    <h2 className="text-3xl lg:text-4xl font-bold text-white">
+                                    <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">
                                         Hikayemiz
                                     </h2>
-                                    <p className="text-lg text-gray-300 leading-relaxed">
+                                    <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
                                         1998 yılında küçük bir dükkanda başlayan yolculuğumuz, bugün Türkiye&apos;nin
                                         en güvenilir müzik enstrümanları mağazası haline geldi.
                                     </p>
                                 </div>
 
                                 <div className="space-y-4">
-                                    <blockquote className="relative p-6 bg-gray-900 rounded-xl shadow-lg border border-gray-800">
+                                    <blockquote className="relative p-6 bg-gray-50 dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-800">
                                         <Quote className="absolute top-4 left-4 h-6 w-6 text-amber-600 opacity-50" />
-                                        <p className="text-gray-300 italic pl-8">
+                                        <p className="text-gray-700 dark:text-gray-300 italic pl-8">
                                             &quot;Müzik, insanların kalbiyle konuşmasının en güzel yoludur.
                                             Biz de bu dili konuşan herkese kapımızı açık tutuyoruz.&quot;
                                         </p>
                                         <footer className="mt-4 pl-8">
-                                            <div className="font-semibold text-white">Ahmet Melodi</div>
-                                            <div className="text-sm text-gray-400">Kurucu & CEO</div>
+                                            <div className="font-semibold text-gray-900 dark:text-white">Ahmet Melodi</div>
+                                            <div className="text-sm text-gray-500 dark:text-gray-400">Kurucu & CEO</div>
                                         </footer>
                                     </blockquote>
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-4">
-                                    <div className="text-center p-4 bg-gray-900 rounded-lg shadow border border-gray-800">
+                                    <div className="text-center p-4 bg-gray-50 dark:bg-gray-900 rounded-lg shadow border border-gray-200 dark:border-gray-800">
                                         <div className="font-bold text-2xl text-amber-600">1998</div>
-                                        <div className="text-sm text-gray-400">Kuruluş Yılı</div>
+                                        <div className="text-sm text-gray-500 dark:text-gray-400">Kuruluş Yılı</div>
                                     </div>
-                                    <div className="text-center p-4 bg-gray-900 rounded-lg shadow border border-gray-800">
+                                    <div className="text-center p-4 bg-gray-50 dark:bg-gray-900 rounded-lg shadow border border-gray-200 dark:border-gray-800">
                                         <div className="font-bold text-2xl text-amber-600">50K+</div>
-                                        <div className="text-sm text-gray-400">Mutlu Müşteri</div>
+                                        <div className="text-sm text-gray-500 dark:text-gray-400">Mutlu Müşteri</div>
                                     </div>
                                 </div>
                             </div>
@@ -243,13 +243,13 @@ export default function AboutPage() {
                 </section>
 
                 {/* Values Section */}
-                <section className="py-20 bg-black dark:bg-black">
+                <section className="py-20 bg-gray-50 dark:bg-black">
                     <div className="max-w-7xl mx-auto px-6 lg:px-8">
                         <div className="text-center mb-16">
-                            <h2 className="text-3xl lg:text-4xl font-bold text-white mb-4">
+                            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-4">
                                 Değerlerimiz
                             </h2>
-                            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+                            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
                                 Her adımımızda müşteri memnuniyeti ve kaliteyi ön planda tutarak,
                                 müzik dünyasında fark yaratıyoruz.
                             </p>
@@ -257,13 +257,13 @@ export default function AboutPage() {
 
                         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
                             {values.map((value, index) => (
-                                <Card key={index} className="border border-gray-800 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 group cursor-pointer bg-gray-900">
+                                <Card key={index} className="border border-gray-200 dark:border-gray-800 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 group cursor-pointer bg-white dark:bg-gray-900">
                                     <CardContent className="p-6 text-center space-y-4">
-                                        <div className={`w-16 h-16 rounded-xl bg-gray-800 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300`}>
+                                        <div className={`w-16 h-16 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300`}>
                                             <value.icon className={`h-8 w-8 ${value.color}`} />
                                         </div>
-                                        <h3 className="text-xl font-semibold text-white">{value.title}</h3>
-                                        <p className="text-gray-300">{value.description}</p>
+                                        <h3 className="text-xl font-semibold text-gray-900 dark:text-white">{value.title}</h3>
+                                        <p className="text-gray-600 dark:text-gray-300">{value.description}</p>
                                     </CardContent>
                                 </Card>
                             ))}
@@ -272,20 +272,20 @@ export default function AboutPage() {
                 </section>
 
                 {/* Team Section */}
-                <section className="py-20 bg-gray-900 dark:bg-gray-900">
+                <section className="py-20 bg-white dark:bg-gray-900">
                     <div className="max-w-7xl mx-auto px-6 lg:px-8">
                         <div className="text-center mb-16">
-                            <h2 className="text-3xl lg:text-4xl font-bold text-white mb-4">
+                            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-4">
                                 Ekibimiz
                             </h2>
-                            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+                            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
                                 Müzik tutkusu ve uzmanlığıyla size en iyi hizmeti sunmak için burada olan ekibimiz.
                             </p>
                         </div>
 
                         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
                             {team.map((member, index) => (
-                                <Card key={index} className="border border-gray-800 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 group cursor-pointer bg-gray-900">
+                                <Card key={index} className="border border-gray-200 dark:border-gray-800 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 group cursor-pointer bg-white dark:bg-gray-900">
                                     <CardContent className="p-6 text-center space-y-4">
                                         <div className="relative w-24 h-24 mx-auto">
                                             <Image
@@ -297,11 +297,11 @@ export default function AboutPage() {
                                             />
                                         </div>
                                         <div>
-                                            <h3 className="text-lg font-semibold text-white">{member.name}</h3>
+                                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{member.name}</h3>
                                             <p className="text-amber-600 font-medium">{member.role}</p>
-                                            <p className="text-sm text-gray-400">{member.instrument}</p>
+                                            <p className="text-sm text-gray-500 dark:text-gray-400">{member.instrument}</p>
                                         </div>
-                                        <p className="text-gray-300 text-sm">{member.description}</p>
+                                        <p className="text-gray-600 dark:text-gray-300 text-sm">{member.description}</p>
                                     </CardContent>
                                 </Card>
                             ))}
@@ -310,13 +310,13 @@ export default function AboutPage() {
                 </section>
 
                 {/* Services Section */}
-                <section className="py-20 bg-black dark:bg-black">
+                <section className="py-20 bg-gray-50 dark:bg-black">
                     <div className="max-w-7xl mx-auto px-6 lg:px-8">
                         <div className="text-center mb-16">
-                            <h2 className="text-3xl lg:text-4xl font-bold text-white mb-4">
+                            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-4">
                                 Hizmetlerimiz
                             </h2>
-                            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+                            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
                                 Müzik yolculuğunuzda yanınızda olmak için sunduğumuz profesyonel hizmetler.
                             </p>
                         </div>
@@ -327,8 +327,8 @@ export default function AboutPage() {
                                     <div className="w-16 h-16 bg-gradient-to-r from-amber-600 to-orange-600 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
                                         <service.icon className="h-8 w-8 text-white" />
                                     </div>
-                                    <h3 className="text-lg font-semibold text-white mb-2">{service.title}</h3>
-                                    <p className="text-gray-300">{service.description}</p>
+                                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{service.title}</h3>
+                                    <p className="text-gray-600 dark:text-gray-300">{service.description}</p>
                                 </div>
                             ))}
                         </div>
@@ -390,7 +390,7 @@ export default function AboutPage() {
             </main>
 
             {/* Footer */}
-            <footer className="bg-black text-white py-16 border-t border-gray-800">
+            <footer className="bg-gray-900 dark:bg-black text-white py-16 border-t border-gray-800">
                 <div className="max-w-7xl mx-auto px-6 lg:px-8">
                     <div className="grid md:grid-cols-4 gap-8">
                         <div className="space-y-4">
