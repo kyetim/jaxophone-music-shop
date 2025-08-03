@@ -197,8 +197,8 @@ export default function BlogPage() {
                     {/* Sidebar */}
                     <div className="lg:col-span-1 space-y-8">
                         {/* Search */}
-                        <div className="bg-gray-900 rounded-xl shadow-lg p-6 border border-gray-800">
-                            <h3 className="text-lg font-bold text-white mb-4">Arama</h3>
+                        <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-800">
+                            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Arama</h3>
                             <div className="relative">
                                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                                 <input
@@ -206,14 +206,14 @@ export default function BlogPage() {
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                     placeholder="Blog yazılarında ara..."
-                                    className="w-full pl-10 pr-4 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-gray-800 text-white placeholder-gray-400"
+                                    className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                                 />
                             </div>
                         </div>
 
                         {/* Categories */}
-                        <div className="bg-gray-900 rounded-xl shadow-lg p-6 border border-gray-800">
-                            <h3 className="text-lg font-bold text-white mb-4">Kategoriler</h3>
+                        <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-800">
+                            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Kategoriler</h3>
                             <div className="space-y-2">
                                 {categories.map(category => (
                                     <button
@@ -221,12 +221,12 @@ export default function BlogPage() {
                                         onClick={() => setSelectedCategory(category.id)}
                                         className={`w-full text-left px-3 py-2 rounded-lg transition-colors ${selectedCategory === category.id
                                             ? 'bg-amber-900 text-amber-300'
-                                            : 'hover:bg-gray-800 text-gray-300'
+                                            : 'hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300'
                                             }`}
                                     >
                                         <div className="flex items-center justify-between">
                                             <span>{category.name}</span>
-                                            <span className="text-sm bg-gray-700 text-gray-300 px-2 py-1 rounded-full">
+                                            <span className="text-sm bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2 py-1 rounded-full">
                                                 {category.count}
                                             </span>
                                         </div>
@@ -236,13 +236,13 @@ export default function BlogPage() {
                         </div>
 
                         {/* Popular Tags */}
-                        <div className="bg-gray-900 rounded-xl shadow-lg p-6 border border-gray-800">
-                            <h3 className="text-lg font-bold text-white mb-4">Popüler Etiketler</h3>
+                        <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-800">
+                            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Popüler Etiketler</h3>
                             <div className="flex flex-wrap gap-2">
                                 {['gitar', 'piyano', 'başlangıç', 'rehber', 'bakım', 'inceleme', 'ipuçları', 'haberler'].map(tag => (
                                     <span
                                         key={tag}
-                                        className="bg-gray-800 text-gray-300 px-3 py-1 rounded-full text-sm hover:bg-gray-700 transition-colors cursor-pointer"
+                                        className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-3 py-1 rounded-full text-sm hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors cursor-pointer"
                                     >
                                         #{tag}
                                     </span>
@@ -254,38 +254,38 @@ export default function BlogPage() {
                     {/* Blog Posts */}
                     <div className="lg:col-span-3">
                         <div className="flex items-center justify-between mb-8">
-                            <h2 className="text-2xl font-bold text-white">
+                            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
                                 {selectedCategory === 'all' ? 'Tüm Yazılar' : `${categories.find(cat => cat.id === selectedCategory)?.name} Yazıları`}
                             </h2>
-                            <span className="text-gray-400">
+                            <span className="text-gray-600 dark:text-gray-400">
                                 {filteredPosts.length} yazı bulundu
                             </span>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             {filteredPosts.slice(1).map(post => (
-                                <article key={post.id} className="bg-gray-900 rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow border border-gray-800">
-                                    <div className="h-48 bg-gray-800 flex items-center justify-center">
+                                <article key={post.id} className="bg-white dark:bg-gray-900 rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow border border-gray-200 dark:border-gray-800">
+                                    <div className="h-48 bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
                                         <Music className="h-12 w-12 text-gray-400" />
                                     </div>
 
                                     <div className="p-6">
                                         <div className="flex items-center space-x-4 mb-3">
-                                            <span className="bg-gray-800 text-gray-300 px-3 py-1 rounded-full text-sm">
+                                            <span className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-3 py-1 rounded-full text-sm">
                                                 {categories.find(cat => cat.id === post.category)?.name}
                                             </span>
-                                            <span className="text-gray-400 text-sm">{post.readTime}</span>
+                                            <span className="text-gray-500 dark:text-gray-400 text-sm">{post.readTime}</span>
                                         </div>
 
-                                        <h3 className="text-xl font-bold text-white mb-3 line-clamp-2">
+                                        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 line-clamp-2">
                                             {post.title}
                                         </h3>
 
-                                        <p className="text-gray-300 mb-4 line-clamp-3">
+                                        <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">
                                             {post.excerpt}
                                         </p>
 
-                                        <div className="flex items-center justify-between text-sm text-gray-400 mb-4">
+                                        <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400 mb-4">
                                             <div className="flex items-center">
                                                 <User className="h-4 w-4 mr-1" />
                                                 {post.author}
@@ -303,14 +303,14 @@ export default function BlogPage() {
                                         </div>
 
                                         <div className="flex items-center justify-between">
-                                            <div className="flex items-center text-gray-400 text-sm">
+                                            <div className="flex items-center text-gray-500 dark:text-gray-400 text-sm">
                                                 <Calendar className="h-4 w-4 mr-1" />
                                                 {post.date}
                                             </div>
 
                                             <Link
                                                 href={`/blog/${post.id}`}
-                                                className="text-amber-400 hover:text-amber-300 font-medium flex items-center space-x-1"
+                                                className="text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 font-medium flex items-center space-x-1"
                                             >
                                                 <span>Oku</span>
                                                 <ArrowRight className="h-4 w-4" />
@@ -324,19 +324,19 @@ export default function BlogPage() {
                         {/* Pagination */}
                         <div className="mt-12 flex justify-center">
                             <div className="flex items-center space-x-2">
-                                <button className="px-4 py-2 border border-gray-600 rounded-lg text-gray-300 hover:bg-gray-800 transition-colors">
+                                <button className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
                                     Önceki
                                 </button>
                                 <button className="px-4 py-2 bg-amber-600 text-white rounded-lg">
                                     1
                                 </button>
-                                <button className="px-4 py-2 border border-gray-600 rounded-lg text-gray-300 hover:bg-gray-800 transition-colors">
+                                <button className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
                                     2
                                 </button>
-                                <button className="px-4 py-2 border border-gray-600 rounded-lg text-gray-300 hover:bg-gray-800 transition-colors">
+                                <button className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
                                     3
                                 </button>
-                                <button className="px-4 py-2 border border-gray-600 rounded-lg text-gray-300 hover:bg-gray-800 transition-colors">
+                                <button className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
                                     Sonraki
                                 </button>
                             </div>

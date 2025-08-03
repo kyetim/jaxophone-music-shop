@@ -613,8 +613,8 @@ export default function AdminDashboard() {
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {/* Navigation Tabs */}
-                <div className="bg-gray-900 rounded-xl shadow-lg mb-8 border border-gray-800">
-                    <div className="border-b border-gray-700">
+                <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg mb-8 border border-gray-200 dark:border-gray-800">
+                    <div className="border-b border-gray-200 dark:border-gray-700">
                         <nav className="flex space-x-8 px-6">
                             {[
                                 { id: 'overview', name: 'Genel Bakış', icon: BarChart3 },
@@ -630,8 +630,8 @@ export default function AdminDashboard() {
                                         key={tab.id}
                                         onClick={() => setActiveTab(tab.id)}
                                         className={`flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-sm ${activeTab === tab.id
-                                            ? 'border-amber-500 text-amber-400'
-                                            : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-600'
+                                            ? 'border-amber-500 text-amber-600 dark:text-amber-400'
+                                            : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
                                             }`}
                                     >
                                         <Icon className="h-5 w-5" />
@@ -647,7 +647,7 @@ export default function AdminDashboard() {
                         {activeTab === 'products' && (
                             <div className="space-y-6">
                                 <div className="flex items-center justify-between">
-                                    <h3 className="text-lg font-semibold text-white">Ürün Yönetimi</h3>
+                                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Ürün Yönetimi</h3>
                                     <button
                                         onClick={openAddModal}
                                         className="flex items-center space-x-2 bg-amber-600 text-white px-4 py-2 rounded-lg hover:bg-amber-700"
@@ -666,10 +666,10 @@ export default function AdminDashboard() {
                                             placeholder="Ürün ara..."
                                             value={searchTerm}
                                             onChange={(e) => setSearchTerm(e.target.value)}
-                                            className="w-full pl-10 pr-4 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-gray-800 text-white placeholder-gray-400"
+                                            className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                                         />
                                     </div>
-                                    <button className="flex items-center space-x-2 bg-gray-800 text-gray-300 px-4 py-2 rounded-lg hover:bg-gray-700 border border-gray-600">
+                                    <button className="flex items-center space-x-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 border border-gray-300 dark:border-gray-600">
                                         <Filter className="h-4 w-4" />
                                         <span>Filtrele</span>
                                     </button>
@@ -681,88 +681,85 @@ export default function AdminDashboard() {
 
                                 {/* Products Table */}
                                 <div className="overflow-x-auto">
-                                    <table className="min-w-full divide-y divide-gray-700">
-                                        <thead className="bg-gray-800">
+                                    <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                        <thead className="bg-gray-50 dark:bg-gray-800">
                                             <tr>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                                     Ürün
                                                 </th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                                     Kategori
                                                 </th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                                     Fiyat
                                                 </th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                                     Stok
                                                 </th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                                     Durum
                                                 </th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                                     İşlemler
                                                 </th>
                                             </tr>
                                         </thead>
-                                        <tbody className="bg-gray-900 divide-y divide-gray-700">
+                                        <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
                                             {filteredProducts.map((product) => (
-                                                <tr key={product.id} className="hover:bg-gray-800">
+                                                <tr key={product.id} className="hover:bg-gray-50 dark:hover:bg-gray-800">
                                                     <td className="px-6 py-4 whitespace-nowrap">
                                                         <div className="flex items-center">
                                                             <div className="h-10 w-10 flex-shrink-0">
                                                                 <img
                                                                     className="h-10 w-10 rounded-lg object-cover"
-                                                                    src={product.imageUrl || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0yMCAxMkMyMi4yMDkxIDEyIDI0IDEzLjc5MDkgMjQgMTZDMjQgMTguMjA5MSAyMi4yMDkxIDIwIDIwIDIwQzE3Ljc5MDkgMjAgMTYgMTguMjA5MSAxNiAxNkMxNiAxMy43OTA5IDE3Ljc5MDkgMTIgMjAgMTJaIiBmaWxsPSIjOUI5QkEwIi8+CjxwYXRoIGQ9Ik0yOCAyOEMyOCAyOS4xMDQ2IDI3LjEwNDYgMzAgMjYgMzBIMTRDMTIuODk1NCAzMCAxMiAyOS4xMDQ2IDEyIDI4VjI2QzEyIDI0Ljg5NTQgMTIuODk1NCAyNCAxNCAyNEgyNkMyNy4xMDQ2IDI0IDI4IDI0Ljg5NTQgMjggMjZWMjhaIiBmaWxsPSIjOUI5QkEwIi8+Cjwvc3ZnPgo='}
+                                                                    src={product.imageUrl}
                                                                     alt={product.name}
                                                                     onError={(e) => {
-                                                                        // Prevent infinite loop by setting a data URL
-                                                                        e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0yMCAxMkMyMi4yMDkxIDEyIDI0IDEzLjc5MDkgMjQgMTZDMjQgMTguMjA5MSAyMi4yMDkxIDIwIDIwIDIwQzE3Ljc5MDkgMjAgMTYgMTguMjA5MSAxNiAxNkMxNiAxMy43OTA5IDE3Ljc5MDkgMTIgMjAgMTJaIiBmaWxsPSIjOUI5QkEwIi8+CjxwYXRoIGQ9Ik0yOCAyOEMyOCAyOS4xMDQ2IDI3LjEwNDYgMzAgMjYgMzBIMTRDMTIuODk1NCAzMCAxMiAyOS4xMDQ2IDEyIDI4VjI2QzEyIDI0Ljg5NTQgMTIuODk1NCAyNCAxNCAyNEgyNkMyNy4xMDQ2IDI0IDI4IDI0Ljg5NTQgMjggMjZWMjhaIiBmaWxsPSIjOUI5QkEwIi8+Cjwvc3ZnPgo=';
+                                                                        const target = e.target as HTMLImageElement;
+                                                                        target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0yMCAxMkMyMi4yMDkxIDEyIDI0IDEzLjc5MDkgMjQgMTZDMjQgMTguMjA5MSAyMi4yMDkxIDIwIDIwIDIwQzE3Ljc5MDkgMjAgMTYgMTguMjA5MSAxNiAxNkMxNiAxMy43OTA5IDE3Ljc5MDkgMTIgMjAgMTJaIiBmaWxsPSIjOUI5QkEwIi8+CjxwYXRoIGQ9Ik0yOCAyOEMyOCAyOS4xMDQ2IDI3LjEwNDYgMzAgMjYgMzBIMTRDMTIuODk1NCAzMCAxMiAyOS4xMDQ2IDEyIDI4VjI2QzEyIDI0Ljg5NTQgMTIuODk1NCAyNCAxNCAyNEgyNkMyNy4xMDQ2IDI0IDI4IDI0Ljg5NTQgMjggMjZWMjhaIiBmaWxsPSIjOUI5QkEwIi8+Cjwvc3ZnPgo=';
                                                                     }}
                                                                 />
                                                             </div>
                                                             <div className="ml-4">
-                                                                <div className="text-sm font-medium text-white">
+                                                                <div className="text-sm font-medium text-gray-900 dark:text-white">
                                                                     {product.name}
                                                                 </div>
-                                                                <div className="text-sm text-gray-400">
+                                                                <div className="text-sm text-gray-500 dark:text-gray-400">
                                                                     {product.brand}
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
-                                                        {product.category}
-                                                    </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
-                                                        {product.price.toLocaleString('tr-TR')}₺
-                                                    </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
-                                                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${product.stockQuantity > 10 ? 'bg-green-900 text-green-300' :
-                                                            product.stockQuantity > 0 ? 'bg-yellow-900 text-yellow-300' :
-                                                                'bg-red-900 text-red-300'
-                                                            }`}>
-                                                            {product.stockQuantity}
+                                                    <td className="px-6 py-4 whitespace-nowrap">
+                                                        <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
+                                                            {product.category}
                                                         </span>
                                                     </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                                                        ₺{product.price.toLocaleString()}
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                                                        {product.stockQuantity}
+                                                    </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
-                                                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${product.inStock ? 'bg-green-900 text-green-300' : 'bg-red-900 text-red-300'
+                                                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${product.inStock
+                                                                ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-300'
+                                                                : 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-300'
                                                             }`}>
-                                                            {product.inStock ? 'Aktif' : 'Pasif'}
+                                                            {product.inStock ? 'Stokta' : 'Tükendi'}
                                                         </span>
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                                         <div className="flex items-center space-x-2">
                                                             <button
                                                                 onClick={() => openEditModal(product)}
-                                                                className="text-amber-400 hover:text-amber-300"
-                                                                title="Düzenle"
+                                                                className="text-amber-600 dark:text-amber-400 hover:text-amber-900 dark:hover:text-amber-300"
                                                             >
                                                                 <Edit className="h-4 w-4" />
                                                             </button>
                                                             <button
                                                                 onClick={() => handleDeleteProduct(product.id)}
-                                                                className="text-red-400 hover:text-red-300"
-                                                                title="Sil"
+                                                                className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
                                                             >
                                                                 <Trash2 className="h-4 w-4" />
                                                             </button>
@@ -776,9 +773,11 @@ export default function AdminDashboard() {
 
                                 {filteredProducts.length === 0 && (
                                     <div className="text-center py-12">
-                                        <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                                        <h3 className="text-lg font-medium text-white mb-2">Ürün Bulunamadı</h3>
-                                        <p className="text-gray-400">Arama kriterlerinize uygun ürün bulunamadı.</p>
+                                        <Package className="mx-auto h-12 w-12 text-gray-400" />
+                                        <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">Ürün bulunamadı</h3>
+                                        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                                            Arama kriterlerinize uygun ürün bulunmuyor.
+                                        </p>
                                     </div>
                                 )}
                             </div>
