@@ -45,11 +45,11 @@ export default function LoginPage() {
     // Success state
     if (success) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-amber-50">
+            <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-amber-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
                 <Header />
                 <main className="flex items-center justify-center px-6 py-12">
                     <div className="w-full max-w-md">
-                        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+                        <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
                             <div className="bg-gradient-to-r from-green-600 to-emerald-600 px-8 py-6 text-center">
                                 <CheckCircle className="h-12 w-12 text-white mx-auto mb-3" />
                                 <h1 className="text-2xl font-bold text-white mb-2">Giriş Başarılı!</h1>
@@ -59,7 +59,7 @@ export default function LoginPage() {
                             <div className="px-8 py-6 text-center">
                                 <div className="mb-6">
                                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-600 mx-auto mb-4"></div>
-                                    <p className="text-gray-600">Hesap sayfanıza yönlendiriliyorsunuz...</p>
+                                    <p className="text-gray-600 dark:text-gray-300">Hesap sayfanıza yönlendiriliyorsunuz...</p>
                                 </div>
 
                                 <Button
@@ -78,13 +78,13 @@ export default function LoginPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-amber-50">
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-amber-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
             <Header />
 
             <main className="flex items-center justify-center px-6 py-12">
                 <div className="w-full max-w-md">
                     {/* Login Card */}
-                    <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+                    <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
                         {/* Header */}
                         <div className="bg-gradient-to-r from-amber-600 to-orange-600 px-8 py-6 text-center">
                             <h1 className="text-2xl font-bold text-white mb-2">Hoş Geldiniz</h1>
@@ -99,15 +99,15 @@ export default function LoginPage() {
                             >
                                 {/* Error Message */}
                                 {error && (
-                                    <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center gap-3">
+                                    <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 flex items-center gap-3">
                                         <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0" />
-                                        <p className="text-red-700 text-sm">{error}</p>
+                                        <p className="text-red-700 dark:text-red-300 text-sm">{error}</p>
                                     </div>
                                 )}
 
                                 {/* Email Field */}
                                 <div>
-                                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                         E-posta Adresi
                                     </label>
                                     <div className="relative">
@@ -118,7 +118,7 @@ export default function LoginPage() {
                                             value={email}
                                             onChange={(e) => setEmail(e.target.value)}
                                             placeholder="ornek@email.com"
-                                            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200"
+                                            className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                                             required
                                             disabled={isLoading}
                                         />
@@ -127,7 +127,7 @@ export default function LoginPage() {
 
                                 {/* Password Field */}
                                 <div>
-                                    <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                                    <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                         Şifre
                                     </label>
                                     <div className="relative">
@@ -138,14 +138,14 @@ export default function LoginPage() {
                                             value={password}
                                             onChange={(e) => setPassword(e.target.value)}
                                             placeholder="••••••••"
-                                            className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200"
+                                            className="w-full pl-10 pr-12 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                                             required
                                             disabled={isLoading}
                                         />
                                         <button
                                             type="button"
                                             onClick={() => setShowPassword(!showPassword)}
-                                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer"
+                                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 cursor-pointer"
                                             disabled={isLoading}
                                         >
                                             {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
@@ -176,7 +176,7 @@ export default function LoginPage() {
                                 <div className="text-center">
                                     <Link
                                         href="/forgot-password"
-                                        className="text-sm text-gray-600 hover:text-amber-600 transition-colors cursor-pointer"
+                                        className="text-sm text-gray-600 dark:text-gray-400 hover:text-amber-600 dark:hover:text-amber-400 transition-colors cursor-pointer"
                                     >
                                         Şifrenizi mi unuttunuz?
                                     </Link>
@@ -185,11 +185,11 @@ export default function LoginPage() {
 
                             {/* Register Link */}
                             <div className="mt-6 text-center">
-                                <p className="text-gray-600">
+                                <p className="text-gray-600 dark:text-gray-400">
                                     Hesabınız yok mu?{' '}
                                     <Link
                                         href="/register"
-                                        className="text-amber-600 hover:text-amber-700 font-medium transition-colors cursor-pointer"
+                                        className="text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 font-medium transition-colors cursor-pointer"
                                     >
                                         Hesap oluşturun
                                     </Link>
