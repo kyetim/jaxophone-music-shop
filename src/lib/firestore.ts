@@ -33,9 +33,31 @@ function ensureDB() {
     return db;
 }
 
-// Helper function to convert Firebase Timestamp to ISO string
+// Helper function to clean undefined values from objects and arrays
+const cleanUndefinedValues = (obj: any): any => {
+    if (obj === null || obj === undefined) {
+        return null;
+    }
+
+    if (Array.isArray(obj)) {
+        return obj.map(item => cleanUndefinedValues(item)).filter(item => item !== null);
+    }
+
+    if (typeof obj === 'object') {
+        const cleaned: any = {};
+        for (const [key, value] of Object.entries(obj)) {
+            if (value !== undefined) {
+                cleaned[key] = cleanUndefinedValues(value);
+            }
+        }
+        return cleaned;
+    }
+
+    return obj;
+};
+
+// Firebase Timestamp'i string'e çeviren helper function
 const convertTimestampToString = (timestamp: any): string | undefined => {
-    if (!timestamp) return undefined;
     if (timestamp && typeof timestamp.toDate === 'function') {
         return timestamp.toDate().toISOString();
     }
@@ -270,7 +292,7 @@ export class UserDataService {
         try {
             const database = ensureDB();
             await updateDoc(doc(database, 'users', uid), {
-                cart: cartItems,
+                cart: cleanUndefinedValues(cartItems),
                 updatedAt: new Date()
             });
         } catch (error) {
@@ -299,7 +321,7 @@ export class UserDataService {
         try {
             const database = ensureDB();
             await updateDoc(doc(database, 'users', uid), {
-                favorites: favorites,
+                favorites: cleanUndefinedValues(favorites),
                 updatedAt: new Date()
             });
         } catch (error) {
@@ -328,7 +350,7 @@ export class UserDataService {
         try {
             const database = ensureDB();
             await updateDoc(doc(database, 'users', uid), {
-                addresses: addresses,
+                addresses: cleanUndefinedValues(addresses),
                 updatedAt: new Date()
             });
         } catch (error) {
@@ -353,7 +375,7 @@ export class UserDataService {
                 addresses.push(newAddress);
 
                 await updateDoc(doc(database, 'users', uid), {
-                    addresses: addresses,
+                    addresses: cleanUndefinedValues(addresses),
                     updatedAt: new Date()
                 });
 
@@ -384,7 +406,7 @@ export class UserDataService {
                     };
 
                     await updateDoc(doc(database, 'users', uid), {
-                        addresses: addresses,
+                        addresses: cleanUndefinedValues(addresses),
                         updatedAt: new Date()
                     });
 
@@ -410,7 +432,7 @@ export class UserDataService {
                 const filteredAddresses = addresses.filter((addr: any) => addr.id !== addressId);
 
                 await updateDoc(doc(database, 'users', uid), {
-                    addresses: filteredAddresses,
+                    addresses: cleanUndefinedValues(filteredAddresses),
                     updatedAt: new Date()
                 });
             }
