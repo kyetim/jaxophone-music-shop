@@ -147,6 +147,7 @@ export function useAuth() {
                     ...data,
                     createdAt: convertTimestampToString(data.createdAt),
                     lastLoginAt: convertTimestampToString(data.lastLoginAt),
+                    updatedAt: convertTimestampToString(data.updatedAt),
                 };
 
                 dispatch(setUserProfile(profileData));
@@ -343,6 +344,9 @@ export function useAuth() {
             if (updatesForFirestore.lastLoginAt) {
                 updatesForFirestore.lastLoginAt = convertTimestampToString(updatesForFirestore.lastLoginAt);
             }
+            if (updatesForFirestore.updatedAt) {
+                updatesForFirestore.updatedAt = convertTimestampToString(updatesForFirestore.updatedAt);
+            }
 
             // Undefined değerleri filtrele
             const sanitizedUpdates = sanitizeData(updatesForFirestore);
@@ -356,6 +360,9 @@ export function useAuth() {
             }
             if (updatesForRedux.lastLoginAt) {
                 updatesForRedux.lastLoginAt = convertTimestampToString(updatesForRedux.lastLoginAt);
+            }
+            if (updatesForRedux.updatedAt) {
+                updatesForRedux.updatedAt = convertTimestampToString(updatesForRedux.updatedAt);
             }
 
             dispatch(setUserProfile({ ...userProfile, ...updatesForRedux }));

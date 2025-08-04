@@ -94,6 +94,7 @@ export const store = configureStore({
                     'user.user',
                     'user.userProfile.createdAt',
                     'user.userProfile.lastLoginAt',
+                    'user.userProfile.updatedAt',
                     'cart.items.product.createdAt',
                     'cart.items.product.updatedAt',
                     'favorites.items.createdAt',
