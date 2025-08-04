@@ -467,6 +467,7 @@ export default function AccountPage() {
                                     <Button
                                         variant="outline"
                                         className="w-full border-gray-200 text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800 transition-colors"
+                                        onClick={() => setActiveTab('settings')}
                                     >
                                         <Settings className="h-4 w-4 mr-2" />
                                         Hesap Ayarları
@@ -722,7 +723,10 @@ export default function AccountPage() {
                                                         {cartTotal.toLocaleString('tr-TR')}₺
                                                     </span>
                                                 </div>
-                                                <Button className="w-full mt-4 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700">
+                                                <Button
+                                                    className="w-full mt-4 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700"
+                                                    onClick={() => router.push('/checkout')}
+                                                >
                                                     Sepeti Tamamla
                                                 </Button>
                                             </CardContent>

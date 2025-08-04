@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 interface CartSidebarProps {
     isOpen: boolean;
@@ -24,6 +25,7 @@ interface CartSidebarProps {
 
 export function CartSidebar({ isOpen, onClose, onMouseEnter, onMouseLeave }: CartSidebarProps) {
     const dispatch = useAppDispatch();
+    const router = useRouter();
     const { items, total, itemCount } = useAppSelector((state) => state.cart);
 
     const handleUpdateQuantity = (productId: string, newQuantity: number) => {
@@ -36,6 +38,11 @@ export function CartSidebar({ isOpen, onClose, onMouseEnter, onMouseLeave }: Car
 
     const handleRemoveItem = (productId: string) => {
         dispatch(removeFromCart(productId));
+    };
+
+    const handleProductClick = (productId: string) => {
+        router.push(`/products/${productId}`);
+        onClose();
     };
 
     return (
@@ -109,7 +116,11 @@ export function CartSidebar({ isOpen, onClose, onMouseEnter, onMouseLeave }: Car
                         <div className="flex-1 overflow-y-auto custom-scrollbar">
                             <div className="p-4 space-y-3">
                                 {items.map((item) => (
-                                    <div key={item.product.id} className="flex gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                                    <div
+                                        key={item.product.id}
+                                        className="flex gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                                        onClick={() => handleProductClick(item.product.id)}
+                                    >
                                         {/* Product Image */}
                                         <div className="relative w-14 h-14 rounded-lg overflow-hidden flex-shrink-0">
                                             <Image
@@ -125,7 +136,7 @@ export function CartSidebar({ isOpen, onClose, onMouseEnter, onMouseLeave }: Car
                                         <div className="flex-1 min-w-0">
                                             <div className="flex justify-between items-start mb-1">
                                                 <div className="min-w-0 flex-1">
-                                                    <h4 className="font-medium text-xs text-gray-900 dark:text-white truncate leading-tight">
+                                                    <h4 className="font-medium text-xs text-gray-900 dark:text-white truncate leading-tight hover:text-amber-600 dark:hover:text-amber-400 transition-colors">
                                                         {item.product.name}
                                                     </h4>
                                                     <p className="text-xs text-gray-500 dark:text-gray-400">{item.product.brand}</p>
@@ -133,7 +144,10 @@ export function CartSidebar({ isOpen, onClose, onMouseEnter, onMouseLeave }: Car
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
-                                                    onClick={() => handleRemoveItem(item.product.id)}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleRemoveItem(item.product.id);
+                                                    }}
                                                     className="text-gray-400 hover:text-red-600 dark:hover:text-red-400 h-5 w-5 flex-shrink-0 ml-1 cursor-pointer"
                                                 >
                                                     <X className="h-3 w-3" />
@@ -147,7 +161,10 @@ export function CartSidebar({ isOpen, onClose, onMouseEnter, onMouseLeave }: Car
                                                         variant="outline"
                                                         size="icon"
                                                         className="h-5 w-5 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white cursor-pointer"
-                                                        onClick={() => handleUpdateQuantity(item.product.id, item.quantity - 1)}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleUpdateQuantity(item.product.id, item.quantity - 1);
+                                                        }}
                                                     >
                                                         <Minus className="h-2 w-2" />
                                                     </Button>
@@ -156,7 +173,10 @@ export function CartSidebar({ isOpen, onClose, onMouseEnter, onMouseLeave }: Car
                                                         variant="outline"
                                                         size="icon"
                                                         className="h-5 w-5 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white cursor-pointer"
-                                                        onClick={() => handleUpdateQuantity(item.product.id, item.quantity + 1)}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleUpdateQuantity(item.product.id, item.quantity + 1);
+                                                        }}
                                                     >
                                                         <Plus className="h-2 w-2" />
                                                     </Button>
