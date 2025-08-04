@@ -6,9 +6,14 @@ import {
     createUserWithEmailAndPassword,
     signOut as firebaseSignOut,
     updateProfile,
-    sendPasswordResetEmail
+    sendPasswordResetEmail,
+    updatePassword,
+    deleteUser,
+    reauthenticateWithCredential,
+    EmailAuthProvider,
+    sendEmailVerification
 } from 'firebase/auth';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc, deleteDoc } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import {
@@ -373,6 +378,87 @@ export function useAuth() {
         }
     };
 
+    const changePassword = async (currentPassword: string, newPassword: string) => {
+        if (!auth || !user?.email) {
+            throw new Error('Kullanıcı oturumu bulunamadı');
+        }
+
+        try {
+            dispatch(setUserError(null));
+            dispatch(setUserLoading(true));
+
+            // Önce mevcut şifre ile yeniden kimlik doğrulama yap
+            const credential = EmailAuthProvider.credential(user.email, currentPassword);
+            await reauthenticateWithCredential(auth.currentUser!, credential);
+
+            // Şifreyi güncelle
+            await updatePassword(auth.currentUser!, newPassword);
+
+            return true;
+        } catch (error: any) {
+            const errorMessage = getErrorMessage(error.code);
+            dispatch(setUserError(errorMessage));
+            throw error;
+        } finally {
+            dispatch(setUserLoading(false));
+        }
+    };
+
+    const deleteAccount = async (currentPassword: string) => {
+        if (!auth || !user?.email || !db) {
+            throw new Error('Kullanıcı oturumu bulunamadı');
+        }
+
+        try {
+            dispatch(setUserError(null));
+            dispatch(setUserLoading(true));
+
+            // Önce mevcut şifre ile yeniden kimlik doğrulama yap
+            const credential = EmailAuthProvider.credential(user.email, currentPassword);
+            await reauthenticateWithCredential(auth.currentUser!, credential);
+
+            // Firestore'dan kullanıcı verilerini sil
+            await deleteDoc(doc(db, 'users', user.uid));
+
+            // Firebase Auth'dan kullanıcıyı sil
+            await deleteUser(auth.currentUser!);
+
+            // Redux state'ini temizle
+            dispatch(clearUser());
+            dispatch(clearCart());
+            dispatch(clearFavorites());
+
+            return true;
+        } catch (error: any) {
+            const errorMessage = getErrorMessage(error.code);
+            dispatch(setUserError(errorMessage));
+            throw error;
+        } finally {
+            dispatch(setUserLoading(false));
+        }
+    };
+
+    const sendEmailVerificationEmail = async () => {
+        if (!auth || !user) {
+            throw new Error('Kullanıcı oturumu bulunamadı veya e-posta doğrulaması yapılamadı.');
+        }
+
+        try {
+            dispatch(setUserError(null));
+            dispatch(setUserLoading(true));
+
+            await sendEmailVerification(auth.currentUser!);
+
+            return true;
+        } catch (error: any) {
+            const errorMessage = getErrorMessage(error.code);
+            dispatch(setUserError(errorMessage));
+            throw error;
+        } finally {
+            dispatch(setUserLoading(false));
+        }
+    };
+
     // Firebase error kodlarını Türkçe mesajlara çevir
     const getErrorMessage = (errorCode: string): string => {
         switch (errorCode) {
@@ -413,8 +499,11 @@ export function useAuth() {
         signOut,
         resetPassword,
         updateUserProfile,
+        changePassword,
+        deleteAccount,
         fetchUserProfile,
         saveUserCart,
         saveUserFavorites,
+        sendEmailVerificationEmail,
     };
 } 

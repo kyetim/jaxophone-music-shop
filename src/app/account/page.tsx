@@ -54,7 +54,7 @@ export default function AccountPage() {
     const { user, userProfile, isAuthenticated, isLoading } = useAppSelector((state) => state.user);
     const { items: cartItems, total: cartTotal, itemCount: cartItemCount } = useAppSelector((state) => state.cart);
     const { items: favoritesItems } = useAppSelector((state) => state.favorites);
-    const { signOut, updateUserProfile } = useAuth();
+    const { signOut, updateUserProfile, changePassword, deleteAccount, sendEmailVerificationEmail } = useAuth();
     const router = useRouter();
     const [activeTab, setActiveTab] = useState('profile');
     const [showAddressModal, setShowAddressModal] = useState(false);
@@ -84,9 +84,11 @@ export default function AccountPage() {
         newPassword: '',
         confirmPassword: ''
     });
+    const [deletePassword, setDeletePassword] = useState('');
     const [showCurrentPassword, setShowCurrentPassword] = useState(false);
     const [showNewPassword, setShowNewPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [showDeletePassword, setShowDeletePassword] = useState(false);
     const [preferences, setPreferences] = useState({
         emailNotifications: userProfile?.preferences?.emailNotifications ?? true,
         smsNotifications: userProfile?.preferences?.smsNotifications ?? true,
@@ -240,8 +242,7 @@ export default function AccountPage() {
         }
 
         try {
-            // Bu fonksiyonu useAuth hook'una eklemek gerekiyor
-            // await changePassword(passwordForm.currentPassword, passwordForm.newPassword);
+            await changePassword(passwordForm.currentPassword, passwordForm.newPassword);
             setShowPasswordModal(false);
             setPasswordForm({
                 currentPassword: '',
@@ -272,13 +273,24 @@ export default function AccountPage() {
         if (!user?.uid) return;
 
         try {
-            // Bu fonksiyonu useAuth hook'una eklemek gerekiyor
-            // await deleteAccount();
+            await deleteAccount(deletePassword);
             setShowDeleteConfirm(false);
             router.push('/');
         } catch (error) {
             console.error('Error deleting account:', error);
             alert('Hesap silinirken hata oluştu!');
+        }
+    };
+
+    const handleEmailVerification = async () => {
+        if (!user?.uid) return;
+
+        try {
+            await sendEmailVerificationEmail();
+            alert('E-posta doğrulama bağlantısı gönderildi! E-posta kutunuzu kontrol edin.');
+        } catch (error) {
+            console.error('Error sending email verification:', error);
+            alert('E-posta doğrulama bağlantısı gönderilirken hata oluştu!');
         }
     };
 
@@ -920,7 +932,7 @@ export default function AccountPage() {
                                                 </p>
                                             </div>
                                             {!user?.emailVerified && (
-                                                <Button variant="outline">
+                                                <Button variant="outline" onClick={handleEmailVerification}>
                                                     Onayla
                                                 </Button>
                                             )}
@@ -1371,17 +1383,49 @@ export default function AccountPage() {
                                 <li>• Hesap ayarlarınızı silecek</li>
                             </ul>
 
+                            <div className="space-y-4">
+                                <div>
+                                    <Label htmlFor="deletePassword" className="text-gray-700 dark:text-gray-300">
+                                        Hesabınızı silmek için şifrenizi girin
+                                    </Label>
+                                    <div className="relative mt-1">
+                                        <Input
+                                            id="deletePassword"
+                                            type={showDeletePassword ? "text" : "password"}
+                                            value={deletePassword}
+                                            onChange={(e) => setDeletePassword(e.target.value)}
+                                            className="pr-10 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+                                            placeholder="Mevcut şifrenizi girin"
+                                            required
+                                        />
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="sm"
+                                            className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                                            onClick={() => setShowDeletePassword(!showDeletePassword)}
+                                        >
+                                            {showDeletePassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                        </Button>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div className="flex gap-3 pt-4">
                                 <Button
                                     variant="outline"
-                                    onClick={() => setShowDeleteConfirm(false)}
+                                    onClick={() => {
+                                        setShowDeleteConfirm(false);
+                                        setDeletePassword('');
+                                    }}
                                     className="flex-1"
                                 >
                                     İptal
                                 </Button>
                                 <Button
                                     onClick={handleAccountDelete}
-                                    className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+                                    disabled={!deletePassword.trim()}
+                                    className="flex-1 bg-red-600 hover:bg-red-700 text-white disabled:bg-gray-400 disabled:cursor-not-allowed"
                                 >
                                     <Trash2 className="h-4 w-4 mr-2" />
                                     Hesabı Sil
