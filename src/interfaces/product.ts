@@ -13,6 +13,8 @@ export interface Product {
     rating: number;
     reviewCount: number;
     tags: string[];
+    createdAt?: string; // ISO string format
+    updatedAt?: string; // ISO string format
 }
 
 export interface CartItem {

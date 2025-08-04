@@ -33,16 +33,51 @@ function ensureDB() {
     return db;
 }
 
+// Helper function to convert Firebase Timestamp to ISO string
+const convertTimestampToString = (timestamp: any): string | undefined => {
+    if (!timestamp) return undefined;
+    if (timestamp && typeof timestamp.toDate === 'function') {
+        return timestamp.toDate().toISOString();
+    }
+    if (timestamp instanceof Date) {
+        return timestamp.toISOString();
+    }
+    if (typeof timestamp === 'string') {
+        return timestamp;
+    }
+    return undefined;
+};
+
+// Helper function to convert Firestore document to Product
+const convertFirestoreDocToProduct = (doc: any): Product => {
+    const data = doc.data();
+    return {
+        id: doc.id,
+        name: data.name || '',
+        description: data.description || '',
+        price: data.price || 0,
+        originalPrice: data.originalPrice,
+        imageUrl: data.imageUrl || '',
+        imageWebp: data.imageWebp,
+        category: data.category || '',
+        brand: data.brand || '',
+        inStock: data.inStock ?? true,
+        stockQuantity: data.stockQuantity || 0,
+        rating: data.rating || 0,
+        reviewCount: data.reviewCount || 0,
+        tags: data.tags || [],
+        createdAt: convertTimestampToString(data.createdAt),
+        updatedAt: convertTimestampToString(data.updatedAt),
+    };
+};
+
 // Product Operations
 export class ProductService {
     static async getAll() {
         try {
             const database = ensureDB();
             const querySnapshot = await getDocs(collection(database, COLLECTIONS.PRODUCTS));
-            return querySnapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            })) as Product[];
+            return querySnapshot.docs.map(doc => convertFirestoreDocToProduct(doc));
         } catch (error) {
             console.error('Error fetching products:', error);
             throw error;
@@ -56,10 +91,7 @@ export class ProductService {
             const docSnap = await getDoc(docRef);
 
             if (docSnap.exists()) {
-                return {
-                    id: docSnap.id,
-                    ...docSnap.data()
-                } as Product;
+                return convertFirestoreDocToProduct(docSnap);
             }
             return null;
         } catch (error) {
@@ -77,10 +109,7 @@ export class ProductService {
                 orderBy('createdAt', 'desc')
             );
             const querySnapshot = await getDocs(q);
-            return querySnapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            })) as Product[];
+            return querySnapshot.docs.map(doc => convertFirestoreDocToProduct(doc));
         } catch (error) {
             console.error('Error fetching products by category:', error);
             throw error;
@@ -99,10 +128,7 @@ export class ProductService {
             );
 
             const querySnapshot = await getDocs(q);
-            const allProducts = querySnapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            })) as Product[];
+            const allProducts = querySnapshot.docs.map(doc => convertFirestoreDocToProduct(doc));
 
             // Client-side filtering (for demo - production should use Algolia/Elasticsearch)
             const searchLower = searchTerm.toLowerCase();

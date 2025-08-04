@@ -30,7 +30,11 @@ export const store = configureStore({
                 ignoredPaths: [
                     'user.user',
                     'user.userProfile.createdAt',
-                    'user.userProfile.lastLoginAt'
+                    'user.userProfile.lastLoginAt',
+                    'cart.items.product.createdAt',
+                    'cart.items.product.updatedAt',
+                    'favorites.items.createdAt',
+                    'favorites.items.updatedAt'
                 ],
             },
         }),
