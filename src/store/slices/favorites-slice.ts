@@ -1,5 +1,6 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
 import { Product } from '@/interfaces/product';
+import { UserDataService } from '@/lib/firestore';
 
 interface FavoritesState {
     items: Product[];
@@ -10,6 +11,19 @@ const initialState: FavoritesState = {
     items: [],
     isLoading: false,
 };
+
+// Async thunk to save favorites to Firestore
+export const saveFavoritesToFirestore = createAsyncThunk(
+    'favorites/saveToFirestore',
+    async ({ uid, favorites }: { uid: string; favorites: Product[] }, { rejectWithValue }) => {
+        try {
+            await UserDataService.saveUserFavorites(uid, favorites);
+            return favorites;
+        } catch (error) {
+            return rejectWithValue('Failed to save favorites');
+        }
+    }
+);
 
 const favoritesSlice = createSlice({
     name: 'favorites',
@@ -33,6 +47,18 @@ const favoritesSlice = createSlice({
         setFavoritesLoading: (state, action: PayloadAction<boolean>) => {
             state.isLoading = action.payload;
         },
+    },
+    extraReducers: (builder) => {
+        builder
+            .addCase(saveFavoritesToFirestore.pending, (state) => {
+                state.isLoading = true;
+            })
+            .addCase(saveFavoritesToFirestore.fulfilled, (state) => {
+                state.isLoading = false;
+            })
+            .addCase(saveFavoritesToFirestore.rejected, (state) => {
+                state.isLoading = false;
+            });
     },
 });
 

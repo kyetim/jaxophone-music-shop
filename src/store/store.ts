@@ -31,6 +31,40 @@ const persistedUserReducer = persistReducer(userPersistConfig, userReducer);
 const persistedCartReducer = persistReducer(cartPersistConfig, cartReducer);
 const persistedFavoritesReducer = persistReducer(favoritesPersistConfig, favoritesReducer);
 
+// Custom middleware to save cart and favorites to Firestore
+const firestoreMiddleware = (store: any) => (next: any) => (action: any) => {
+    const result = next(action);
+    const state = store.getState();
+    const user = state.user.user;
+
+    // Only save if user is authenticated
+    if (!user?.uid) return result;
+
+    // Save cart to Firestore when cart changes
+    if (action.type?.startsWith('cart/') && action.type !== 'cart/setCartLoading') {
+        const { items } = state.cart;
+        // Use setTimeout to avoid blocking the UI
+        setTimeout(() => {
+            import('@/lib/firestore').then(({ UserDataService }) => {
+                UserDataService.saveUserCart(user.uid, items).catch(console.error);
+            });
+        }, 0);
+    }
+
+    // Save favorites to Firestore when favorites change
+    if (action.type?.startsWith('favorites/') && action.type !== 'favorites/setFavoritesLoading') {
+        const { items } = state.favorites;
+        // Use setTimeout to avoid blocking the UI
+        setTimeout(() => {
+            import('@/lib/firestore').then(({ UserDataService }) => {
+                UserDataService.saveUserFavorites(user.uid, items).catch(console.error);
+            });
+        }, 0);
+    }
+
+    return result;
+};
+
 export const store = configureStore({
     reducer: {
         cart: persistedCartReducer,
@@ -66,7 +100,7 @@ export const store = configureStore({
                     'favorites.items.updatedAt'
                 ],
             },
-        }),
+        }).concat(firestoreMiddleware),
 });
 
 export const persistor = persistStore(store);
