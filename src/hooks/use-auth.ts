@@ -100,6 +100,31 @@ export function useAuth() {
         return () => unsubscribe();
     }, [dispatch]);
 
+    // Auth state'inin senkronizasyonunu kontrol et
+    useEffect(() => {
+        if (hasInitialized.current && auth) {
+            const currentUser = auth.currentUser;
+            const isAuthenticatedInRedux = !!user;
+
+            // Firebase'de user var ama Redux'ta yoksa, Redux'ı güncelle
+            if (currentUser && !isAuthenticatedInRedux) {
+                const serializableUser = {
+                    uid: currentUser.uid,
+                    email: currentUser.email,
+                    displayName: currentUser.displayName,
+                    photoURL: currentUser.photoURL,
+                    emailVerified: currentUser.emailVerified,
+                };
+                dispatch(setUser(serializableUser));
+                fetchUserProfile(currentUser.uid);
+            }
+            // Firebase'de user yok ama Redux'ta varsa, Redux'ı temizle
+            else if (!currentUser && isAuthenticatedInRedux) {
+                dispatch(clearUser());
+            }
+        }
+    }, [user, dispatch]);
+
     const fetchUserProfile = async (uid: string) => {
         if (!db) {
             console.warn('Firestore service bulunamadı');
