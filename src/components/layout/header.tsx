@@ -269,11 +269,14 @@ export function Header() {
         }
 
         if (categoryName) {
-            setHoveredCategory(categoryName);
+            // Add delay before opening dropdown to prevent accidental activation
+            categoryHoverTimeoutRef.current = setTimeout(() => {
+                setHoveredCategory(categoryName);
+            }, 300); // 300ms delay before opening
         } else {
             categoryHoverTimeoutRef.current = setTimeout(() => {
                 setHoveredCategory(null);
-            }, 500);
+            }, 1000); // Increased from 500ms to 1000ms for easier navigation
         }
     };
 
