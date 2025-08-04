@@ -18,8 +18,9 @@ import {
     setUserError,
     clearUser
 } from '@/store/slices/user-slice';
-import { clearCart } from '@/store/slices/cart-slice';
-import { clearFavorites } from '@/store/slices/favorites-slice';
+import { clearCart, setCartItems, setCartLoading } from '@/store/slices/cart-slice';
+import { clearFavorites, setFavoritesItems, setFavoritesLoading } from '@/store/slices/favorites-slice';
+import { UserDataService } from '@/lib/firestore';
 import { RootState } from '@/store/store';
 
 export interface AuthUser extends User {
@@ -82,6 +83,9 @@ export function useAuth() {
 
                     // Kullanıcı profilini Firestore'dan çek
                     await fetchUserProfile(firebaseUser.uid);
+                    // Kullanıcının sepetini ve favorilerini Firestore'dan çek
+                    await loadUserCart(firebaseUser.uid);
+                    await loadUserFavorites(firebaseUser.uid);
                 } else {
                     dispatch(clearUser());
                 }
@@ -117,6 +121,8 @@ export function useAuth() {
                 };
                 dispatch(setUser(serializableUser));
                 fetchUserProfile(currentUser.uid);
+                loadUserCart(currentUser.uid);
+                loadUserFavorites(currentUser.uid);
             }
             // Firebase'de user yok ama Redux'ta varsa, Redux'ı temizle
             else if (!currentUser && isAuthenticatedInRedux) {
@@ -148,6 +154,48 @@ export function useAuth() {
         } catch (error) {
             console.error('Error fetching user profile:', error);
             dispatch(setUserError('Kullanıcı profili yüklenemedi'));
+        }
+    };
+
+    const loadUserCart = async (uid: string) => {
+        try {
+            dispatch(setCartLoading(true));
+            const cartItems = await UserDataService.getUserCart(uid);
+            dispatch(setCartItems(cartItems));
+        } catch (error) {
+            console.error('Error loading user cart:', error);
+        } finally {
+            dispatch(setCartLoading(false));
+        }
+    };
+
+    const loadUserFavorites = async (uid: string) => {
+        try {
+            dispatch(setFavoritesLoading(true));
+            const favorites = await UserDataService.getUserFavorites(uid);
+            dispatch(setFavoritesItems(favorites));
+        } catch (error) {
+            console.error('Error loading user favorites:', error);
+        } finally {
+            dispatch(setFavoritesLoading(false));
+        }
+    };
+
+    const saveUserCart = async (cartItems: any[]) => {
+        if (!user?.uid) return;
+        try {
+            await UserDataService.saveUserCart(user.uid, cartItems);
+        } catch (error) {
+            console.error('Error saving user cart:', error);
+        }
+    };
+
+    const saveUserFavorites = async (favorites: any[]) => {
+        if (!user?.uid) return;
+        try {
+            await UserDataService.saveUserFavorites(user.uid, favorites);
+        } catch (error) {
+            console.error('Error saving user favorites:', error);
         }
     };
 
@@ -359,5 +407,7 @@ export function useAuth() {
         resetPassword,
         updateUserProfile,
         fetchUserProfile,
+        saveUserCart,
+        saveUserFavorites,
     };
 } 

@@ -3,10 +3,12 @@ import { Product } from '@/interfaces/product';
 
 interface FavoritesState {
     items: Product[];
+    isLoading: boolean;
 }
 
 const initialState: FavoritesState = {
     items: [],
+    isLoading: false,
 };
 
 const favoritesSlice = createSlice({
@@ -25,8 +27,20 @@ const favoritesSlice = createSlice({
         clearFavorites: (state) => {
             state.items = [];
         },
+        setFavoritesItems: (state, action: PayloadAction<Product[]>) => {
+            state.items = action.payload;
+        },
+        setFavoritesLoading: (state, action: PayloadAction<boolean>) => {
+            state.isLoading = action.payload;
+        },
     },
 });
 
-export const { addToFavorites, removeFromFavorites, clearFavorites } = favoritesSlice.actions;
+export const {
+    addToFavorites,
+    removeFromFavorites,
+    clearFavorites,
+    setFavoritesItems,
+    setFavoritesLoading
+} = favoritesSlice.actions;
 export default favoritesSlice.reducer; 

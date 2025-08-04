@@ -1,16 +1,19 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
 import { CartItem, Product } from '@/interfaces/product';
+import { UserDataService } from '@/lib/firestore';
 
 interface CartState {
     items: CartItem[];
     total: number;
     itemCount: number;
+    isLoading: boolean;
 }
 
 const initialState: CartState = {
     items: [],
     total: 0,
     itemCount: 0,
+    isLoading: false,
 };
 
 function calculateTotals(items: CartItem[]) {
@@ -18,6 +21,19 @@ function calculateTotals(items: CartItem[]) {
     const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
     return { total, itemCount };
 }
+
+// Async thunk to save cart to Firestore
+export const saveCartToFirestore = createAsyncThunk(
+    'cart/saveToFirestore',
+    async ({ uid, cartItems }: { uid: string; cartItems: CartItem[] }, { rejectWithValue }) => {
+        try {
+            await UserDataService.saveUserCart(uid, cartItems);
+            return cartItems;
+        } catch (error) {
+            return rejectWithValue('Failed to save cart');
+        }
+    }
+);
 
 const cartSlice = createSlice({
     name: 'cart',
@@ -59,8 +75,36 @@ const cartSlice = createSlice({
             state.total = 0;
             state.itemCount = 0;
         },
+        setCartItems: (state, action: PayloadAction<CartItem[]>) => {
+            state.items = action.payload;
+            const totals = calculateTotals(state.items);
+            state.total = totals.total;
+            state.itemCount = totals.itemCount;
+        },
+        setCartLoading: (state, action: PayloadAction<boolean>) => {
+            state.isLoading = action.payload;
+        },
+    },
+    extraReducers: (builder) => {
+        builder
+            .addCase(saveCartToFirestore.pending, (state) => {
+                state.isLoading = true;
+            })
+            .addCase(saveCartToFirestore.fulfilled, (state) => {
+                state.isLoading = false;
+            })
+            .addCase(saveCartToFirestore.rejected, (state) => {
+                state.isLoading = false;
+            });
     },
 });
 
-export const { addToCart, removeFromCart, updateQuantity, clearCart } = cartSlice.actions;
+export const {
+    addToCart,
+    removeFromCart,
+    updateQuantity,
+    clearCart,
+    setCartItems,
+    setCartLoading
+} = cartSlice.actions;
 export default cartSlice.reducer; 

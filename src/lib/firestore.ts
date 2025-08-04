@@ -246,4 +246,177 @@ export class BrandService {
             throw error;
         }
     }
+}
+
+// User-specific data operations
+export class UserDataService {
+    // Cart operations
+    static async getUserCart(uid: string) {
+        try {
+            const database = ensureDB();
+            const userDoc = await getDoc(doc(database, 'users', uid));
+            if (userDoc.exists()) {
+                const data = userDoc.data();
+                return data.cart || [];
+            }
+            return [];
+        } catch (error) {
+            console.error('Error fetching user cart:', error);
+            return [];
+        }
+    }
+
+    static async saveUserCart(uid: string, cartItems: any[]) {
+        try {
+            const database = ensureDB();
+            await updateDoc(doc(database, 'users', uid), {
+                cart: cartItems,
+                updatedAt: new Date()
+            });
+        } catch (error) {
+            console.error('Error saving user cart:', error);
+            throw error;
+        }
+    }
+
+    // Favorites operations
+    static async getUserFavorites(uid: string) {
+        try {
+            const database = ensureDB();
+            const userDoc = await getDoc(doc(database, 'users', uid));
+            if (userDoc.exists()) {
+                const data = userDoc.data();
+                return data.favorites || [];
+            }
+            return [];
+        } catch (error) {
+            console.error('Error fetching user favorites:', error);
+            return [];
+        }
+    }
+
+    static async saveUserFavorites(uid: string, favorites: any[]) {
+        try {
+            const database = ensureDB();
+            await updateDoc(doc(database, 'users', uid), {
+                favorites: favorites,
+                updatedAt: new Date()
+            });
+        } catch (error) {
+            console.error('Error saving user favorites:', error);
+            throw error;
+        }
+    }
+
+    // Addresses operations
+    static async getUserAddresses(uid: string) {
+        try {
+            const database = ensureDB();
+            const userDoc = await getDoc(doc(database, 'users', uid));
+            if (userDoc.exists()) {
+                const data = userDoc.data();
+                return data.addresses || [];
+            }
+            return [];
+        } catch (error) {
+            console.error('Error fetching user addresses:', error);
+            return [];
+        }
+    }
+
+    static async saveUserAddresses(uid: string, addresses: any[]) {
+        try {
+            const database = ensureDB();
+            await updateDoc(doc(database, 'users', uid), {
+                addresses: addresses,
+                updatedAt: new Date()
+            });
+        } catch (error) {
+            console.error('Error saving user addresses:', error);
+            throw error;
+        }
+    }
+
+    // Add new address
+    static async addUserAddress(uid: string, address: any) {
+        try {
+            const database = ensureDB();
+            const userDoc = await getDoc(doc(database, 'users', uid));
+            if (userDoc.exists()) {
+                const data = userDoc.data();
+                const addresses = data.addresses || [];
+                const newAddress = {
+                    ...address,
+                    id: Date.now().toString(), // Simple ID generation
+                    createdAt: new Date()
+                };
+                addresses.push(newAddress);
+
+                await updateDoc(doc(database, 'users', uid), {
+                    addresses: addresses,
+                    updatedAt: new Date()
+                });
+
+                return newAddress;
+            }
+            throw new Error('User not found');
+        } catch (error) {
+            console.error('Error adding user address:', error);
+            throw error;
+        }
+    }
+
+    // Update address
+    static async updateUserAddress(uid: string, addressId: string, updatedAddress: any) {
+        try {
+            const database = ensureDB();
+            const userDoc = await getDoc(doc(database, 'users', uid));
+            if (userDoc.exists()) {
+                const data = userDoc.data();
+                const addresses = data.addresses || [];
+                const addressIndex = addresses.findIndex((addr: any) => addr.id === addressId);
+
+                if (addressIndex !== -1) {
+                    addresses[addressIndex] = {
+                        ...addresses[addressIndex],
+                        ...updatedAddress,
+                        updatedAt: new Date()
+                    };
+
+                    await updateDoc(doc(database, 'users', uid), {
+                        addresses: addresses,
+                        updatedAt: new Date()
+                    });
+
+                    return addresses[addressIndex];
+                }
+                throw new Error('Address not found');
+            }
+            throw new Error('User not found');
+        } catch (error) {
+            console.error('Error updating user address:', error);
+            throw error;
+        }
+    }
+
+    // Delete address
+    static async deleteUserAddress(uid: string, addressId: string) {
+        try {
+            const database = ensureDB();
+            const userDoc = await getDoc(doc(database, 'users', uid));
+            if (userDoc.exists()) {
+                const data = userDoc.data();
+                const addresses = data.addresses || [];
+                const filteredAddresses = addresses.filter((addr: any) => addr.id !== addressId);
+
+                await updateDoc(doc(database, 'users', uid), {
+                    addresses: filteredAddresses,
+                    updatedAt: new Date()
+                });
+            }
+        } catch (error) {
+            console.error('Error deleting user address:', error);
+            throw error;
+        }
+    }
 } 

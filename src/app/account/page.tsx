@@ -1,12 +1,13 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppSelector } from '@/store/hooks';
 import { useAuth } from '@/hooks/use-auth';
 import { Header } from '@/components/layout/header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import {
     User,
     Mail,
@@ -17,13 +18,20 @@ import {
     MapPin,
     Bell,
     Shield,
-    Heart
+    Heart,
+    Plus,
+    Edit,
+    Trash2
 } from 'lucide-react';
+import Image from 'next/image';
 
 export default function AccountPage() {
     const { user, userProfile, isAuthenticated, isLoading } = useAppSelector((state) => state.user);
+    const { items: cartItems, total: cartTotal, itemCount: cartItemCount } = useAppSelector((state) => state.cart);
+    const { items: favoritesItems } = useAppSelector((state) => state.favorites);
     const { signOut } = useAuth();
     const router = useRouter();
+    const [activeTab, setActiveTab] = useState('profile');
 
     useEffect(() => {
         if (!isLoading && !isAuthenticated) {
