@@ -8,6 +8,9 @@ import { Header } from '@/components/layout/header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import {
     User,
     Mail,
@@ -21,20 +24,58 @@ import {
     Heart,
     Plus,
     Edit,
-    Trash2
+    Trash2,
+    X
 } from 'lucide-react';
 import Image from 'next/image';
+
+interface Address {
+    id: string;
+    title: string;
+    fullName: string;
+    phone: string;
+    address: string;
+    district: string;
+    city: string;
+    zipCode: string;
+    isDefault: boolean;
+    createdAt: string;
+}
 
 export default function AccountPage() {
     const { user, userProfile, isAuthenticated, isLoading } = useAppSelector((state) => state.user);
     const { items: cartItems, total: cartTotal, itemCount: cartItemCount } = useAppSelector((state) => state.cart);
     const { items: favoritesItems } = useAppSelector((state) => state.favorites);
-    const { signOut } = useAuth();
+    const { signOut, updateUserProfile } = useAuth();
     const router = useRouter();
     const [activeTab, setActiveTab] = useState('profile');
+    const [showAddressModal, setShowAddressModal] = useState(false);
+    const [editingAddress, setEditingAddress] = useState<Address | null>(null);
+    const [addressForm, setAddressForm] = useState({
+        title: '',
+        fullName: '',
+        phone: '',
+        address: '',
+        district: '',
+        city: '',
+        zipCode: '',
+        isDefault: false
+    });
+
+    // Türkiye şehirleri
+    const cities = [
+        'Adana', 'Adıyaman', 'Afyonkarahisar', 'Ağrı', 'Amasya', 'Ankara', 'Antalya', 'Artvin', 'Aydın', 'Balıkesir',
+        'Bilecik', 'Bingöl', 'Bitlis', 'Bolu', 'Burdur', 'Bursa', 'Çanakkale', 'Çankırı', 'Çorum', 'Denizli',
+        'Diyarbakır', 'Edirne', 'Elazığ', 'Erzincan', 'Erzurum', 'Eskişehir', 'Gaziantep', 'Giresun', 'Gümüşhane', 'Hakkari',
+        'Hatay', 'Isparta', 'Mersin', 'İstanbul', 'İzmir', 'Kars', 'Kastamonu', 'Kayseri', 'Kırklareli', 'Kırşehir',
+        'Kocaeli', 'Konya', 'Kütahya', 'Malatya', 'Manisa', 'Kahramanmaraş', 'Mardin', 'Muğla', 'Muş', 'Nevşehir',
+        'Niğde', 'Ordu', 'Rize', 'Sakarya', 'Samsun', 'Siirt', 'Sinop', 'Sivas', 'Tekirdağ', 'Tokat',
+        'Trabzon', 'Tunceli', 'Şanlıurfa', 'Uşak', 'Van', 'Yozgat', 'Zonguldak', 'Aksaray', 'Bayburt', 'Karaman',
+        'Kırıkkale', 'Batman', 'Şırnak', 'Bartın', 'Ardahan', 'Iğdır', 'Yalova', 'Karabük', 'Kilis', 'Osmaniye', 'Düzce'
+    ];
 
     useEffect(() => {
-        if (!isLoading && !isAuthenticated) {
+        if (!isAuthenticated && !isLoading) {
             router.push('/login');
         }
     }, [isAuthenticated, isLoading, router]);
@@ -48,22 +89,110 @@ export default function AccountPage() {
         }
     };
 
-    // Loading state
+    const handleAddAddress = () => {
+        setEditingAddress(null);
+        setAddressForm({
+            title: '',
+            fullName: '',
+            phone: '',
+            address: '',
+            district: '',
+            city: '',
+            zipCode: '',
+            isDefault: false
+        });
+        setShowAddressModal(true);
+    };
+
+    const handleEditAddress = (address: Address) => {
+        setEditingAddress(address);
+        setAddressForm({
+            title: address.title,
+            fullName: address.fullName,
+            phone: address.phone,
+            address: address.address,
+            district: address.district,
+            city: address.city,
+            zipCode: address.zipCode,
+            isDefault: address.isDefault
+        });
+        setShowAddressModal(true);
+    };
+
+    const handleDeleteAddress = async (addressId: string) => {
+        if (!user?.uid || !userProfile?.addresses) return;
+
+        try {
+            const updatedAddresses = userProfile.addresses.filter((addr: any) => addr.id !== addressId);
+            await updateUserProfile({ addresses: updatedAddresses });
+        } catch (error) {
+            console.error('Error deleting address:', error);
+        }
+    };
+
+    const handleAddressSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!user?.uid || !userProfile) return;
+
+        try {
+            const newAddress: Address = {
+                id: editingAddress?.id || Date.now().toString(),
+                ...addressForm,
+                createdAt: editingAddress?.createdAt || new Date().toISOString()
+            };
+
+            let updatedAddresses = [...(userProfile.addresses || [])];
+
+            if (editingAddress) {
+                // Update existing address
+                updatedAddresses = updatedAddresses.map((addr: any) =>
+                    addr.id === editingAddress.id ? newAddress : addr
+                );
+            } else {
+                // Add new address
+                updatedAddresses.push(newAddress);
+            }
+
+            // If this address is set as default, remove default from others
+            if (newAddress.isDefault) {
+                updatedAddresses = updatedAddresses.map((addr: any) => ({
+                    ...addr,
+                    isDefault: addr.id === newAddress.id
+                }));
+            }
+
+            await updateUserProfile({ addresses: updatedAddresses });
+            setShowAddressModal(false);
+            setAddressForm({
+                title: '',
+                fullName: '',
+                phone: '',
+                address: '',
+                district: '',
+                city: '',
+                zipCode: '',
+                isDefault: false
+            });
+        } catch (error) {
+            console.error('Error saving address:', error);
+        }
+    };
+
     if (isLoading) {
         return (
-            <div className="min-h-screen bg-gray-50">
+            <div className="min-h-screen bg-gray-50 dark:bg-black">
                 <Header />
-                <main className="max-w-7xl mx-auto px-6 lg:px-8 py-12">
-                    <div className="flex items-center justify-center py-12">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-600"></div>
+                <div className="flex items-center justify-center min-h-screen">
+                    <div className="text-center">
+                        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-amber-600 mx-auto"></div>
+                        <p className="mt-4 text-gray-600 dark:text-gray-400">Yükleniyor...</p>
                     </div>
-                </main>
+                </div>
             </div>
         );
     }
 
-    // Not authenticated
-    if (!isAuthenticated || !user) {
+    if (!isAuthenticated) {
         return null;
     }
 
@@ -142,8 +271,8 @@ export default function AccountPage() {
                             <button
                                 onClick={() => setActiveTab('profile')}
                                 className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${activeTab === 'profile'
-                                        ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
-                                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                                    ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
+                                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                                     }`}
                             >
                                 Profil
@@ -151,8 +280,8 @@ export default function AccountPage() {
                             <button
                                 onClick={() => setActiveTab('cart')}
                                 className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${activeTab === 'cart'
-                                        ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
-                                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                                    ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
+                                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                                     }`}
                             >
                                 Sepetim ({cartItemCount})
@@ -160,8 +289,8 @@ export default function AccountPage() {
                             <button
                                 onClick={() => setActiveTab('favorites')}
                                 className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${activeTab === 'favorites'
-                                        ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
-                                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                                    ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
+                                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                                     }`}
                             >
                                 Favorilerim ({favoritesItems.length})
@@ -169,8 +298,8 @@ export default function AccountPage() {
                             <button
                                 onClick={() => setActiveTab('addresses')}
                                 className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${activeTab === 'addresses'
-                                        ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
-                                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                                    ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
+                                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                                     }`}
                             >
                                 Adreslerim
@@ -438,7 +567,7 @@ export default function AccountPage() {
                             <div className="space-y-6">
                                 <div className="flex items-center justify-between">
                                     <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Adreslerim</h2>
-                                    <Button className="flex items-center gap-2">
+                                    <Button onClick={handleAddAddress} className="flex items-center gap-2">
                                         <Plus className="h-4 w-4" />
                                         Yeni Adres Ekle
                                     </Button>
@@ -450,7 +579,7 @@ export default function AccountPage() {
                                             <MapPin className="h-16 w-16 text-gray-400 mx-auto mb-4" />
                                             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Henüz Adres Eklenmemiş</h3>
                                             <p className="text-gray-600 dark:text-gray-400 mb-4">Teslimat adreslerinizi ekleyin.</p>
-                                            <Button className="flex items-center gap-2">
+                                            <Button onClick={handleAddAddress} className="flex items-center gap-2">
                                                 <Plus className="h-4 w-4" />
                                                 İlk Adresinizi Ekleyin
                                             </Button>
@@ -483,10 +612,19 @@ export default function AccountPage() {
                                                             </p>
                                                         </div>
                                                         <div className="flex gap-2">
-                                                            <Button size="sm" variant="outline">
+                                                            <Button
+                                                                size="sm"
+                                                                variant="outline"
+                                                                onClick={() => handleEditAddress(address)}
+                                                            >
                                                                 <Edit className="h-4 w-4" />
                                                             </Button>
-                                                            <Button size="sm" variant="outline" className="text-red-600 hover:text-red-700">
+                                                            <Button
+                                                                size="sm"
+                                                                variant="outline"
+                                                                className="text-red-600 hover:text-red-700"
+                                                                onClick={() => handleDeleteAddress(address.id)}
+                                                            >
                                                                 <Trash2 className="h-4 w-4" />
                                                             </Button>
                                                         </div>
@@ -501,6 +639,147 @@ export default function AccountPage() {
                     </div>
                 </div>
             </main>
+
+            {/* Address Modal */}
+            {showAddressModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white dark:bg-gray-900 rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
+                        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                                {editingAddress ? 'Adresi Düzenle' : 'Yeni Adres Ekle'}
+                            </h3>
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setShowAddressModal(false)}
+                                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                            >
+                                <X className="h-5 w-5" />
+                            </Button>
+                        </div>
+
+                        <form onSubmit={handleAddressSubmit} className="p-6 space-y-4">
+                            <div>
+                                <Label htmlFor="title" className="text-gray-700 dark:text-gray-300">Adres Başlığı</Label>
+                                <Input
+                                    id="title"
+                                    value={addressForm.title}
+                                    onChange={(e) => setAddressForm({ ...addressForm, title: e.target.value })}
+                                    placeholder="Ev, İş, vb."
+                                    className="mt-1 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+                                    required
+                                />
+                            </div>
+
+                            <div>
+                                <Label htmlFor="fullName" className="text-gray-700 dark:text-gray-300">Ad Soyad</Label>
+                                <Input
+                                    id="fullName"
+                                    value={addressForm.fullName}
+                                    onChange={(e) => setAddressForm({ ...addressForm, fullName: e.target.value })}
+                                    placeholder="Ad Soyad"
+                                    className="mt-1 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+                                    required
+                                />
+                            </div>
+
+                            <div>
+                                <Label htmlFor="phone" className="text-gray-700 dark:text-gray-300">Telefon</Label>
+                                <Input
+                                    id="phone"
+                                    value={addressForm.phone}
+                                    onChange={(e) => setAddressForm({ ...addressForm, phone: e.target.value })}
+                                    placeholder="0555 123 45 67"
+                                    className="mt-1 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+                                    required
+                                />
+                            </div>
+
+                            <div>
+                                <Label htmlFor="address" className="text-gray-700 dark:text-gray-300">Adres</Label>
+                                <Textarea
+                                    id="address"
+                                    value={addressForm.address}
+                                    onChange={(e) => setAddressForm({ ...addressForm, address: e.target.value })}
+                                    placeholder="Mahalle, Sokak, Bina No, Daire No"
+                                    className="mt-1 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+                                    rows={3}
+                                    required
+                                />
+                            </div>
+
+                            <div>
+                                <Label htmlFor="district" className="text-gray-700 dark:text-gray-300">İlçe</Label>
+                                <Input
+                                    id="district"
+                                    value={addressForm.district}
+                                    onChange={(e) => setAddressForm({ ...addressForm, district: e.target.value })}
+                                    placeholder="İlçe"
+                                    className="mt-1 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+                                    required
+                                />
+                            </div>
+
+                            <div>
+                                <Label htmlFor="city" className="text-gray-700 dark:text-gray-300">Şehir</Label>
+                                <select
+                                    id="city"
+                                    value={addressForm.city}
+                                    onChange={(e) => setAddressForm({ ...addressForm, city: e.target.value })}
+                                    className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+                                    required
+                                >
+                                    <option value="">Şehir seçin</option>
+                                    {cities.map((city) => (
+                                        <option key={city} value={city}>
+                                            {city}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <div>
+                                <Label htmlFor="zipCode" className="text-gray-700 dark:text-gray-300">Posta Kodu</Label>
+                                <Input
+                                    id="zipCode"
+                                    value={addressForm.zipCode}
+                                    onChange={(e) => setAddressForm({ ...addressForm, zipCode: e.target.value })}
+                                    placeholder="34000"
+                                    className="mt-1 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+                                    required
+                                />
+                            </div>
+
+                            <div className="flex items-center space-x-2">
+                                <input
+                                    type="checkbox"
+                                    id="isDefault"
+                                    checked={addressForm.isDefault}
+                                    onChange={(e) => setAddressForm({ ...addressForm, isDefault: e.target.checked })}
+                                    className="rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+                                />
+                                <Label htmlFor="isDefault" className="text-gray-700 dark:text-gray-300">
+                                    Varsayılan adres olarak ayarla
+                                </Label>
+                            </div>
+
+                            <div className="flex gap-3 pt-4">
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={() => setShowAddressModal(false)}
+                                    className="flex-1"
+                                >
+                                    İptal
+                                </Button>
+                                <Button type="submit" className="flex-1 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700">
+                                    {editingAddress ? 'Güncelle' : 'Ekle'}
+                                </Button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 } 
