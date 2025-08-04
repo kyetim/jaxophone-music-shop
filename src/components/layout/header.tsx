@@ -276,7 +276,7 @@ export function Header() {
         } else {
             categoryHoverTimeoutRef.current = setTimeout(() => {
                 setHoveredCategory(null);
-            }, 1000); // Increased from 500ms to 1000ms for easier navigation
+            }, 200); // Reduced from 1000ms to 200ms for quick closing
         }
     };
 

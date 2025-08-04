@@ -294,8 +294,8 @@
   /* Dropdown hover delay */
   .dropdown-hover {
     transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
-    transition-delay: 800ms;
-    /* Increased from 400ms to 800ms for easier navigation */
+    transition-delay: 200ms;
+    /* Reduced from 800ms to 200ms for quick closing */
   }
 
   .dropdown-hover:hover {
