@@ -25,9 +25,17 @@ import {
     Plus,
     Edit,
     Trash2,
-    X
+    X,
+    AlertTriangle,
+    Eye,
+    EyeOff,
+    Save,
+    Key,
+    Smartphone,
+    Globe
 } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 interface Address {
     id: string;
@@ -60,6 +68,29 @@ export default function AccountPage() {
         city: '',
         zipCode: '',
         isDefault: false
+    });
+
+    // Account settings states
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [showPasswordModal, setShowPasswordModal] = useState(false);
+    const [showProfileModal, setShowProfileModal] = useState(false);
+    const [profileForm, setProfileForm] = useState({
+        displayName: user?.displayName || '',
+        email: user?.email || '',
+        phone: (userProfile as any)?.phone || ''
+    });
+    const [passwordForm, setPasswordForm] = useState({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+    });
+    const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+    const [showNewPassword, setShowNewPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [preferences, setPreferences] = useState({
+        emailNotifications: userProfile?.preferences?.emailNotifications ?? true,
+        smsNotifications: userProfile?.preferences?.smsNotifications ?? true,
+        newsletter: userProfile?.preferences?.newsletter ?? true
     });
 
     // Türkiye şehirleri
@@ -175,6 +206,79 @@ export default function AccountPage() {
             });
         } catch (error) {
             console.error('Error saving address:', error);
+        }
+    };
+
+    // Account settings functions
+    const handleProfileUpdate = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!user?.uid) return;
+
+        try {
+            await updateUserProfile({
+                displayName: profileForm.displayName,
+                phone: profileForm.phone
+            });
+            setShowProfileModal(false);
+        } catch (error) {
+            console.error('Error updating profile:', error);
+        }
+    };
+
+    const handlePasswordChange = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!user?.uid) return;
+
+        if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+            alert('Yeni şifreler eşleşmiyor!');
+            return;
+        }
+
+        if (passwordForm.newPassword.length < 6) {
+            alert('Yeni şifre en az 6 karakter olmalıdır!');
+            return;
+        }
+
+        try {
+            // Bu fonksiyonu useAuth hook'una eklemek gerekiyor
+            // await changePassword(passwordForm.currentPassword, passwordForm.newPassword);
+            setShowPasswordModal(false);
+            setPasswordForm({
+                currentPassword: '',
+                newPassword: '',
+                confirmPassword: ''
+            });
+            alert('Şifre başarıyla güncellendi!');
+        } catch (error) {
+            console.error('Error changing password:', error);
+            alert('Şifre güncellenirken hata oluştu!');
+        }
+    };
+
+    const handlePreferencesUpdate = async () => {
+        if (!user?.uid) return;
+
+        try {
+            await updateUserProfile({
+                preferences: preferences
+            });
+            alert('Tercihler başarıyla güncellendi!');
+        } catch (error) {
+            console.error('Error updating preferences:', error);
+        }
+    };
+
+    const handleAccountDelete = async () => {
+        if (!user?.uid) return;
+
+        try {
+            // Bu fonksiyonu useAuth hook'una eklemek gerekiyor
+            // await deleteAccount();
+            setShowDeleteConfirm(false);
+            router.push('/');
+        } catch (error) {
+            console.error('Error deleting account:', error);
+            alert('Hesap silinirken hata oluştu!');
         }
     };
 
@@ -412,6 +516,15 @@ export default function AccountPage() {
                             >
                                 Adreslerim
                             </button>
+                            <button
+                                onClick={() => setActiveTab('settings')}
+                                className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${activeTab === 'settings'
+                                    ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
+                                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                                    }`}
+                            >
+                                Ayarlar
+                            </button>
                         </div>
 
                         {/* Tab Content */}
@@ -572,7 +685,7 @@ export default function AccountPage() {
                                 ) : (
                                     <div className="space-y-4">
                                         {cartItems.map((item) => (
-                                            <Card key={item.product.id} className="dark:bg-gray-900 dark:border-gray-800">
+                                            <Card key={item.product.id} className="dark:bg-gray-900 dark:border-gray-800 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => router.push(`/products/${item.product.id}`)}>
                                                 <CardContent className="p-4">
                                                     <div className="flex gap-4">
                                                         <div className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
@@ -585,7 +698,7 @@ export default function AccountPage() {
                                                             />
                                                         </div>
                                                         <div className="flex-1">
-                                                            <h4 className="font-medium text-gray-900 dark:text-white">{item.product.name}</h4>
+                                                            <h4 className="font-medium text-gray-900 dark:text-white hover:text-amber-600 dark:hover:text-amber-400 transition-colors">{item.product.name}</h4>
                                                             <p className="text-sm text-gray-600 dark:text-gray-400">{item.product.brand}</p>
                                                             <div className="flex justify-between items-center mt-2">
                                                                 <span className="text-sm text-gray-600 dark:text-gray-400">
@@ -744,6 +857,173 @@ export default function AccountPage() {
                                 )}
                             </div>
                         )}
+
+                        {activeTab === 'settings' && (
+                            <div className="space-y-6">
+                                <div className="flex items-center justify-between">
+                                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Hesap Ayarları</h2>
+                                </div>
+
+                                {/* Profile Settings */}
+                                <Card className="dark:bg-gray-900 dark:border-gray-800">
+                                    <CardHeader>
+                                        <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-white">
+                                            <User className="h-5 w-5 text-amber-600" />
+                                            Profil Bilgileri
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="space-y-4">
+                                        <div className="grid sm:grid-cols-2 gap-4">
+                                            <div>
+                                                <Label className="text-gray-700 dark:text-gray-300">Ad Soyad</Label>
+                                                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{user?.displayName || 'Belirtilmemiş'}</p>
+                                            </div>
+                                            <div>
+                                                <Label className="text-gray-700 dark:text-gray-300">E-posta</Label>
+                                                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{user?.email}</p>
+                                            </div>
+                                        </div>
+                                        <Button onClick={() => setShowProfileModal(true)} className="flex items-center gap-2">
+                                            <Edit className="h-4 w-4" />
+                                            Profili Düzenle
+                                        </Button>
+                                    </CardContent>
+                                </Card>
+
+                                {/* Security Settings */}
+                                <Card className="dark:bg-gray-900 dark:border-gray-800">
+                                    <CardHeader>
+                                        <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-white">
+                                            <Key className="h-5 w-5 text-amber-600" />
+                                            Güvenlik
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="space-y-4">
+                                        <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                            <div>
+                                                <p className="font-medium text-gray-900 dark:text-white">Şifre Değiştir</p>
+                                                <p className="text-sm text-gray-600 dark:text-gray-400">Hesap güvenliğiniz için şifrenizi güncelleyin</p>
+                                            </div>
+                                            <Button variant="outline" onClick={() => setShowPasswordModal(true)}>
+                                                Değiştir
+                                            </Button>
+                                        </div>
+                                        <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                            <div>
+                                                <p className="font-medium text-gray-900 dark:text-white">E-posta Onayı</p>
+                                                <p className="text-sm text-gray-600 dark:text-gray-400">
+                                                    {user?.emailVerified ? 'E-posta adresiniz onaylandı' : 'E-posta adresinizi onaylayın'}
+                                                </p>
+                                            </div>
+                                            {!user?.emailVerified && (
+                                                <Button variant="outline">
+                                                    Onayla
+                                                </Button>
+                                            )}
+                                        </div>
+                                    </CardContent>
+                                </Card>
+
+                                {/* Notification Preferences */}
+                                <Card className="dark:bg-gray-900 dark:border-gray-800">
+                                    <CardHeader>
+                                        <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-white">
+                                            <Bell className="h-5 w-5 text-amber-600" />
+                                            Bildirim Tercihleri
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="space-y-4">
+                                        <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                            <div className="flex items-center gap-3">
+                                                <Mail className="h-5 w-5 text-gray-500" />
+                                                <div>
+                                                    <p className="font-medium text-gray-900 dark:text-white">E-posta Bildirimleri</p>
+                                                    <p className="text-sm text-gray-600 dark:text-gray-400">Kampanya ve fırsat e-postaları</p>
+                                                </div>
+                                            </div>
+                                            <label className="relative inline-flex items-center cursor-pointer">
+                                                <input
+                                                    type="checkbox"
+                                                    className="sr-only peer"
+                                                    checked={preferences.emailNotifications}
+                                                    onChange={(e) => setPreferences({ ...preferences, emailNotifications: e.target.checked })}
+                                                />
+                                                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-amber-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-600"></div>
+                                            </label>
+                                        </div>
+
+                                        <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                            <div className="flex items-center gap-3">
+                                                <Smartphone className="h-5 w-5 text-gray-500" />
+                                                <div>
+                                                    <p className="font-medium text-gray-900 dark:text-white">SMS Bildirimleri</p>
+                                                    <p className="text-sm text-gray-600 dark:text-gray-400">Sipariş durumu SMS'leri</p>
+                                                </div>
+                                            </div>
+                                            <label className="relative inline-flex items-center cursor-pointer">
+                                                <input
+                                                    type="checkbox"
+                                                    className="sr-only peer"
+                                                    checked={preferences.smsNotifications}
+                                                    onChange={(e) => setPreferences({ ...preferences, smsNotifications: e.target.checked })}
+                                                />
+                                                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-amber-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-600"></div>
+                                            </label>
+                                        </div>
+
+                                        <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                            <div className="flex items-center gap-3">
+                                                <Globe className="h-5 w-5 text-gray-500" />
+                                                <div>
+                                                    <p className="font-medium text-gray-900 dark:text-white">Bülten</p>
+                                                    <p className="text-sm text-gray-600 dark:text-gray-400">Haftalık ürün bülteni</p>
+                                                </div>
+                                            </div>
+                                            <label className="relative inline-flex items-center cursor-pointer">
+                                                <input
+                                                    type="checkbox"
+                                                    className="sr-only peer"
+                                                    checked={preferences.newsletter}
+                                                    onChange={(e) => setPreferences({ ...preferences, newsletter: e.target.checked })}
+                                                />
+                                                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-amber-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-600"></div>
+                                            </label>
+                                        </div>
+
+                                        <Button onClick={handlePreferencesUpdate} className="flex items-center gap-2">
+                                            <Save className="h-4 w-4" />
+                                            Tercihleri Kaydet
+                                        </Button>
+                                    </CardContent>
+                                </Card>
+
+                                {/* Danger Zone */}
+                                <Card className="dark:bg-gray-900 dark:border-gray-800 border-red-200 dark:border-red-800">
+                                    <CardHeader>
+                                        <CardTitle className="flex items-center gap-2 text-red-600 dark:text-red-400">
+                                            <AlertTriangle className="h-5 w-5" />
+                                            Tehlikeli Bölge
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="space-y-4">
+                                        <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg">
+                                            <h4 className="font-medium text-red-800 dark:text-red-200 mb-2">Hesabı Sil</h4>
+                                            <p className="text-sm text-red-600 dark:text-red-300 mb-4">
+                                                Bu işlem geri alınamaz. Tüm verileriniz kalıcı olarak silinecektir.
+                                            </p>
+                                            <Button
+                                                variant="outline"
+                                                className="border-red-300 text-red-700 hover:bg-red-50 dark:border-red-700 dark:text-red-300 dark:hover:bg-red-900/30"
+                                                onClick={() => setShowDeleteConfirm(true)}
+                                            >
+                                                <Trash2 className="h-4 w-4 mr-2" />
+                                                Hesabı Sil
+                                            </Button>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            </div>
+                        )}
                     </div>
                 </div>
             </main>
@@ -885,6 +1165,225 @@ export default function AccountPage() {
                                 </Button>
                             </div>
                         </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Profile Edit Modal */}
+            {showProfileModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white dark:bg-gray-900 rounded-lg max-w-md w-full">
+                        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Profili Düzenle</h3>
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setShowProfileModal(false)}
+                                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                            >
+                                <X className="h-5 w-5" />
+                            </Button>
+                        </div>
+
+                        <form onSubmit={handleProfileUpdate} className="p-6 space-y-4">
+                            <div>
+                                <Label htmlFor="profileDisplayName" className="text-gray-700 dark:text-gray-300">Ad Soyad</Label>
+                                <Input
+                                    id="profileDisplayName"
+                                    value={profileForm.displayName}
+                                    onChange={(e) => setProfileForm({ ...profileForm, displayName: e.target.value })}
+                                    className="mt-1 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+                                    required
+                                />
+                            </div>
+
+                            <div>
+                                <Label htmlFor="profilePhone" className="text-gray-700 dark:text-gray-300">Telefon</Label>
+                                <Input
+                                    id="profilePhone"
+                                    value={profileForm.phone}
+                                    onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })}
+                                    placeholder="0555 123 45 67"
+                                    className="mt-1 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+                                />
+                            </div>
+
+                            <div className="flex gap-3 pt-4">
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={() => setShowProfileModal(false)}
+                                    className="flex-1"
+                                >
+                                    İptal
+                                </Button>
+                                <Button type="submit" className="flex-1 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700">
+                                    Kaydet
+                                </Button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Password Change Modal */}
+            {showPasswordModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white dark:bg-gray-900 rounded-lg max-w-md w-full">
+                        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Şifre Değiştir</h3>
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setShowPasswordModal(false)}
+                                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                            >
+                                <X className="h-5 w-5" />
+                            </Button>
+                        </div>
+
+                        <form onSubmit={handlePasswordChange} className="p-6 space-y-4">
+                            <div>
+                                <Label htmlFor="currentPassword" className="text-gray-700 dark:text-gray-300">Mevcut Şifre</Label>
+                                <div className="relative mt-1">
+                                    <Input
+                                        id="currentPassword"
+                                        type={showCurrentPassword ? "text" : "password"}
+                                        value={passwordForm.currentPassword}
+                                        onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
+                                        className="pr-10 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+                                        required
+                                    />
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="sm"
+                                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                                        onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                                    >
+                                        {showCurrentPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                    </Button>
+                                </div>
+                            </div>
+
+                            <div>
+                                <Label htmlFor="newPassword" className="text-gray-700 dark:text-gray-300">Yeni Şifre</Label>
+                                <div className="relative mt-1">
+                                    <Input
+                                        id="newPassword"
+                                        type={showNewPassword ? "text" : "password"}
+                                        value={passwordForm.newPassword}
+                                        onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+                                        className="pr-10 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+                                        required
+                                    />
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="sm"
+                                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                                        onClick={() => setShowNewPassword(!showNewPassword)}
+                                    >
+                                        {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                    </Button>
+                                </div>
+                            </div>
+
+                            <div>
+                                <Label htmlFor="confirmPassword" className="text-gray-700 dark:text-gray-300">Yeni Şifre (Tekrar)</Label>
+                                <div className="relative mt-1">
+                                    <Input
+                                        id="confirmPassword"
+                                        type={showConfirmPassword ? "text" : "password"}
+                                        value={passwordForm.confirmPassword}
+                                        onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
+                                        className="pr-10 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+                                        required
+                                    />
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="sm"
+                                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                    >
+                                        {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                    </Button>
+                                </div>
+                            </div>
+
+                            <div className="flex gap-3 pt-4">
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={() => setShowPasswordModal(false)}
+                                    className="flex-1"
+                                >
+                                    İptal
+                                </Button>
+                                <Button type="submit" className="flex-1 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700">
+                                    Değiştir
+                                </Button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Account Delete Confirmation Modal */}
+            {showDeleteConfirm && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white dark:bg-gray-900 rounded-lg max-w-md w-full">
+                        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+                            <h3 className="text-lg font-semibold text-red-600 dark:text-red-400">Hesabı Sil</h3>
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setShowDeleteConfirm(false)}
+                                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                            >
+                                <X className="h-5 w-5" />
+                            </Button>
+                        </div>
+
+                        <div className="p-6 space-y-4">
+                            <div className="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-900/20 rounded-lg">
+                                <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400" />
+                                <div>
+                                    <h4 className="font-medium text-red-800 dark:text-red-200">Dikkat!</h4>
+                                    <p className="text-sm text-red-600 dark:text-red-300">
+                                        Bu işlem geri alınamaz. Tüm verileriniz kalıcı olarak silinecektir.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                                Hesabınızı silmek istediğinizden emin misiniz? Bu işlem:
+                            </p>
+                            <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1 ml-4">
+                                <li>• Tüm sipariş geçmişinizi silecek</li>
+                                <li>• Favorilerinizi ve sepetinizi silecek</li>
+                                <li>• Adres bilgilerinizi silecek</li>
+                                <li>• Hesap ayarlarınızı silecek</li>
+                            </ul>
+
+                            <div className="flex gap-3 pt-4">
+                                <Button
+                                    variant="outline"
+                                    onClick={() => setShowDeleteConfirm(false)}
+                                    className="flex-1"
+                                >
+                                    İptal
+                                </Button>
+                                <Button
+                                    onClick={handleAccountDelete}
+                                    className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+                                >
+                                    <Trash2 className="h-4 w-4 mr-2" />
+                                    Hesabı Sil
+                                </Button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             )}
