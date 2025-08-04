@@ -18,6 +18,9 @@ import {
     setUserError,
     clearUser
 } from '@/store/slices/user-slice';
+import { clearCart } from '@/store/slices/cart-slice';
+import { clearFavorites } from '@/store/slices/favorites-slice';
+import { RootState } from '@/store/store';
 
 export interface AuthUser extends User {
     displayName: string | null;
@@ -220,6 +223,8 @@ export function useAuth() {
             dispatch(setUserLoading(true));
             await firebaseSignOut(auth);
             dispatch(clearUser());
+            dispatch(clearCart());
+            dispatch(clearFavorites());
         } catch (error: any) {
             const errorMessage = getErrorMessage(error.code);
             dispatch(setUserError(errorMessage));

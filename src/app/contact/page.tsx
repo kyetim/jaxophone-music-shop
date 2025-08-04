@@ -293,10 +293,7 @@ export default function ContactPage() {
                                 <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Sosyal Medya</h3>
                                 <div className="flex space-x-4">
                                     <a href="#" className="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center hover:bg-blue-700 transition-colors">
-                                        <span className="text-sm font-bold">f</span>
-                                    </a>
-                                    <a href="#" className="w-10 h-10 bg-blue-400 text-white rounded-full flex items-center justify-center hover:bg-blue-500 transition-colors">
-                                        <span className="text-sm font-bold">t</span>
+                                        <span className="text-sm font-bold">x</span>
                                     </a>
                                     <a href="#" className="w-10 h-10 bg-pink-600 text-white rounded-full flex items-center justify-center hover:bg-pink-700 transition-colors">
                                         <span className="text-sm font-bold">ig</span>
