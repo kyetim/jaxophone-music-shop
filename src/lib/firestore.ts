@@ -593,8 +593,16 @@ export class BlogService {
         if (!db) throw new Error('Firestore not initialized');
 
         const now = new Date();
-        const blog = {
+
+        // Clean the data to remove undefined values
+        const cleanBlogData = {
             ...blogData,
+            imageUrl: blogData.imageUrl || null, // Convert undefined to null
+            tags: blogData.tags.filter(tag => tag && tag.trim() !== ''), // Remove empty tags
+        };
+
+        const blog = {
+            ...cleanBlogData,
             id: '',
             createdAt: now,
             updatedAt: now,
@@ -605,7 +613,12 @@ export class BlogService {
             status: blogData.isPublished ? 'published' : 'draft'
         };
 
-        const docRef = await addDoc(collection(db, this.collection), blog);
+        // Remove undefined values from the blog object
+        const cleanBlog = Object.fromEntries(
+            Object.entries(blog).filter(([_, value]) => value !== undefined)
+        );
+
+        const docRef = await addDoc(collection(db, this.collection), cleanBlog);
 
         // Update the document with its ID
         await updateDoc(docRef, { id: docRef.id });
@@ -628,8 +641,16 @@ export class BlogService {
         if (!db) throw new Error('Firestore not initialized');
 
         const now = new Date();
-        const blog = {
+
+        // Clean the data to remove undefined values
+        const cleanBlogData = {
             ...blogData,
+            imageUrl: blogData.imageUrl || null, // Convert undefined to null
+            tags: blogData.tags.filter(tag => tag && tag.trim() !== ''), // Remove empty tags
+        };
+
+        const blog = {
+            ...cleanBlogData,
             id: '',
             createdAt: now,
             updatedAt: now,
@@ -644,7 +665,12 @@ export class BlogService {
             reviewNotes: null
         };
 
-        const docRef = await addDoc(collection(db, this.collection), blog);
+        // Remove undefined values from the blog object
+        const cleanBlog = Object.fromEntries(
+            Object.entries(blog).filter(([_, value]) => value !== undefined)
+        );
+
+        const docRef = await addDoc(collection(db, this.collection), cleanBlog);
 
         // Update the document with its ID
         await updateDoc(docRef, { id: docRef.id });
@@ -828,8 +854,15 @@ export class ReviewService {
         if (!db) throw new Error('Firestore not initialized');
 
         const now = new Date();
-        const review = {
+
+        // Clean the data to remove undefined values
+        const cleanReviewData = {
             ...reviewData,
+            images: reviewData.images?.filter(img => img && img.trim() !== '') || null, // Remove empty images
+        };
+
+        const review = {
+            ...cleanReviewData,
             id: '',
             createdAt: now,
             updatedAt: now,
@@ -838,7 +871,12 @@ export class ReviewService {
             status: 'pending' // pending, approved, rejected
         };
 
-        const docRef = await addDoc(collection(db, this.collection), review);
+        // Remove undefined values from the review object
+        const cleanReview = Object.fromEntries(
+            Object.entries(review).filter(([_, value]) => value !== undefined)
+        );
+
+        const docRef = await addDoc(collection(db, this.collection), cleanReview);
 
         // Update the document with its ID
         await updateDoc(docRef, { id: docRef.id });

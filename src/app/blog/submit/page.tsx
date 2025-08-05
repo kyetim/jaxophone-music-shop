@@ -54,17 +54,20 @@ export default function BlogSubmitPage() {
         setLoading(true);
 
         try {
-            await BlogService.submitForReview({
-                title: formData.title,
-                excerpt: formData.excerpt,
-                content: formData.content,
-                author: formData.author || user.displayName || user.email?.split('@')[0] || 'Anonim',
+            // Clean the form data
+            const cleanFormData = {
+                title: formData.title.trim(),
+                excerpt: formData.excerpt.trim(),
+                content: formData.content.trim(),
+                author: formData.author.trim() || user.displayName || user.email?.split('@')[0] || 'Anonim',
                 category: formData.category,
-                tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
-                imageUrl: formData.imageUrl || undefined,
+                tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag !== ''),
+                imageUrl: formData.imageUrl.trim() || undefined, // Only send if not empty
                 submittedBy: user.uid,
                 userEmail: user.email || ''
-            });
+            };
+
+            await BlogService.submitForReview(cleanFormData);
 
             setSuccess(true);
             setFormData({
