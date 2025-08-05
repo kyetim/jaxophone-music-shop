@@ -656,10 +656,10 @@ export class BlogService {
     static async getPublished() {
         if (!db) throw new Error('Firestore not initialized');
 
+        // Simplified query to avoid index requirement
         const q = query(
             collection(db, this.collection),
-            where('status', '==', 'published'),
-            orderBy('publishedAt', 'desc')
+            orderBy('createdAt', 'desc')
         );
 
         const querySnapshot = await getDocs(q);
@@ -668,7 +668,8 @@ export class BlogService {
             ...doc.data()
         }));
 
-        return blogs;
+        // Filter on client side to avoid index requirement
+        return blogs.filter((blog: any) => blog.status === 'published');
     }
 
     // Get blog post by ID
@@ -709,9 +710,9 @@ export class BlogService {
     static async getPending() {
         if (!db) throw new Error('Firestore not initialized');
 
+        // Simplified query to avoid index requirement
         const q = query(
             collection(db, this.collection),
-            where('status', '==', 'pending'),
             orderBy('createdAt', 'desc')
         );
 
@@ -721,7 +722,8 @@ export class BlogService {
             ...doc.data()
         }));
 
-        return blogs;
+        // Filter on client side to avoid index requirement
+        return blogs.filter((blog: any) => blog.status === 'pending');
     }
 
     // Approve blog post
@@ -851,10 +853,10 @@ export class ReviewService {
     static async getProductReviews(productId: string) {
         if (!db) throw new Error('Firestore not initialized');
 
+        // Simplified query to avoid index requirement
         const q = query(
             collection(db, this.collection),
             where('productId', '==', productId),
-            where('status', '==', 'approved'),
             orderBy('createdAt', 'desc')
         );
 
@@ -864,7 +866,8 @@ export class ReviewService {
             ...doc.data()
         }));
 
-        return reviews;
+        // Filter on client side to avoid index requirement
+        return reviews.filter((review: any) => review.status === 'approved');
     }
 
     // Get all reviews (for admin)
@@ -889,9 +892,9 @@ export class ReviewService {
     static async getPending() {
         if (!db) throw new Error('Firestore not initialized');
 
+        // Simplified query to avoid index requirement
         const q = query(
             collection(db, this.collection),
-            where('status', '==', 'pending'),
             orderBy('createdAt', 'desc')
         );
 
@@ -901,7 +904,8 @@ export class ReviewService {
             ...doc.data()
         }));
 
-        return reviews;
+        // Filter on client side to avoid index requirement
+        return reviews.filter((review: any) => review.status === 'pending');
     }
 
     // Approve review
@@ -941,20 +945,24 @@ export class ReviewService {
     static async updateProductRating(productId: string) {
         if (!db) throw new Error('Firestore not initialized');
 
+        // Simplified query to avoid index requirement
         const q = query(
             collection(db, this.collection),
             where('productId', '==', productId),
-            where('status', '==', 'approved')
+            orderBy('createdAt', 'desc')
         );
 
         const querySnapshot = await getDocs(q);
         const reviews = querySnapshot.docs.map(doc => doc.data());
 
-        if (reviews.length === 0) return;
+        // Filter on client side to avoid index requirement
+        const approvedReviews = reviews.filter((review: any) => review.status === 'approved');
 
-        const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
-        const averageRating = totalRating / reviews.length;
-        const reviewCount = reviews.length;
+        if (approvedReviews.length === 0) return;
+
+        const totalRating = approvedReviews.reduce((sum, review) => sum + review.rating, 0);
+        const averageRating = totalRating / approvedReviews.length;
+        const reviewCount = approvedReviews.length;
 
         // Update product with new rating
         const productRef = doc(db, 'products', productId);
