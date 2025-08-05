@@ -498,9 +498,9 @@ export class NotificationService {
     static async getUserNotifications(userId: string) {
         if (!db) throw new Error('Firestore not initialized');
 
+        // Simplified query to avoid index requirement
         const q = query(
             collection(db, this.collection),
-            where('sentTo', 'in', ['all', userId]),
             orderBy('createdAt', 'desc')
         );
 
@@ -510,7 +510,11 @@ export class NotificationService {
             ...doc.data()
         }));
 
-        return notifications;
+        // Filter on client side to avoid index requirement
+        return notifications.filter((notification: any) =>
+            notification.sentTo === 'all' ||
+            (Array.isArray(notification.sentTo) && notification.sentTo.includes(userId))
+        );
     }
 
     // Mark notification as read

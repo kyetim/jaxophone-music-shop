@@ -447,7 +447,7 @@ export function Header() {
                                 onMouseLeave={() => handleNotificationsHover(false)}
                             >
                                 <Bell className="h-5 w-5 text-gray-700 dark:text-gray-300 hover:text-amber-600 dark:hover:text-amber-400 transition-colors" />
-                                {isAuthenticated && (
+                                {isAuthenticated && unreadCount > 0 && (
                                     <Badge className="absolute -top-2 -right-2 h-5 w-5 text-xs bg-amber-600 border-white dark:border-gray-900 flex items-center justify-center">
                                         {unreadCount}
                                     </Badge>

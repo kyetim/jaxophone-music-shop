@@ -13,17 +13,17 @@ const userPersistConfig = {
     blacklist: ['isLoading', 'error'] // Don't persist loading and error states
 };
 
-// Don't persist cart and favorites - they'll be stored in Firestore
+// Persist cart and favorites to maintain state across page navigation
 const cartPersistConfig = {
     key: 'cart',
     storage,
-    whitelist: [] // Don't persist cart data
+    whitelist: ['items', 'itemCount'] // Persist cart data
 };
 
 const favoritesPersistConfig = {
     key: 'favorites',
     storage,
-    whitelist: [] // Don't persist favorites data
+    whitelist: ['items'] // Persist favorites data
 };
 
 // Create persisted reducers

@@ -90,21 +90,23 @@ export function useAuth() {
 
                     // Kullanıcı profilini Firestore'dan çek
                     await fetchUserProfile(firebaseUser.uid);
-                    // Kullanıcının sepetini ve favorilerini Firestore'dan çek
-                    await loadUserCart(firebaseUser.uid);
-                    await loadUserFavorites(firebaseUser.uid);
+
+                    // Sadece ilk girişte cart ve favorites'ı Firestore'dan yükle
+                    // Redux Persist sayfa geçişlerinde state'i koruyacak
+                    if (!hasInitialized.current) {
+                        await loadUserCart(firebaseUser.uid);
+                        await loadUserFavorites(firebaseUser.uid);
+                        hasInitialized.current = true;
+                    }
                 } else {
                     dispatch(clearUser());
+                    hasInitialized.current = false;
                 }
             } catch (error) {
                 console.error('Auth state change error:', error);
                 dispatch(setUserError('Kimlik doğrulama hatası'));
             } finally {
-                // Loading'i sadece ilk kez false yap
-                if (!hasInitialized.current) {
-                    hasInitialized.current = true;
-                    dispatch(setUserLoading(false));
-                }
+                dispatch(setUserLoading(false));
             }
         });
 

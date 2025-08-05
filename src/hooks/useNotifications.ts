@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAppSelector } from '@/store/hooks';
 import { NotificationService } from '@/lib/firestore';
 
@@ -7,13 +7,16 @@ export function useNotifications() {
     const user = useAppSelector((state) => state.user.user);
     const [notifications, setNotifications] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
+    const hasLoaded = useRef(false);
 
-    // Load user notifications
+    // Load user notifications only once when user is authenticated
     useEffect(() => {
-        if (isAuthenticated && user?.uid) {
+        if (isAuthenticated && user?.uid && !hasLoaded.current) {
             loadNotifications();
-        } else {
+            hasLoaded.current = true;
+        } else if (!isAuthenticated) {
             setNotifications([]);
+            hasLoaded.current = false;
         }
     }, [isAuthenticated, user?.uid]);
 
@@ -26,6 +29,8 @@ export function useNotifications() {
             setNotifications(userNotifications);
         } catch (error) {
             console.error('Error loading notifications:', error);
+            // Fallback to empty array if there's an error
+            setNotifications([]);
         } finally {
             setLoading(false);
         }
@@ -39,7 +44,7 @@ export function useNotifications() {
 
         try {
             await NotificationService.markAsRead(notificationId, user.uid);
-            // Update local state
+            // Update local state immediately for better UX
             setNotifications(prev => prev.map(n =>
                 n.id === notificationId ? { ...n, isRead: true } : n
             ));
