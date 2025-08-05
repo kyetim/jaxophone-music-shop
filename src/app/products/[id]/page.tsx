@@ -6,6 +6,7 @@ import { createPortal } from 'react-dom';
 import { Header } from '@/components/layout/header';
 import { Button } from '@/components/ui/button';
 import { ProductCard } from '@/components/product/product-card';
+import { ProductReviews } from '@/components/product/product-reviews';
 import { ProductService } from '@/lib/firestore';
 import { Product } from '@/interfaces/product';
 import { useAppDispatch } from '@/store/hooks';
@@ -427,6 +428,13 @@ export default function ProductDetailPage() {
                                     <p className="text-sm mt-2">Kategori: {product.category} | Marka: {product.brand}</p>
                                 </div>
                             )}
+                        </div>
+                    </div>
+
+                    {/* Product Reviews */}
+                    <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden mt-12">
+                        <div className="p-6 lg:p-8">
+                            <ProductReviews productId={product.id} productName={product.name} />
                         </div>
                     </div>
                 </main>

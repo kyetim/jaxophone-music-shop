@@ -805,4 +805,240 @@ export class BlogService {
             totalViews
         };
     }
+}
+
+// Review Service for managing product reviews
+export class ReviewService {
+    private static collection = 'reviews';
+
+    // Create a new review
+    static async create(reviewData: {
+        productId: string;
+        userId: string;
+        userName: string;
+        userEmail: string;
+        rating: number;
+        title: string;
+        comment: string;
+        images?: string[];
+        verified: boolean;
+    }) {
+        if (!db) throw new Error('Firestore not initialized');
+
+        const now = new Date();
+        const review = {
+            ...reviewData,
+            id: '',
+            createdAt: now,
+            updatedAt: now,
+            helpful: 0,
+            reported: false,
+            status: 'pending' // pending, approved, rejected
+        };
+
+        const docRef = await addDoc(collection(db, this.collection), review);
+
+        // Update the document with its ID
+        await updateDoc(docRef, { id: docRef.id });
+
+        // Update product rating
+        await this.updateProductRating(reviewData.productId);
+
+        return docRef.id;
+    }
+
+    // Get reviews for a specific product
+    static async getProductReviews(productId: string) {
+        if (!db) throw new Error('Firestore not initialized');
+
+        const q = query(
+            collection(db, this.collection),
+            where('productId', '==', productId),
+            where('status', '==', 'approved'),
+            orderBy('createdAt', 'desc')
+        );
+
+        const querySnapshot = await getDocs(q);
+        const reviews = querySnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+
+        return reviews;
+    }
+
+    // Get all reviews (for admin)
+    static async getAll() {
+        if (!db) throw new Error('Firestore not initialized');
+
+        const q = query(
+            collection(db, this.collection),
+            orderBy('createdAt', 'desc')
+        );
+
+        const querySnapshot = await getDocs(q);
+        const reviews = querySnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+
+        return reviews;
+    }
+
+    // Get pending reviews
+    static async getPending() {
+        if (!db) throw new Error('Firestore not initialized');
+
+        const q = query(
+            collection(db, this.collection),
+            where('status', '==', 'pending'),
+            orderBy('createdAt', 'desc')
+        );
+
+        const querySnapshot = await getDocs(q);
+        const reviews = querySnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+
+        return reviews;
+    }
+
+    // Approve review
+    static async approve(reviewId: string) {
+        if (!db) throw new Error('Firestore not initialized');
+
+        const reviewRef = doc(db, this.collection, reviewId);
+        const reviewDoc = await getDoc(reviewRef);
+
+        if (!reviewDoc.exists()) {
+            throw new Error('Review not found');
+        }
+
+        const review = reviewDoc.data();
+        await updateDoc(reviewRef, {
+            status: 'approved',
+            updatedAt: new Date()
+        });
+
+        // Update product rating
+        await this.updateProductRating(review.productId);
+    }
+
+    // Reject review
+    static async reject(reviewId: string, reason: string) {
+        if (!db) throw new Error('Firestore not initialized');
+
+        const reviewRef = doc(db, this.collection, reviewId);
+        await updateDoc(reviewRef, {
+            status: 'rejected',
+            rejectionReason: reason,
+            updatedAt: new Date()
+        });
+    }
+
+    // Update product rating based on reviews
+    static async updateProductRating(productId: string) {
+        if (!db) throw new Error('Firestore not initialized');
+
+        const q = query(
+            collection(db, this.collection),
+            where('productId', '==', productId),
+            where('status', '==', 'approved')
+        );
+
+        const querySnapshot = await getDocs(q);
+        const reviews = querySnapshot.docs.map(doc => doc.data());
+
+        if (reviews.length === 0) return;
+
+        const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
+        const averageRating = totalRating / reviews.length;
+        const reviewCount = reviews.length;
+
+        // Update product with new rating
+        const productRef = doc(db, 'products', productId);
+        await updateDoc(productRef, {
+            rating: Math.round(averageRating * 10) / 10, // Round to 1 decimal place
+            reviewCount: reviewCount
+        });
+    }
+
+    // Mark review as helpful
+    static async markHelpful(reviewId: string, userId: string) {
+        if (!db) throw new Error('Firestore not initialized');
+
+        const reviewRef = doc(db, this.collection, reviewId);
+        const reviewDoc = await getDoc(reviewRef);
+
+        if (!reviewDoc.exists()) {
+            throw new Error('Review not found');
+        }
+
+        const review = reviewDoc.data();
+        const helpfulUsers = review.helpfulUsers || [];
+
+        if (!helpfulUsers.includes(userId)) {
+            helpfulUsers.push(userId);
+            await updateDoc(reviewRef, {
+                helpful: helpfulUsers.length,
+                helpfulUsers: helpfulUsers
+            });
+        }
+    }
+
+    // Report review
+    static async reportReview(reviewId: string, userId: string, reason: string) {
+        if (!db) throw new Error('Firestore not initialized');
+
+        const reviewRef = doc(db, this.collection, reviewId);
+        await updateDoc(reviewRef, {
+            reported: true,
+            reportReason: reason,
+            reportedBy: userId,
+            reportedAt: new Date()
+        });
+    }
+
+    // Delete review
+    static async delete(reviewId: string) {
+        if (!db) throw new Error('Firestore not initialized');
+
+        const reviewRef = doc(db, this.collection, reviewId);
+        const reviewDoc = await getDoc(reviewRef);
+
+        if (!reviewDoc.exists()) {
+            throw new Error('Review not found');
+        }
+
+        const review = reviewDoc.data();
+
+        // Delete the review
+        await deleteDoc(reviewRef);
+
+        // Update product rating
+        await this.updateProductRating(review.productId);
+    }
+
+    // Get review statistics
+    static async getStatistics() {
+        if (!db) throw new Error('Firestore not initialized');
+
+        const querySnapshot = await getDocs(collection(db, this.collection));
+        const reviews = querySnapshot.docs.map(doc => doc.data());
+
+        const totalReviews = reviews.length;
+        const approvedReviews = reviews.filter(r => r.status === 'approved').length;
+        const pendingReviews = reviews.filter(r => r.status === 'pending').length;
+        const averageRating = reviews.length > 0
+            ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length
+            : 0;
+
+        return {
+            totalReviews,
+            approvedReviews,
+            pendingReviews,
+            averageRating: Math.round(averageRating * 10) / 10
+        };
+    }
 } 
