@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Header } from '@/components/layout/header';
 import { Button } from '@/components/ui/button';
-import { ProductService, NotificationService, BlogService } from '@/lib/firestore';
+import { ProductService, NotificationService, BlogService, ReviewService } from '@/lib/firestore';
 import {
     Users,
     Package,
@@ -25,7 +25,8 @@ import {
     Save,
     Image as ImageIcon,
     Bell,
-    Send
+    Send,
+    Star
 } from 'lucide-react';
 
 interface Product {
@@ -612,6 +613,162 @@ const BlogModal = ({
     );
 };
 
+// ReviewModal component for viewing review details
+const ReviewModal = ({
+    isOpen,
+    onClose,
+    review,
+    onApprove,
+    onReject,
+    onDelete,
+    isLoading
+}: {
+    isOpen: boolean;
+    onClose: () => void;
+    review: any;
+    onApprove: (reviewId: string) => void;
+    onReject: (reviewId: string) => void;
+    onDelete: (reviewId: string) => void;
+    isLoading: boolean;
+}) => {
+    if (!isOpen || !review) return null;
+
+    const formatDate = (date: any) => {
+        if (!date) return '';
+        const d = date.toDate ? date.toDate() : new Date(date);
+        return d.toLocaleDateString('tr-TR', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    };
+
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-gray-900 rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto border border-gray-800">
+                <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-xl font-semibold text-white">Yorum Detayları</h2>
+                    <button onClick={onClose} className="text-gray-400 hover:text-gray-200">
+                        <X className="h-6 w-6" />
+                    </button>
+                </div>
+
+                <div className="space-y-6">
+                    {/* Review Header */}
+                    <div className="bg-gray-800 rounded-lg p-4">
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-lg font-semibold text-white">{review.title}</h3>
+                            <span className={`px-3 py-1 rounded-full text-sm font-medium ${review.status === 'approved' ? 'bg-green-900 text-green-300' :
+                                review.status === 'pending' ? 'bg-yellow-900 text-yellow-300' :
+                                    'bg-red-900 text-red-300'
+                                }`}>
+                                {review.status === 'approved' ? 'Onaylandı' :
+                                    review.status === 'pending' ? 'Beklemede' : 'Reddedildi'}
+                            </span>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-300">
+                            <div>
+                                <span className="font-medium">Kullanıcı:</span> {review.userName}
+                            </div>
+                            <div>
+                                <span className="font-medium">E-posta:</span> {review.userEmail}
+                            </div>
+                            <div>
+                                <span className="font-medium">Ürün ID:</span> {review.productId}
+                            </div>
+                            <div>
+                                <span className="font-medium">Tarih:</span> {formatDate(review.createdAt)}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Rating */}
+                    <div>
+                        <h4 className="font-semibold text-white mb-2">Puan</h4>
+                        <div className="flex items-center gap-2">
+                            {[...Array(5)].map((_, i) => (
+                                <Star
+                                    key={i}
+                                    className={`h-5 w-5 ${i < review.rating
+                                        ? 'text-yellow-400 fill-current'
+                                        : 'text-gray-600'
+                                        }`}
+                                />
+                            ))}
+                            <span className="text-gray-300 ml-2">{review.rating}/5</span>
+                        </div>
+                    </div>
+
+                    {/* Review Content */}
+                    <div className="space-y-4">
+                        <div>
+                            <h4 className="font-semibold text-white mb-2">Yorum</h4>
+                            <div className="text-gray-300 bg-gray-800 rounded-lg p-3 whitespace-pre-wrap">
+                                {review.comment}
+                            </div>
+                        </div>
+
+                        {review.images && review.images.length > 0 && (
+                            <div>
+                                <h4 className="font-semibold text-white mb-2">Fotoğraflar</h4>
+                                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                    {review.images.map((image: string, index: number) => (
+                                        <img
+                                            key={index}
+                                            src={image}
+                                            alt={`Review image ${index + 1}`}
+                                            className="w-full h-32 object-cover rounded-lg"
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Action Buttons */}
+                    {review.status === 'pending' && (
+                        <div className="flex items-center justify-end space-x-4 pt-6 border-t border-gray-700">
+                            <Button
+                                onClick={() => onReject(review.id)}
+                                disabled={isLoading}
+                                className="bg-red-600 hover:bg-red-700 text-white"
+                            >
+                                {isLoading ? 'İşleniyor...' : 'Reddet'}
+                            </Button>
+                            <Button
+                                onClick={() => onApprove(review.id)}
+                                disabled={isLoading}
+                                className="bg-green-600 hover:bg-green-700 text-white"
+                            >
+                                {isLoading ? 'İşleniyor...' : 'Onayla'}
+                            </Button>
+                        </div>
+                    )}
+
+                    <div className="flex items-center justify-end space-x-4 pt-6 border-t border-gray-700">
+                        <Button
+                            onClick={() => onDelete(review.id)}
+                            disabled={isLoading}
+                            className="bg-red-600 hover:bg-red-700 text-white"
+                        >
+                            {isLoading ? 'İşleniyor...' : 'Sil'}
+                        </Button>
+                        <Button
+                            onClick={onClose}
+                            variant="outline"
+                            className="border-gray-600 text-gray-300 hover:bg-gray-800"
+                        >
+                            Kapat
+                        </Button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 export default function AdminDashboard() {
     const [activeTab, setActiveTab] = useState('products');
     const [searchTerm, setSearchTerm] = useState('');
@@ -619,6 +776,8 @@ export default function AdminDashboard() {
     const [notifications, setNotifications] = useState<any[]>([]);
     const [blogs, setBlogs] = useState<any[]>([]);
     const [pendingBlogs, setPendingBlogs] = useState<any[]>([]);
+    const [reviews, setReviews] = useState<any[]>([]);
+    const [pendingReviews, setPendingReviews] = useState<any[]>([]);
     const [notificationStats, setNotificationStats] = useState({
         totalSent: 0,
         thisMonthSent: 0,
@@ -630,16 +789,25 @@ export default function AdminDashboard() {
         pendingPosts: 0,
         totalViews: 0
     });
+    const [reviewStats, setReviewStats] = useState({
+        totalReviews: 0,
+        approvedReviews: 0,
+        pendingReviews: 0,
+        averageRating: 0
+    });
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isNotificationModalOpen, setIsNotificationModalOpen] = useState(false);
     const [isBlogModalOpen, setIsBlogModalOpen] = useState(false);
+    const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
     const [selectedBlog, setSelectedBlog] = useState<any>(null);
+    const [selectedReview, setSelectedReview] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
     const [isNotificationLoading, setIsNotificationLoading] = useState(false);
     const [isBlogLoading, setIsBlogLoading] = useState(false);
+    const [isReviewLoading, setIsReviewLoading] = useState(false);
 
     // Form state for adding/editing products
     const [formData, setFormData] = useState({
@@ -698,13 +866,16 @@ export default function AdminDashboard() {
         // Load products and notifications from database
         const loadData = async () => {
             try {
-                const [productsData, notificationsData, statsData, blogsData, pendingBlogsData, blogStatsData] = await Promise.all([
+                const [productsData, notificationsData, statsData, blogsData, pendingBlogsData, blogStatsData, reviewsData, pendingReviewsData, reviewStatsData] = await Promise.all([
                     ProductService.getAll(),
                     NotificationService.getAll(),
                     NotificationService.getStatistics(),
                     BlogService.getAll(),
                     BlogService.getPending(),
-                    BlogService.getStatistics()
+                    BlogService.getStatistics(),
+                    ReviewService.getAll(),
+                    ReviewService.getPending(),
+                    ReviewService.getStatistics()
                 ]);
 
                 setProducts(productsData);
@@ -713,6 +884,9 @@ export default function AdminDashboard() {
                 setBlogs(blogsData);
                 setPendingBlogs(pendingBlogsData);
                 setBlogStats(blogStatsData);
+                setReviews(reviewsData);
+                setPendingReviews(pendingReviewsData);
+                setReviewStats(reviewStatsData);
             } catch (error) {
                 console.error('Error loading data:', error);
                 alert('Veriler yüklenirken bir hata oluştu.');
@@ -1082,12 +1256,88 @@ export default function AdminDashboard() {
 
     // Helper function to format time ago
     const getTimeAgo = (date: Date) => {
-        const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
-        if (seconds < 60) return `${seconds} saniye önce`;
+        const now = new Date();
+        const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+        if (seconds < 60) return 'Az önce';
         if (seconds < 3600) return `${Math.floor(seconds / 60)} dakika önce`;
         if (seconds < 86400) return `${Math.floor(seconds / 3600)} saat önce`;
         if (seconds < 2592000) return `${Math.floor(seconds / 86400)} gün önce`;
         return `${Math.floor(seconds / 2592000)} ay önce`;
+    };
+
+    // Handle review approval
+    const handleReviewApprove = async (reviewId: string) => {
+        try {
+            setIsReviewLoading(true);
+            await ReviewService.approve(reviewId);
+            alert('Yorum onaylandı!');
+            // Reload data
+            const [reviewsData, pendingReviewsData, reviewStatsData] = await Promise.all([
+                ReviewService.getAll(),
+                ReviewService.getPending(),
+                ReviewService.getStatistics()
+            ]);
+            setReviews(reviewsData);
+            setPendingReviews(pendingReviewsData);
+            setReviewStats(reviewStatsData);
+        } catch (error) {
+            console.error('Error approving review:', error);
+            alert('Yorum onaylanırken bir hata oluştu.');
+        } finally {
+            setIsReviewLoading(false);
+        }
+    };
+
+    // Handle review rejection
+    const handleReviewReject = async (reviewId: string) => {
+        const reason = prompt('Yorumu neden reddediyorsunuz?');
+        if (!reason) return;
+
+        try {
+            setIsReviewLoading(true);
+            await ReviewService.reject(reviewId, reason);
+            alert('Yorum reddedildi!');
+            // Reload data
+            const [reviewsData, pendingReviewsData, reviewStatsData] = await Promise.all([
+                ReviewService.getAll(),
+                ReviewService.getPending(),
+                ReviewService.getStatistics()
+            ]);
+            setReviews(reviewsData);
+            setPendingReviews(pendingReviewsData);
+            setReviewStats(reviewStatsData);
+        } catch (error) {
+            console.error('Error rejecting review:', error);
+            alert('Yorum reddedilirken bir hata oluştu.');
+        } finally {
+            setIsReviewLoading(false);
+        }
+    };
+
+    // Handle review deletion
+    const handleReviewDelete = async (reviewId: string) => {
+        if (!confirm('Bu yorumu silmek istediğinizden emin misiniz?')) return;
+
+        try {
+            setIsReviewLoading(true);
+            await ReviewService.delete(reviewId);
+            alert('Yorum silindi!');
+            // Reload data
+            const [reviewsData, pendingReviewsData, reviewStatsData] = await Promise.all([
+                ReviewService.getAll(),
+                ReviewService.getPending(),
+                ReviewService.getStatistics()
+            ]);
+            setReviews(reviewsData);
+            setPendingReviews(pendingReviewsData);
+            setReviewStats(reviewStatsData);
+        } catch (error) {
+            console.error('Error deleting review:', error);
+            alert('Yorum silinirken bir hata oluştu.');
+        } finally {
+            setIsReviewLoading(false);
+        }
     };
 
     return (
@@ -1115,6 +1365,7 @@ export default function AdminDashboard() {
                                 { id: 'overview', name: 'Genel Bakış', icon: BarChart3 },
                                 { id: 'products', name: 'Ürün Yönetimi', icon: Package },
                                 { id: 'blogs', name: 'Blog Yönetimi', icon: FileText },
+                                { id: 'reviews', name: 'Yorum Yönetimi', icon: Star },
                                 { id: 'orders', name: 'Siparişler', icon: ShoppingCart },
                                 { id: 'customers', name: 'Müşteriler', icon: Users },
                                 { id: 'reports', name: 'Raporlar', icon: FileText },
@@ -1578,8 +1829,8 @@ export default function AdminDashboard() {
                                                                     <div className="flex items-center space-x-2 mb-1">
                                                                         <h5 className="font-semibold text-gray-900 dark:text-white">{blog.title}</h5>
                                                                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${blog.status === 'published' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' :
-                                                                                blog.status === 'pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' :
-                                                                                    'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
+                                                                            blog.status === 'pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' :
+                                                                                'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
                                                                             }`}>
                                                                             {blog.status === 'published' ? 'Yayınlandı' :
                                                                                 blog.status === 'pending' ? 'Beklemede' : 'Reddedildi'}
@@ -1612,6 +1863,227 @@ export default function AdminDashboard() {
                                                                     className="bg-red-600 hover:bg-red-700 text-white"
                                                                 >
                                                                     {isBlogLoading ? 'İşleniyor...' : <Trash2 className="h-4 w-4" />}
+                                                                </Button>
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Review Management Tab */}
+                        {activeTab === 'reviews' && (
+                            <div className="space-y-6">
+                                <div className="flex items-center justify-between">
+                                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Yorum Yönetimi</h3>
+                                    <div className="flex items-center space-x-4">
+                                        <div className="text-sm text-gray-600 dark:text-gray-400">
+                                            <span className="font-medium">Toplam:</span> {reviewStats.totalReviews} |
+                                            <span className="font-medium text-green-600">Onaylanan:</span> {reviewStats.approvedReviews} |
+                                            <span className="font-medium text-yellow-600">Bekleyen:</span> {reviewStats.pendingReviews}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Review Statistics */}
+                                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                                    <div className="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <p className="text-gray-500 dark:text-gray-400 text-sm">Toplam Yorum</p>
+                                                <p className="text-2xl font-bold text-gray-900 dark:text-white">{reviewStats.totalReviews}</p>
+                                            </div>
+                                            <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
+                                                <Star className="h-6 w-6 text-white" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <p className="text-gray-500 dark:text-gray-400 text-sm">Onaylanan</p>
+                                                <p className="text-2xl font-bold text-green-600">{reviewStats.approvedReviews}</p>
+                                            </div>
+                                            <div className="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center">
+                                                <Star className="h-6 w-6 text-white" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <p className="text-gray-500 dark:text-gray-400 text-sm">Bekleyen</p>
+                                                <p className="text-2xl font-bold text-yellow-600">{reviewStats.pendingReviews}</p>
+                                            </div>
+                                            <div className="w-12 h-12 bg-yellow-600 rounded-lg flex items-center justify-center">
+                                                <Star className="h-6 w-6 text-white" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <p className="text-gray-500 dark:text-gray-400 text-sm">Ortalama Puan</p>
+                                                <p className="text-2xl font-bold text-gray-900 dark:text-white">{reviewStats.averageRating}</p>
+                                            </div>
+                                            <div className="w-12 h-12 bg-purple-600 rounded-lg flex items-center justify-center">
+                                                <Star className="h-6 w-6 text-white" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Pending Reviews */}
+                                <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                                    <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+                                        <h4 className="text-lg font-semibold text-gray-900 dark:text-white">Bekleyen Yorumlar</h4>
+                                        <p className="text-gray-600 dark:text-gray-400 text-sm">Onay bekleyen kullanıcı yorumları</p>
+                                    </div>
+                                    <div className="p-6">
+                                        {pendingReviews.length === 0 ? (
+                                            <div className="text-center py-8">
+                                                <Star className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+                                                <p className="text-gray-500 dark:text-gray-400">Bekleyen yorum yok</p>
+                                            </div>
+                                        ) : (
+                                            <div className="space-y-4">
+                                                {pendingReviews.map((review) => {
+                                                    const createdAt = review.createdAt?.toDate ? review.createdAt.toDate() : new Date(review.createdAt);
+                                                    const timeAgo = getTimeAgo(createdAt);
+                                                    return (
+                                                        <div key={review.id} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                                            <div className="flex items-center space-x-4">
+                                                                <div className="flex-1">
+                                                                    <h5 className="font-semibold text-gray-900 dark:text-white">{review.title}</h5>
+                                                                    <p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-2">{review.comment}</p>
+                                                                    <div className="flex items-center space-x-4 mt-2 text-xs text-gray-500 dark:text-gray-400">
+                                                                        <span>Kullanıcı: {review.userName}</span>
+                                                                        <span>Ürün ID: {review.productId}</span>
+                                                                        <div className="flex items-center gap-1">
+                                                                            {[...Array(5)].map((_, i) => (
+                                                                                <Star
+                                                                                    key={i}
+                                                                                    className={`h-3 w-3 ${i < review.rating
+                                                                                        ? 'text-yellow-400 fill-current'
+                                                                                        : 'text-gray-300 dark:text-gray-600'
+                                                                                        }`}
+                                                                                />
+                                                                            ))}
+                                                                            <span>{review.rating}/5</span>
+                                                                        </div>
+                                                                        <span>{timeAgo}</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div className="flex items-center space-x-2">
+                                                                <Button
+                                                                    onClick={() => {
+                                                                        setSelectedReview(review);
+                                                                        setIsReviewModalOpen(true);
+                                                                    }}
+                                                                    size="sm"
+                                                                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                                                                >
+                                                                    <Eye className="h-4 w-4" />
+                                                                </Button>
+                                                                <Button
+                                                                    onClick={() => handleReviewApprove(review.id)}
+                                                                    disabled={isReviewLoading}
+                                                                    size="sm"
+                                                                    className="bg-green-600 hover:bg-green-700 text-white"
+                                                                >
+                                                                    {isReviewLoading ? 'İşleniyor...' : 'Onayla'}
+                                                                </Button>
+                                                                <Button
+                                                                    onClick={() => handleReviewReject(review.id)}
+                                                                    disabled={isReviewLoading}
+                                                                    size="sm"
+                                                                    className="bg-red-600 hover:bg-red-700 text-white"
+                                                                >
+                                                                    {isReviewLoading ? 'İşleniyor...' : 'Reddet'}
+                                                                </Button>
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* All Reviews */}
+                                <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                                    <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+                                        <h4 className="text-lg font-semibold text-gray-900 dark:text-white">Tüm Yorumlar</h4>
+                                        <p className="text-gray-600 dark:text-gray-400 text-sm">Sistemdeki tüm yorumlar</p>
+                                    </div>
+                                    <div className="p-6">
+                                        {reviews.length === 0 ? (
+                                            <div className="text-center py-8">
+                                                <Star className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+                                                <p className="text-gray-500 dark:text-gray-400">Henüz yorum yok</p>
+                                            </div>
+                                        ) : (
+                                            <div className="space-y-4">
+                                                {reviews.map((review) => {
+                                                    const createdAt = review.createdAt?.toDate ? review.createdAt.toDate() : new Date(review.createdAt);
+                                                    const timeAgo = getTimeAgo(createdAt);
+                                                    return (
+                                                        <div key={review.id} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                                            <div className="flex items-center space-x-4">
+                                                                <div className="flex-1">
+                                                                    <div className="flex items-center space-x-2 mb-1">
+                                                                        <h5 className="font-semibold text-gray-900 dark:text-white">{review.title}</h5>
+                                                                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${review.status === 'approved' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' :
+                                                                            review.status === 'pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' :
+                                                                                'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
+                                                                            }`}>
+                                                                            {review.status === 'approved' ? 'Onaylandı' :
+                                                                                review.status === 'pending' ? 'Beklemede' : 'Reddedildi'}
+                                                                        </span>
+                                                                    </div>
+                                                                    <p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-2">{review.comment}</p>
+                                                                    <div className="flex items-center space-x-4 mt-2 text-xs text-gray-500 dark:text-gray-400">
+                                                                        <span>Kullanıcı: {review.userName}</span>
+                                                                        <span>Ürün ID: {review.productId}</span>
+                                                                        <div className="flex items-center gap-1">
+                                                                            {[...Array(5)].map((_, i) => (
+                                                                                <Star
+                                                                                    key={i}
+                                                                                    className={`h-3 w-3 ${i < review.rating
+                                                                                        ? 'text-yellow-400 fill-current'
+                                                                                        : 'text-gray-300 dark:text-gray-600'
+                                                                                        }`}
+                                                                                />
+                                                                            ))}
+                                                                            <span>{review.rating}/5</span>
+                                                                        </div>
+                                                                        <span>{timeAgo}</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div className="flex items-center space-x-2">
+                                                                <Button
+                                                                    onClick={() => {
+                                                                        setSelectedReview(review);
+                                                                        setIsReviewModalOpen(true);
+                                                                    }}
+                                                                    size="sm"
+                                                                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                                                                >
+                                                                    <Eye className="h-4 w-4" />
+                                                                </Button>
+                                                                <Button
+                                                                    onClick={() => handleReviewDelete(review.id)}
+                                                                    disabled={isReviewLoading}
+                                                                    size="sm"
+                                                                    className="bg-red-600 hover:bg-red-700 text-white"
+                                                                >
+                                                                    {isReviewLoading ? 'İşleniyor...' : <Trash2 className="h-4 w-4" />}
                                                                 </Button>
                                                             </div>
                                                         </div>
@@ -1687,6 +2159,17 @@ export default function AdminDashboard() {
                 onReject={handleBlogReject}
                 onDelete={handleBlogDelete}
                 isLoading={isBlogLoading}
+            />
+
+            {/* Review Modal */}
+            <ReviewModal
+                isOpen={isReviewModalOpen}
+                onClose={() => setIsReviewModalOpen(false)}
+                review={selectedReview}
+                onApprove={handleReviewApprove}
+                onReject={handleReviewReject}
+                onDelete={handleReviewDelete}
+                isLoading={isReviewLoading}
             />
         </div>
     );
