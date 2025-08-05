@@ -11,7 +11,9 @@ import {
     deleteUser,
     reauthenticateWithCredential,
     EmailAuthProvider,
-    sendEmailVerification
+    sendEmailVerification,
+    GoogleAuthProvider,
+    signInWithPopup
 } from 'firebase/auth';
 import { doc, setDoc, getDoc, deleteDoc } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
@@ -459,6 +461,69 @@ export function useAuth() {
         }
     };
 
+    const signInWithGoogle = async () => {
+        if (!auth || !db) {
+            throw new Error('Firebase servisleri bulunamadı. Yapılandırmayı kontrol edin.');
+        }
+
+        try {
+            dispatch(setUserError(null));
+            dispatch(setUserLoading(true));
+
+            const provider = new GoogleAuthProvider();
+            const result = await signInWithPopup(auth, provider);
+
+            // Kullanıcı profilini Firestore'da kontrol et veya oluştur
+            const userDoc = await getDoc(doc(db, 'users', result.user.uid));
+
+            if (!userDoc.exists()) {
+                // Yeni Google kullanıcısı için profil oluştur
+                const now = new Date();
+                const userProfileData: any = {
+                    uid: result.user.uid,
+                    email: result.user.email,
+                    displayName: result.user.displayName,
+                    photoURL: result.user.photoURL,
+                    createdAt: now,
+                    lastLoginAt: now,
+                    emailVerified: result.user.emailVerified,
+                    addresses: [],
+                    preferences: {
+                        newsletter: true,
+                        smsNotifications: true,
+                        emailNotifications: true,
+                    },
+                };
+
+                const sanitizedData = sanitizeData(userProfileData);
+                await setDoc(doc(db, 'users', result.user.uid), sanitizedData);
+
+                // Redux'a string formatında kaydet
+                const profileForRedux = {
+                    ...userProfileData,
+                    createdAt: now.toISOString(),
+                    lastLoginAt: now.toISOString(),
+                };
+
+                dispatch(setUserProfile(profileForRedux));
+            } else {
+                // Mevcut kullanıcı için son giriş tarihini güncelle
+                const updateData = sanitizeData({
+                    lastLoginAt: new Date(),
+                });
+                await setDoc(doc(db, 'users', result.user.uid), updateData, { merge: true });
+            }
+
+            return result.user;
+        } catch (error: any) {
+            const errorMessage = getErrorMessage(error.code);
+            dispatch(setUserError(errorMessage));
+            throw error;
+        } finally {
+            dispatch(setUserLoading(false));
+        }
+    };
+
     // Firebase error kodlarını Türkçe mesajlara çevir
     const getErrorMessage = (errorCode: string): string => {
         switch (errorCode) {
@@ -505,5 +570,6 @@ export function useAuth() {
         saveUserCart,
         saveUserFavorites,
         sendEmailVerificationEmail,
+        signInWithGoogle,
     };
 } 

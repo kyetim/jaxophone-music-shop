@@ -11,20 +11,24 @@ import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { ShoppingCart, Heart, User, Search, Menu, X, Phone, Bell, Gift, ChevronDown } from 'lucide-react';
 import { CartSidebar } from './cart-sidebar';
 import { FavoritesSidebar } from './favorites-sidebar';
+import { NotificationsSidebar } from './notifications-sidebar';
 import { SearchInput } from '@/components/search/search-input';
 
 export function Header() {
     const [isCartOpen, setIsCartOpen] = useState(false);
     const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
+    const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
     const cartHoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const favoritesHoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const notificationsHoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const categoryHoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     const cartItemCount = useAppSelector((state) => state.cart.itemCount);
     const favoritesCount = useAppSelector((state) => state.favorites.items.length);
     const isAuthenticated = useAppSelector((state) => state.user.isAuthenticated);
+    const user = useAppSelector((state) => state.user.user);
     const { setLoading } = useLoading();
     const router = useRouter();
 
@@ -286,11 +290,13 @@ export function Header() {
         }
 
         if (isHovering) {
-            setIsCartOpen(true);
+            cartHoverTimeoutRef.current = setTimeout(() => {
+                setIsCartOpen(true);
+            }, 500); // 500ms delay before opening
         } else {
             cartHoverTimeoutRef.current = setTimeout(() => {
                 setIsCartOpen(false);
-            }, 800);
+            }, 1200); // 1200ms delay before closing
         }
     };
 
@@ -300,11 +306,29 @@ export function Header() {
         }
 
         if (isHovering) {
-            setIsFavoritesOpen(true);
+            favoritesHoverTimeoutRef.current = setTimeout(() => {
+                setIsFavoritesOpen(true);
+            }, 500); // 500ms delay before opening
         } else {
             favoritesHoverTimeoutRef.current = setTimeout(() => {
                 setIsFavoritesOpen(false);
-            }, 800);
+            }, 1200); // 1200ms delay before closing
+        }
+    };
+
+    const handleNotificationsHover = (isHovering: boolean) => {
+        if (notificationsHoverTimeoutRef.current) {
+            clearTimeout(notificationsHoverTimeoutRef.current);
+        }
+
+        if (isHovering) {
+            notificationsHoverTimeoutRef.current = setTimeout(() => {
+                setIsNotificationsOpen(true);
+            }, 500); // 500ms delay before opening
+        } else {
+            notificationsHoverTimeoutRef.current = setTimeout(() => {
+                setIsNotificationsOpen(false);
+            }, 1200); // 1200ms delay before closing
         }
     };
 
@@ -405,17 +429,21 @@ export function Header() {
                                 <User className="h-5 w-5" />
                                 <div className="hidden lg:block text-sm">
                                     <div className="font-medium">
-                                        {isAuthenticated ? "Hesabım" : "Giriş Yap"}
+                                        {isAuthenticated ? (user?.displayName || user?.email?.split('@')[0] || "Kullanıcı") : "Giriş Yap"}
                                     </div>
                                     <div className="text-xs text-gray-500 dark:text-gray-400">
-                                        {isAuthenticated ? "Hoş geldin!" : "veya Üye Ol"}
+                                        {isAuthenticated ? "Hesabım" : "veya Üye Ol"}
                                     </div>
                                 </div>
                             </Link>
 
                             {/* Notifications */}
-                            <div className="relative">
-                                <Bell className="h-5 w-5 text-gray-700 dark:text-gray-300 hover:text-amber-600 dark:hover:text-amber-400 transition-colors cursor-pointer" />
+                            <div
+                                className="relative cursor-pointer"
+                                onMouseEnter={() => handleNotificationsHover(true)}
+                                onMouseLeave={() => handleNotificationsHover(false)}
+                            >
+                                <Bell className="h-5 w-5 text-gray-700 dark:text-gray-300 hover:text-amber-600 dark:hover:text-amber-400 transition-colors" />
                                 <Badge className="absolute -top-2 -right-2 h-5 w-5 text-xs bg-amber-600 border-white dark:border-gray-900 flex items-center justify-center">
                                     1
                                 </Badge>
@@ -668,6 +696,13 @@ export function Header() {
                 onClose={() => setIsFavoritesOpen(false)}
                 onMouseEnter={() => handleFavoritesHover(true)}
                 onMouseLeave={() => handleFavoritesHover(false)}
+            />
+
+            <NotificationsSidebar
+                isOpen={isNotificationsOpen}
+                onClose={() => setIsNotificationsOpen(false)}
+                onMouseEnter={() => handleNotificationsHover(true)}
+                onMouseLeave={() => handleNotificationsHover(false)}
             />
         </>
     );
