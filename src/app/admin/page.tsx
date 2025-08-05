@@ -23,7 +23,9 @@ import {
     Upload,
     X,
     Save,
-    Image as ImageIcon
+    Image as ImageIcon,
+    Bell,
+    Send
 } from 'lucide-react';
 
 interface Product {
@@ -315,15 +317,160 @@ const ProductModal = ({
     );
 };
 
+// NotificationModal component for sending notifications
+const NotificationModal = ({
+    isOpen,
+    onClose,
+    onSubmit,
+    formData,
+    onInputChange,
+    isLoading
+}: {
+    isOpen: boolean;
+    onClose: () => void;
+    onSubmit: (e: React.FormEvent) => void;
+    formData: any;
+    onInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
+    isLoading: boolean;
+}) => {
+    if (!isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-gray-900 rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-gray-800">
+                <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-xl font-semibold text-white">Tüm Kullanıcılara Bildirim Gönder</h2>
+                    <button onClick={onClose} className="text-gray-400 hover:text-gray-200">
+                        <X className="h-6 w-6" />
+                    </button>
+                </div>
+
+                <form onSubmit={onSubmit} className="space-y-4">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-1">
+                            Bildirim Türü *
+                        </label>
+                        <select
+                            name="type"
+                            value={formData.type}
+                            onChange={onInputChange}
+                            className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+                            required
+                        >
+                            <option value="">Tür seçin</option>
+                            <option value="order">Sipariş Bildirimi</option>
+                            <option value="promotion">Promosyon</option>
+                            <option value="system">Sistem Bildirimi</option>
+                            <option value="product">Ürün Bildirimi</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-1">
+                            Başlık *
+                        </label>
+                        <input
+                            type="text"
+                            name="title"
+                            value={formData.title}
+                            onChange={onInputChange}
+                            placeholder="Bildirim başlığı"
+                            className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+                            required
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-1">
+                            Mesaj *
+                        </label>
+                        <textarea
+                            name="message"
+                            value={formData.message}
+                            onChange={onInputChange}
+                            placeholder="Bildirim mesajı"
+                            rows={4}
+                            className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+                            required
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-1">
+                            İkon
+                        </label>
+                        <select
+                            name="icon"
+                            value={formData.icon}
+                            onChange={onInputChange}
+                            className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+                        >
+                            <option value="shipping">Kargo (Mavi)</option>
+                            <option value="gift">Hediye (Kırmızı)</option>
+                            <option value="check">Onay (Yeşil)</option>
+                            <option value="star">Yıldız (Sarı)</option>
+                        </select>
+                    </div>
+
+                    <div className="flex items-center gap-4">
+                        <div className="flex items-center">
+                            <input
+                                type="checkbox"
+                                name="isUrgent"
+                                checked={formData.isUrgent}
+                                onChange={(e) => onInputChange({
+                                    target: { name: 'isUrgent', value: e.target.checked }
+                                } as any)}
+                                className="mr-2"
+                            />
+                            <label className="text-sm text-gray-300">Acil Bildirim</label>
+                        </div>
+                    </div>
+
+                    <div className="flex justify-end space-x-3 pt-4">
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={onClose}
+                            className="border-gray-600 text-gray-300 hover:bg-gray-800"
+                        >
+                            İptal
+                        </Button>
+                        <Button
+                            type="submit"
+                            disabled={isLoading}
+                            className="bg-amber-600 hover:bg-amber-700 text-white"
+                        >
+                            {isLoading ? (
+                                <>
+                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                                    <span>Gönderiliyor...</span>
+                                </>
+                            ) : (
+                                <>
+                                    <Send className="h-4 w-4 mr-2" />
+                                    <span>Bildirim Gönder</span>
+                                </>
+                            )}
+                        </Button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    );
+};
+
 export default function AdminDashboard() {
     const [activeTab, setActiveTab] = useState('products');
     const [searchTerm, setSearchTerm] = useState('');
     const [products, setProducts] = useState<Product[]>([]);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isNotificationModalOpen, setIsNotificationModalOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
+    const [isNotificationLoading, setIsNotificationLoading] = useState(false);
 
     // Form state for adding/editing products
     const [formData, setFormData] = useState({
@@ -335,6 +482,15 @@ export default function AdminDashboard() {
         imageUrl: '',
         brand: '',
         inStock: true
+    });
+
+    // Form state for notifications
+    const [notificationFormData, setNotificationFormData] = useState({
+        type: '',
+        title: '',
+        message: '',
+        icon: 'shipping',
+        isUrgent: false
     });
 
     // File upload state
@@ -386,6 +542,44 @@ export default function AdminDashboard() {
             [name]: value
         }));
     }, []);
+
+    // Handle notification form input changes
+    const handleNotificationInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+        const { name, value, type } = e.target;
+        setNotificationFormData(prev => ({
+            ...prev,
+            [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
+        }));
+    }, []);
+
+    // Handle notification submission
+    const handleNotificationSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsNotificationLoading(true);
+
+        try {
+            // Burada gerçek bildirim gönderme API'si çağrılacak
+            console.log('Sending notification:', notificationFormData);
+
+            // Simüle edilmiş başarı
+            await new Promise(resolve => setTimeout(resolve, 2000));
+
+            alert('Bildirim başarıyla gönderildi!');
+            setIsNotificationModalOpen(false);
+            setNotificationFormData({
+                type: '',
+                title: '',
+                message: '',
+                icon: 'shipping',
+                isUrgent: false
+            });
+        } catch (error) {
+            console.error('Error sending notification:', error);
+            alert('Bildirim gönderilirken bir hata oluştu.');
+        } finally {
+            setIsNotificationLoading(false);
+        }
+    };
 
     // Reset form
     const resetForm = useCallback(() => {
@@ -622,7 +816,8 @@ export default function AdminDashboard() {
                                 { id: 'orders', name: 'Siparişler', icon: ShoppingCart },
                                 { id: 'customers', name: 'Müşteriler', icon: Users },
                                 { id: 'reports', name: 'Raporlar', icon: FileText },
-                                { id: 'settings', name: 'Ayarlar', icon: Settings }
+                                { id: 'settings', name: 'Ayarlar', icon: Settings },
+                                { id: 'notifications', name: 'Bildirimler', icon: Bell }
                             ].map((tab) => {
                                 const Icon = tab.icon;
                                 return (
@@ -743,8 +938,8 @@ export default function AdminDashboard() {
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
                                                         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${product.inStock
-                                                                ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-300'
-                                                                : 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-300'
+                                                            ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-300'
+                                                            : 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-300'
                                                             }`}>
                                                             {product.inStock ? 'Stokta' : 'Tükendi'}
                                                         </span>
@@ -823,6 +1018,116 @@ export default function AdminDashboard() {
                                 <p className="text-gray-400">Sistem ayarları burada yapılandırılacak.</p>
                             </div>
                         )}
+
+                        {/* Notifications Tab */}
+                        {activeTab === 'notifications' && (
+                            <div className="space-y-6">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <h3 className="text-lg font-medium text-white mb-2">Bildirim Yönetimi</h3>
+                                        <p className="text-gray-400">Tüm kullanıcılara toplu bildirim gönderin</p>
+                                    </div>
+                                    <Button
+                                        onClick={() => setIsNotificationModalOpen(true)}
+                                        className="bg-amber-600 hover:bg-amber-700 text-white"
+                                    >
+                                        <Bell className="h-4 w-4 mr-2" />
+                                        Yeni Bildirim
+                                    </Button>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    {/* Notification Stats */}
+                                    <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <p className="text-gray-400 text-sm">Toplam Gönderilen</p>
+                                                <p className="text-2xl font-bold text-white">1,247</p>
+                                            </div>
+                                            <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
+                                                <Bell className="h-6 w-6 text-white" />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <p className="text-gray-400 text-sm">Bu Ay</p>
+                                                <p className="text-2xl font-bold text-white">89</p>
+                                            </div>
+                                            <div className="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center">
+                                                <TrendingUp className="h-6 w-6 text-white" />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <p className="text-gray-400 text-sm">Aktif Kullanıcı</p>
+                                                <p className="text-2xl font-bold text-white">2,341</p>
+                                            </div>
+                                            <div className="w-12 h-12 bg-purple-600 rounded-lg flex items-center justify-center">
+                                                <Users className="h-6 w-6 text-white" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Recent Notifications */}
+                                <div className="bg-gray-800 rounded-lg border border-gray-700">
+                                    <div className="p-6 border-b border-gray-700">
+                                        <h4 className="text-lg font-medium text-white">Son Gönderilen Bildirimler</h4>
+                                    </div>
+                                    <div className="p-6">
+                                        <div className="space-y-4">
+                                            <div className="flex items-center justify-between p-4 bg-gray-700 rounded-lg">
+                                                <div className="flex items-center space-x-3">
+                                                    <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                                                    <div>
+                                                        <p className="text-white font-medium">Özel İndirim Fırsatı!</p>
+                                                        <p className="text-gray-400 text-sm">Tüm gitar kategorisinde %20 indirim</p>
+                                                    </div>
+                                                </div>
+                                                <div className="text-right">
+                                                    <p className="text-gray-400 text-sm">2 saat önce</p>
+                                                    <p className="text-green-400 text-sm">2,341 kullanıcıya gönderildi</p>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex items-center justify-between p-4 bg-gray-700 rounded-lg">
+                                                <div className="flex items-center space-x-3">
+                                                    <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                                                    <div>
+                                                        <p className="text-white font-medium">Sistem Güncellemesi</p>
+                                                        <p className="text-gray-400 text-sm">Yeni özellikler eklendi</p>
+                                                    </div>
+                                                </div>
+                                                <div className="text-right">
+                                                    <p className="text-gray-400 text-sm">1 gün önce</p>
+                                                    <p className="text-green-400 text-sm">2,341 kullanıcıya gönderildi</p>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex items-center justify-between p-4 bg-gray-700 rounded-lg">
+                                                <div className="flex items-center space-x-3">
+                                                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                                                    <div>
+                                                        <p className="text-white font-medium">Yeni Ürünler</p>
+                                                        <p className="text-gray-400 text-sm">Yeni gitar modelleri eklendi</p>
+                                                    </div>
+                                                </div>
+                                                <div className="text-right">
+                                                    <p className="text-gray-400 text-sm">3 gün önce</p>
+                                                    <p className="text-green-400 text-sm">2,341 kullanıcıya gönderildi</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
@@ -866,6 +1171,16 @@ export default function AdminDashboard() {
                 onClearFileSelection={clearFileSelection}
                 isUploading={isUploading}
                 isLoading={isLoading}
+            />
+
+            {/* Notification Modal */}
+            <NotificationModal
+                isOpen={isNotificationModalOpen}
+                onClose={() => setIsNotificationModalOpen(false)}
+                onSubmit={handleNotificationSubmit}
+                formData={notificationFormData}
+                onInputChange={handleNotificationInputChange}
+                isLoading={isNotificationLoading}
             />
         </div>
     );

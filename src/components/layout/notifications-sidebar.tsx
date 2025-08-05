@@ -66,6 +66,9 @@ const mockNotifications = [
 export function NotificationsSidebar({ isOpen, onClose, onMouseEnter, onMouseLeave }: NotificationsSidebarProps) {
     const isAuthenticated = useAppSelector((state) => state.user.isAuthenticated);
 
+    // Get unread notification count
+    const unreadCount = mockNotifications.filter(notification => !notification.isRead).length;
+
     const getNotificationIcon = (icon: string) => {
         switch (icon) {
             case 'shipping':
