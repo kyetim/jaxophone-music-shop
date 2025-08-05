@@ -1,114 +1,51 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Calendar, User, Tag, Eye, Search, ArrowRight, Music, Heart, MessageCircle } from 'lucide-react';
+import { Calendar, User, Tag, Eye, Search, ArrowRight, Music, Heart, MessageCircle, Plus } from 'lucide-react';
 import { Header } from '@/components/layout/header';
+import { BlogService } from '@/lib/firestore';
+import { useAppSelector } from '@/store/hooks';
 
 export default function BlogPage() {
     const [selectedCategory, setSelectedCategory] = useState('all');
     const [searchTerm, setSearchTerm] = useState('');
+    const [blogPosts, setBlogPosts] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+    const isAuthenticated = useAppSelector((state) => state.user.isAuthenticated);
 
     const categories = [
-        { id: 'all', name: 'Tümü', count: 12 },
-        { id: 'guitar', name: 'Gitar', count: 4 },
-        { id: 'piano', name: 'Piyano', count: 3 },
-        { id: 'tips', name: 'İpuçları', count: 3 },
-        { id: 'news', name: 'Haberler', count: 2 }
+        { id: 'all', name: 'Tümü', count: 0 },
+        { id: 'Gitar', name: 'Gitar', count: 0 },
+        { id: 'Piyano', name: 'Piyano', count: 0 },
+        { id: 'İpuçları', name: 'İpuçları', count: 0 },
+        { id: 'Haberler', name: 'Haberler', count: 0 }
     ];
 
-    const blogPosts = [
-        {
-            id: 1,
-            title: 'Elektro Gitar Almadan Önce Bilmeniz Gerekenler',
-            excerpt: 'İlk elektro gitarınızı alırken dikkat etmeniz gereken önemli noktalar ve öneriler.',
-            content: 'Elektro gitar almaya karar verdiniz ancak nereden başlayacağınızı bilmiyor musunuz? Bu rehberde sizin için en doğru elektro gitarı seçmenize yardımcı olacak önemli bilgileri derledik...',
-            author: 'Mehmet Kaya',
-            date: '15 Ocak 2024',
-            category: 'guitar',
-            tags: ['elektro gitar', 'satın alma', 'rehber'],
-            image: '/api/placeholder/800/400',
-            readTime: '5 dakika',
-            views: 1250,
-            likes: 89,
-            comments: 23
-        },
-        {
-            id: 2,
-            title: 'Piyano Çalmaya Başlamak İçin 10 Altın Kural',
-            excerpt: 'Piyano öğrenmeye başlayanlar için pratik ipuçları ve temel bilgiler.',
-            content: 'Piyano öğrenmek istediğiniz ancak nereden başlayacağınızı bilmiyor musunuz? İşte başlangıç seviyesindeki piyanistler için vazgeçilmez 10 kural...',
-            author: 'Ayşe Demir',
-            date: '12 Ocak 2024',
-            category: 'piano',
-            tags: ['piyano', 'başlangıç', 'öğrenim'],
-            image: '/api/placeholder/800/400',
-            readTime: '7 dakika',
-            views: 2100,
-            likes: 156,
-            comments: 34
-        },
-        {
-            id: 3,
-            title: '2024 Yılının En İyi Akustik Gitarları',
-            excerpt: 'Bu yıl piyasaya çıkan en kaliteli akustik gitar modellerinin detaylı incelemesi.',
-            content: '2024 yılında müzik dünyasında öne çıkan akustik gitar modelleri ve özellikleri hakkında detaylı bilgiler...',
-            author: 'Can Özkan',
-            date: '8 Ocak 2024',
-            category: 'guitar',
-            tags: ['akustik gitar', 'inceleme', '2024'],
-            image: '/api/placeholder/800/400',
-            readTime: '6 dakika',
-            views: 850,
-            likes: 67,
-            comments: 18
-        },
-        {
-            id: 4,
-            title: 'Enstrüman Bakımı: Uzun Ömürlü Kullanım Rehberi',
-            excerpt: 'Enstrümanlarınızın ömrünü uzatmak için yapmanız gereken bakım işlemleri.',
-            content: 'Enstrümanlarınızın uzun yıllar boyunca size eşlik etmesi için düzenli bakım çok önemli. İşte detaylı bakım rehberi...',
-            author: 'Fatma Arslan',
-            date: '5 Ocak 2024',
-            category: 'tips',
-            tags: ['bakım', 'enstrüman', 'rehber'],
-            image: '/api/placeholder/800/400',
-            readTime: '4 dakika',
-            views: 1800,
-            likes: 134,
-            comments: 45
-        },
-        {
-            id: 5,
-            title: 'Dijital Piyano vs Akustik Piyano: Hangisi Sizin İçin?',
-            excerpt: 'Dijital ve akustik piyano arasındaki farklar ve hangi durumda hangisini tercih etmelisiniz.',
-            content: 'Piyano alırken karşılaştığınız en büyük karar: Dijital mi akustik mi? Her iki seçeneğin artı ve eksilerini karşılaştırıyoruz...',
-            author: 'Emre Yıldız',
-            date: '2 Ocak 2024',
-            category: 'piano',
-            tags: ['dijital piyano', 'akustik piyano', 'karşılaştırma'],
-            image: '/api/placeholder/800/400',
-            readTime: '8 dakika',
-            views: 1650,
-            likes: 98,
-            comments: 29
-        },
-        {
-            id: 6,
-            title: 'Müzik Dünyasından Haberler: Ocak 2024',
-            excerpt: 'Müzik endüstrisinde bu ay yaşanan önemli gelişmeler ve yenilikler.',
-            content: 'Ocak ayında müzik dünyasında yaşanan önemli gelişmeleri ve yeni çıkan albümleri sizler için derledik...',
-            author: 'Serkan Taş',
-            date: '1 Ocak 2024',
-            category: 'news',
-            tags: ['haberler', 'müzik endüstrisi', '2024'],
-            image: '/api/placeholder/800/400',
-            readTime: '3 dakika',
-            views: 950,
-            likes: 45,
-            comments: 12
+    useEffect(() => {
+        loadBlogPosts();
+    }, []);
+
+    const loadBlogPosts = async () => {
+        try {
+            setLoading(true);
+            const posts = await BlogService.getPublished();
+            setBlogPosts(posts);
+
+            // Update category counts
+            categories.forEach(cat => {
+                if (cat.id === 'all') {
+                    cat.count = posts.length;
+                } else {
+                    cat.count = posts.filter((post: any) => post.category === cat.id).length;
+                }
+            });
+        } catch (error) {
+            console.error('Error loading blog posts:', error);
+        } finally {
+            setLoading(false);
         }
-    ];
+    };
 
     const filteredPosts = blogPosts.filter(post => {
         const matchesCategory = selectedCategory === 'all' || post.category === selectedCategory;
@@ -117,7 +54,17 @@ export default function BlogPage() {
         return matchesCategory && matchesSearch;
     });
 
-    const featuredPost = blogPosts[0];
+    const featuredPost = filteredPosts[0];
+
+    const formatDate = (date: any) => {
+        if (!date) return '';
+        const d = date.toDate ? date.toDate() : new Date(date);
+        return d.toLocaleDateString('tr-TR', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+    };
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-black">
@@ -127,9 +74,17 @@ export default function BlogPage() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center">
                         <h1 className="text-4xl font-bold mb-4">Jaxophone Blog</h1>
-                        <p className="text-xl text-purple-100">
+                        <p className="text-xl text-purple-100 mb-6">
                             Müzik dünyasından haberler, ipuçları ve rehberler
                         </p>
+                        {isAuthenticated && (
+                            <Link href="/blog/submit">
+                                <button className="bg-white text-purple-600 px-6 py-3 rounded-lg font-semibold hover:bg-purple-50 transition-colors flex items-center mx-auto">
+                                    <Plus className="h-5 w-5 mr-2" />
+                                    Blog Yazısı Gönder
+                                </button>
+                            </Link>
+                        )}
                     </div>
                 </div>
             </div>
@@ -137,51 +92,51 @@ export default function BlogPage() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                 {/* Featured Post */}
                 <div className="mb-12">
-                    <h2 className="text-2xl font-bold text-white mb-6">Öne Çıkan Yazı</h2>
-                    <div className="bg-gray-900 rounded-xl shadow-lg overflow-hidden border border-gray-800">
+                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Öne Çıkan Yazı</h2>
+                    <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-800">
                         <div className="md:flex">
                             <div className="md:w-1/2">
-                                <div className="h-64 md:h-full bg-gray-800 flex items-center justify-center">
+                                <div className="h-64 md:h-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
                                     <Music className="h-16 w-16 text-gray-400" />
                                 </div>
                             </div>
                             <div className="md:w-1/2 p-8">
                                 <div className="flex items-center space-x-4 mb-4">
-                                    <span className="bg-amber-900 text-amber-300 px-3 py-1 rounded-full text-sm font-medium">
-                                        {categories.find(cat => cat.id === featuredPost.category)?.name}
+                                    <span className="bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-300 px-3 py-1 rounded-full text-sm font-medium">
+                                        {featuredPost ? categories.find(cat => cat.id === featuredPost.category)?.name : 'Yok'}
                                     </span>
-                                    <div className="flex items-center text-gray-400 text-sm">
+                                    <div className="flex items-center text-gray-500 dark:text-gray-400 text-sm">
                                         <Calendar className="h-4 w-4 mr-1" />
-                                        {featuredPost.date}
+                                        {featuredPost ? featuredPost.date : ''}
                                     </div>
                                 </div>
 
-                                <h3 className="text-2xl font-bold text-white mb-4">
-                                    {featuredPost.title}
+                                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+                                    {featuredPost ? featuredPost.title : 'Henüz yazı yok'}
                                 </h3>
 
-                                <p className="text-gray-300 mb-6">
-                                    {featuredPost.excerpt}
+                                <p className="text-gray-600 dark:text-gray-300 mb-6">
+                                    {featuredPost ? featuredPost.excerpt : 'Henüz yazı yok'}
                                 </p>
 
                                 <div className="flex items-center justify-between">
-                                    <div className="flex items-center space-x-4 text-sm text-gray-400">
+                                    <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
                                         <div className="flex items-center">
                                             <User className="h-4 w-4 mr-1" />
-                                            {featuredPost.author}
+                                            {featuredPost ? featuredPost.author : ''}
                                         </div>
                                         <div className="flex items-center">
                                             <Eye className="h-4 w-4 mr-1" />
-                                            {featuredPost.views}
+                                            {featuredPost ? featuredPost.views : ''}
                                         </div>
                                         <div className="flex items-center">
                                             <Heart className="h-4 w-4 mr-1" />
-                                            {featuredPost.likes}
+                                            {featuredPost ? featuredPost.likes : ''}
                                         </div>
                                     </div>
 
                                     <Link
-                                        href={`/blog/${featuredPost.id}`}
+                                        href={featuredPost ? `/blog/${featuredPost.id}` : '#'}
                                         className="bg-amber-600 text-white px-6 py-2 rounded-lg hover:bg-amber-700 transition-colors flex items-center space-x-2"
                                     >
                                         <span>Devamını Oku</span>
@@ -263,62 +218,89 @@ export default function BlogPage() {
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            {filteredPosts.slice(1).map(post => (
-                                <article key={post.id} className="bg-white dark:bg-gray-900 rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow border border-gray-200 dark:border-gray-800">
-                                    <div className="h-48 bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-                                        <Music className="h-12 w-12 text-gray-400" />
-                                    </div>
-
-                                    <div className="p-6">
-                                        <div className="flex items-center space-x-4 mb-3">
-                                            <span className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-3 py-1 rounded-full text-sm">
-                                                {categories.find(cat => cat.id === post.category)?.name}
-                                            </span>
-                                            <span className="text-gray-500 dark:text-gray-400 text-sm">{post.readTime}</span>
-                                        </div>
-
-                                        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 line-clamp-2">
-                                            {post.title}
-                                        </h3>
-
-                                        <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">
-                                            {post.excerpt}
-                                        </p>
-
-                                        <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400 mb-4">
-                                            <div className="flex items-center">
-                                                <User className="h-4 w-4 mr-1" />
-                                                {post.author}
-                                            </div>
-                                            <div className="flex items-center space-x-3">
-                                                <div className="flex items-center">
-                                                    <Eye className="h-4 w-4 mr-1" />
-                                                    {post.views}
-                                                </div>
-                                                <div className="flex items-center">
-                                                    <MessageCircle className="h-4 w-4 mr-1" />
-                                                    {post.comments}
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex items-center text-gray-500 dark:text-gray-400 text-sm">
-                                                <Calendar className="h-4 w-4 mr-1" />
-                                                {post.date}
-                                            </div>
-
-                                            <Link
-                                                href={`/blog/${post.id}`}
-                                                className="text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 font-medium flex items-center space-x-1"
-                                            >
-                                                <span>Oku</span>
-                                                <ArrowRight className="h-4 w-4" />
-                                            </Link>
+                            {loading ? (
+                                // Loading state
+                                Array.from({ length: 4 }).map((_, index) => (
+                                    <div key={index} className="bg-white dark:bg-gray-900 rounded-xl shadow-lg overflow-hidden animate-pulse">
+                                        <div className="h-48 bg-gray-200 dark:bg-gray-700"></div>
+                                        <div className="p-6">
+                                            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
+                                            <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded mb-4"></div>
+                                            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
+                                            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded"></div>
                                         </div>
                                     </div>
-                                </article>
-                            ))}
+                                ))
+                            ) : filteredPosts.slice(1).length > 0 ? (
+                                filteredPosts.slice(1).map((post: any) => (
+                                    <article key={post.id} className="bg-white dark:bg-gray-900 rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow border border-gray-200 dark:border-gray-800">
+                                        <div className="h-48 bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                                            <Music className="h-12 w-12 text-gray-400" />
+                                        </div>
+
+                                        <div className="p-6">
+                                            <div className="flex items-center space-x-4 mb-3">
+                                                <span className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-3 py-1 rounded-full text-sm">
+                                                    {post.category}
+                                                </span>
+                                                <span className="text-gray-500 dark:text-gray-400 text-sm">
+                                                    {Math.ceil((post.content?.split(' ').length || 0) / 200)} dakika
+                                                </span>
+                                            </div>
+
+                                            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 line-clamp-2">
+                                                {post.title}
+                                            </h3>
+
+                                            <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">
+                                                {post.excerpt}
+                                            </p>
+
+                                            <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400 mb-4">
+                                                <div className="flex items-center">
+                                                    <User className="h-4 w-4 mr-1" />
+                                                    {post.author}
+                                                </div>
+                                                <div className="flex items-center space-x-3">
+                                                    <div className="flex items-center">
+                                                        <Eye className="h-4 w-4 mr-1" />
+                                                        {post.views || 0}
+                                                    </div>
+                                                    <div className="flex items-center">
+                                                        <MessageCircle className="h-4 w-4 mr-1" />
+                                                        {post.comments || 0}
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center text-gray-500 dark:text-gray-400 text-sm">
+                                                    <Calendar className="h-4 w-4 mr-1" />
+                                                    {formatDate(post.publishedAt)}
+                                                </div>
+
+                                                <Link
+                                                    href={`/blog/${post.id}`}
+                                                    className="text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 font-medium flex items-center space-x-1"
+                                                >
+                                                    <span>Oku</span>
+                                                    <ArrowRight className="h-4 w-4" />
+                                                </Link>
+                                            </div>
+                                        </div>
+                                    </article>
+                                ))
+                            ) : (
+                                <div className="col-span-2 text-center py-12">
+                                    <Music className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                                        Bu kategoride henüz yazı yok
+                                    </h3>
+                                    <p className="text-gray-600 dark:text-gray-400">
+                                        Farklı bir kategori seçin veya ilk yazıyı gönderin.
+                                    </p>
+                                </div>
+                            )}
                         </div>
 
                         {/* Pagination */}

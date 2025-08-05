@@ -572,4 +572,237 @@ export class NotificationService {
 
         await deleteDoc(doc(db, this.collection, notificationId));
     }
+}
+
+// Blog Service for managing blog posts
+export class BlogService {
+    private static collection = 'blogs';
+
+    // Create a new blog post (admin only)
+    static async create(blogData: {
+        title: string;
+        excerpt: string;
+        content: string;
+        author: string;
+        category: string;
+        tags: string[];
+        imageUrl?: string;
+        isPublished: boolean;
+        createdBy: string;
+    }) {
+        if (!db) throw new Error('Firestore not initialized');
+
+        const now = new Date();
+        const blog = {
+            ...blogData,
+            id: '',
+            createdAt: now,
+            updatedAt: now,
+            publishedAt: blogData.isPublished ? now : null,
+            views: 0,
+            likes: 0,
+            comments: 0,
+            status: blogData.isPublished ? 'published' : 'draft'
+        };
+
+        const docRef = await addDoc(collection(db, this.collection), blog);
+
+        // Update the document with its ID
+        await updateDoc(docRef, { id: docRef.id });
+
+        return docRef.id;
+    }
+
+    // Submit a blog post for review (user submission)
+    static async submitForReview(blogData: {
+        title: string;
+        excerpt: string;
+        content: string;
+        author: string;
+        category: string;
+        tags: string[];
+        imageUrl?: string;
+        submittedBy: string;
+        userEmail: string;
+    }) {
+        if (!db) throw new Error('Firestore not initialized');
+
+        const now = new Date();
+        const blog = {
+            ...blogData,
+            id: '',
+            createdAt: now,
+            updatedAt: now,
+            status: 'pending',
+            isPublished: false,
+            publishedAt: null,
+            views: 0,
+            likes: 0,
+            comments: 0,
+            reviewedBy: null,
+            reviewedAt: null,
+            reviewNotes: null
+        };
+
+        const docRef = await addDoc(collection(db, this.collection), blog);
+
+        // Update the document with its ID
+        await updateDoc(docRef, { id: docRef.id });
+
+        return docRef.id;
+    }
+
+    // Get all published blog posts
+    static async getPublished() {
+        if (!db) throw new Error('Firestore not initialized');
+
+        const q = query(
+            collection(db, this.collection),
+            where('status', '==', 'published'),
+            orderBy('publishedAt', 'desc')
+        );
+
+        const querySnapshot = await getDocs(q);
+        const blogs = querySnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+
+        return blogs;
+    }
+
+    // Get blog post by ID
+    static async getById(id: string) {
+        if (!db) throw new Error('Firestore not initialized');
+
+        const docRef = doc(db, this.collection, id);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            return {
+                id: docSnap.id,
+                ...docSnap.data()
+            };
+        }
+        return null;
+    }
+
+    // Get all blog posts (for admin)
+    static async getAll() {
+        if (!db) throw new Error('Firestore not initialized');
+
+        const q = query(
+            collection(db, this.collection),
+            orderBy('createdAt', 'desc')
+        );
+
+        const querySnapshot = await getDocs(q);
+        const blogs = querySnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+
+        return blogs;
+    }
+
+    // Get pending blog submissions
+    static async getPending() {
+        if (!db) throw new Error('Firestore not initialized');
+
+        const q = query(
+            collection(db, this.collection),
+            where('status', '==', 'pending'),
+            orderBy('createdAt', 'desc')
+        );
+
+        const querySnapshot = await getDocs(q);
+        const blogs = querySnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+
+        return blogs;
+    }
+
+    // Approve blog post
+    static async approve(blogId: string, reviewedBy: string, reviewNotes?: string) {
+        if (!db) throw new Error('Firestore not initialized');
+
+        const now = new Date();
+        await updateDoc(doc(db, this.collection, blogId), {
+            status: 'published',
+            isPublished: true,
+            publishedAt: now,
+            reviewedBy,
+            reviewedAt: now,
+            reviewNotes: reviewNotes || null,
+            updatedAt: now
+        });
+    }
+
+    // Reject blog post
+    static async reject(blogId: string, reviewedBy: string, reviewNotes: string) {
+        if (!db) throw new Error('Firestore not initialized');
+
+        const now = new Date();
+        await updateDoc(doc(db, this.collection, blogId), {
+            status: 'rejected',
+            reviewedBy,
+            reviewedAt: now,
+            reviewNotes,
+            updatedAt: now
+        });
+    }
+
+    // Update blog post
+    static async update(id: string, updates: any) {
+        if (!db) throw new Error('Firestore not initialized');
+
+        await updateDoc(doc(db, this.collection, id), {
+            ...updates,
+            updatedAt: new Date()
+        });
+    }
+
+    // Delete blog post
+    static async delete(id: string) {
+        if (!db) throw new Error('Firestore not initialized');
+
+        await deleteDoc(doc(db, this.collection, id));
+    }
+
+    // Increment view count
+    static async incrementViews(id: string) {
+        if (!db) throw new Error('Firestore not initialized');
+
+        const blogRef = doc(db, this.collection, id);
+        const blogDoc = await getDoc(blogRef);
+
+        if (blogDoc.exists()) {
+            const currentViews = blogDoc.data().views || 0;
+            await updateDoc(blogRef, {
+                views: currentViews + 1
+            });
+        }
+    }
+
+    // Get blog statistics
+    static async getStatistics() {
+        if (!db) throw new Error('Firestore not initialized');
+
+        const querySnapshot = await getDocs(collection(db, this.collection));
+        const blogs = querySnapshot.docs.map(doc => doc.data());
+
+        const totalPosts = blogs.length;
+        const publishedPosts = blogs.filter(b => b.status === 'published').length;
+        const pendingPosts = blogs.filter(b => b.status === 'pending').length;
+        const totalViews = blogs.reduce((sum, blog) => sum + (blog.views || 0), 0);
+
+        return {
+            totalPosts,
+            publishedPosts,
+            pendingPosts,
+            totalViews
+        };
+    }
 } 
