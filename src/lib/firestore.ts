@@ -894,7 +894,6 @@ export class ReviewService {
         // Simplified query to avoid index requirement
         const q = query(
             collection(db, this.collection),
-            where('productId', '==', productId),
             orderBy('createdAt', 'desc')
         );
 
@@ -905,7 +904,9 @@ export class ReviewService {
         }));
 
         // Filter on client side to avoid index requirement
-        return reviews.filter((review: any) => review.status === 'approved');
+        return reviews.filter((review: any) =>
+            review.productId === productId && review.status === 'approved'
+        );
     }
 
     // Get all reviews (for admin)
@@ -986,7 +987,6 @@ export class ReviewService {
         // Simplified query to avoid index requirement
         const q = query(
             collection(db, this.collection),
-            where('productId', '==', productId),
             orderBy('createdAt', 'desc')
         );
 
@@ -994,7 +994,9 @@ export class ReviewService {
         const reviews = querySnapshot.docs.map(doc => doc.data());
 
         // Filter on client side to avoid index requirement
-        const approvedReviews = reviews.filter((review: any) => review.status === 'approved');
+        const approvedReviews = reviews.filter((review: any) =>
+            review.productId === productId && review.status === 'approved'
+        );
 
         if (approvedReviews.length === 0) return;
 

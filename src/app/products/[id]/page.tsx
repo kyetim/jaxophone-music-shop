@@ -396,7 +396,14 @@ export default function ProductDetailPage() {
                         </div>
                     </div>
 
-                    {/* Related Products */}
+                    {/* Product Reviews */}
+                    <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden mb-12">
+                        <div className="p-6 lg:p-8">
+                            <ProductReviews productId={product.id} productName={product.name} />
+                        </div>
+                    </div>
+
+                    {/* Similar Products */}
                     <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden">
                         <div className="p-6 lg:p-8">
                             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
@@ -428,13 +435,6 @@ export default function ProductDetailPage() {
                                     <p className="text-sm mt-2">Kategori: {product.category} | Marka: {product.brand}</p>
                                 </div>
                             )}
-                        </div>
-                    </div>
-
-                    {/* Product Reviews */}
-                    <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden mt-12">
-                        <div className="p-6 lg:p-8">
-                            <ProductReviews productId={product.id} productName={product.name} />
                         </div>
                     </div>
                 </main>
