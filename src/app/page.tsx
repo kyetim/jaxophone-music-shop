@@ -460,8 +460,11 @@ export default function HomePage() {
                 <a href="/products" className="block text-gray-400 hover:text-white transition-colors cursor-pointer">
                   Ürünler
                 </a>
-                <a href="/categories" className="block text-gray-400 hover:text-white transition-colors cursor-pointer">
-                  Kategoriler
+                <a href="/about" className="block text-gray-400 hover:text-white transition-colors cursor-pointer">
+                  Hakkımızda
+                </a>
+                <a href="/blog" className="block text-gray-400 hover:text-white transition-colors cursor-pointer">
+                  Blog
                 </a>
                 <a href="/brands" className="block text-gray-400 hover:text-white transition-colors cursor-pointer">
                   Markalar
@@ -474,6 +477,9 @@ export default function HomePage() {
               <div className="space-y-2">
                 <a href="/contact" className="block text-gray-400 hover:text-white transition-colors cursor-pointer">
                   İletişim
+                </a>
+                <a href="/installment" className="block text-gray-400 hover:text-white transition-colors cursor-pointer">
+                  Sipariş Takibi
                 </a>
                 <a href="/shipping" className="block text-gray-400 hover:text-white transition-colors cursor-pointer">
                   Kargo Bilgileri

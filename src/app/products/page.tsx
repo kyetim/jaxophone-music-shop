@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Header } from '@/components/layout/header';
 import { ProductCard } from '@/components/product/product-card';
+import { ProductCardList } from '@/components/product/product-card-list';
 import { Button } from '@/components/ui/button';
 import { SearchInput } from '@/components/search/search-input';
 import { ProductCardSkeleton } from '@/components/ui/loading';
@@ -157,10 +158,17 @@ export default function ProductsPage() {
                         : 'grid-cols-1'
                         }`}>
                         {sortedProducts.map((product) => (
-                            <ProductCard
-                                key={product.id}
-                                product={product}
-                            />
+                            viewMode === 'grid' ? (
+                                <ProductCard
+                                    key={product.id}
+                                    product={product}
+                                />
+                            ) : (
+                                <ProductCardList
+                                    key={product.id}
+                                    product={product}
+                                />
+                            )
                         ))}
                     </div>
                 ) : (
