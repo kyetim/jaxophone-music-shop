@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAppSelector } from '@/store/hooks';
 import { useLoading } from '@/components/providers/loading-provider';
+import { useNotifications } from '@/hooks/useNotifications';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
@@ -29,6 +30,7 @@ export function Header() {
     const favoritesCount = useAppSelector((state) => state.favorites.items.length);
     const isAuthenticated = useAppSelector((state) => state.user.isAuthenticated);
     const user = useAppSelector((state) => state.user.user);
+    const { unreadCount } = useNotifications();
     const { setLoading } = useLoading();
     const router = useRouter();
 
@@ -445,9 +447,11 @@ export function Header() {
                                 onMouseLeave={() => handleNotificationsHover(false)}
                             >
                                 <Bell className="h-5 w-5 text-gray-700 dark:text-gray-300 hover:text-amber-600 dark:hover:text-amber-400 transition-colors" />
-                                <Badge className="absolute -top-2 -right-2 h-5 w-5 text-xs bg-amber-600 border-white dark:border-gray-900 flex items-center justify-center">
-                                    {isAuthenticated ? 2 : 0}
-                                </Badge>
+                                {isAuthenticated && (
+                                    <Badge className="absolute -top-2 -right-2 h-5 w-5 text-xs bg-amber-600 border-white dark:border-gray-900 flex items-center justify-center">
+                                        {unreadCount}
+                                    </Badge>
+                                )}
                             </div>
 
                             {/* Theme Toggle */}

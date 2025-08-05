@@ -441,4 +441,131 @@ export class UserDataService {
             throw error;
         }
     }
+}
+
+// Notification Service for managing notifications
+export class NotificationService {
+    private static collection = 'notifications';
+
+    // Create a new notification
+    static async create(notificationData: {
+        type: 'order' | 'promotion' | 'system' | 'product';
+        title: string;
+        message: string;
+        icon: 'shipping' | 'gift' | 'check' | 'star';
+        isUrgent?: boolean;
+        sentBy: string;
+        sentTo: 'all' | string[]; // 'all' for all users, or specific user IDs
+    }) {
+        if (!db) throw new Error('Firestore not initialized');
+
+        const now = new Date();
+        const notification = {
+            ...notificationData,
+            id: '',
+            createdAt: now,
+            isRead: false,
+            readBy: [] as string[], // Array of user IDs who read this notification
+            sentAt: now,
+        };
+
+        const docRef = await addDoc(collection(db, this.collection), notification);
+
+        // Update the document with its ID
+        await updateDoc(docRef, { id: docRef.id });
+
+        return docRef.id;
+    }
+
+    // Get all notifications (for admin)
+    static async getAll() {
+        if (!db) throw new Error('Firestore not initialized');
+
+        const querySnapshot = await getDocs(collection(db, this.collection));
+        const notifications = querySnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+
+        return notifications.sort((a: any, b: any) => {
+            const aDate = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt);
+            const bDate = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt);
+            return bDate.getTime() - aDate.getTime();
+        });
+    }
+
+    // Get notifications for a specific user
+    static async getUserNotifications(userId: string) {
+        if (!db) throw new Error('Firestore not initialized');
+
+        const q = query(
+            collection(db, this.collection),
+            where('sentTo', 'in', ['all', userId]),
+            orderBy('createdAt', 'desc')
+        );
+
+        const querySnapshot = await getDocs(q);
+        const notifications = querySnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+
+        return notifications;
+    }
+
+    // Mark notification as read
+    static async markAsRead(notificationId: string, userId: string) {
+        if (!db) throw new Error('Firestore not initialized');
+
+        const notificationRef = doc(db, this.collection, notificationId);
+        const notificationDoc = await getDoc(notificationRef);
+
+        if (!notificationDoc.exists()) {
+            throw new Error('Notification not found');
+        }
+
+        const notification = notificationDoc.data();
+        const readBy = notification.readBy || [];
+
+        if (!readBy.includes(userId)) {
+            readBy.push(userId);
+            await updateDoc(notificationRef, {
+                readBy,
+                isRead: readBy.length > 0
+            });
+        }
+    }
+
+    // Get notification statistics
+    static async getStatistics() {
+        if (!db) throw new Error('Firestore not initialized');
+
+        const querySnapshot = await getDocs(collection(db, this.collection));
+        const notifications = querySnapshot.docs.map(doc => doc.data());
+
+        const now = new Date();
+        const thisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+        const totalSent = notifications.length;
+        const thisMonthSent = notifications.filter(n =>
+            n.createdAt.toDate() >= thisMonth
+        ).length;
+
+        // Get total users count (you might want to implement this separately)
+        const usersSnapshot = await getDocs(collection(db, 'users'));
+        const totalUsers = usersSnapshot.size;
+
+        return {
+            totalSent,
+            thisMonthSent,
+            totalUsers
+        };
+    }
+
+    // Delete notification
+    static async delete(notificationId: string) {
+        if (!db) throw new Error('Firestore not initialized');
+
+        await deleteDoc(doc(db, this.collection, notificationId));
+    }
 } 

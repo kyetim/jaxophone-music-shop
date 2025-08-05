@@ -1,6 +1,7 @@
 'use client';
 
 import { useAppSelector } from '@/store/hooks';
+import { useNotifications } from '@/hooks/useNotifications';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -23,51 +24,9 @@ interface NotificationsSidebarProps {
     onMouseLeave?: () => void;
 }
 
-// Mock notifications data - in real app this would come from Firestore
-const mockNotifications = [
-    {
-        id: '1',
-        type: 'order',
-        title: 'Siparişiniz hazırlanıyor',
-        message: 'Sipariş #12345 kargoya verildi',
-        time: '2 saat önce',
-        isRead: false,
-        icon: 'shipping'
-    },
-    {
-        id: '2',
-        type: 'promotion',
-        title: 'Özel İndirim Fırsatı!',
-        message: 'Tüm gitar kategorisinde %20 indirim',
-        time: '1 gün önce',
-        isRead: false,
-        icon: 'gift'
-    },
-    {
-        id: '3',
-        type: 'system',
-        title: 'Hesabınız güncellendi',
-        message: 'Profil bilgileriniz başarıyla güncellendi',
-        time: '3 gün önce',
-        isRead: true,
-        icon: 'check'
-    },
-    {
-        id: '4',
-        type: 'product',
-        title: 'Favori ürününüz stokta',
-        message: 'Takip ettiğiniz ürün tekrar stokta',
-        time: '1 hafta önce',
-        isRead: true,
-        icon: 'star'
-    }
-];
-
 export function NotificationsSidebar({ isOpen, onClose, onMouseEnter, onMouseLeave }: NotificationsSidebarProps) {
     const isAuthenticated = useAppSelector((state) => state.user.isAuthenticated);
-
-    // Get unread notification count
-    const unreadCount = mockNotifications.filter(notification => !notification.isRead).length;
+    const { notifications, loading, markAsRead } = useNotifications();
 
     const getNotificationIcon = (icon: string) => {
         switch (icon) {
@@ -97,6 +56,20 @@ export function NotificationsSidebar({ isOpen, onClose, onMouseEnter, onMouseLea
             default:
                 return 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700';
         }
+    };
+
+    const getTimeAgo = (date: Date) => {
+        const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
+        if (seconds < 60) return `${seconds} saniye önce`;
+        if (seconds < 3600) return `${Math.floor(seconds / 60)} dakika önce`;
+        if (seconds < 86400) return `${Math.floor(seconds / 3600)} saat önce`;
+        if (seconds < 2592000) return `${Math.floor(seconds / 86400)} gün önce`;
+        return `${Math.floor(seconds / 2592000)} ay önce`;
+    };
+
+    const handleNotificationClick = async (notification: any) => {
+        if (notification.isRead) return;
+        await markAsRead(notification.id);
     };
 
     return (
@@ -168,16 +141,21 @@ export function NotificationsSidebar({ isOpen, onClose, onMouseEnter, onMouseLea
                     <>
                         <div className="flex-1 overflow-y-auto custom-scrollbar">
                             <div className="p-4 space-y-3">
-                                {mockNotifications.length === 0 ? (
+                                {loading ? (
+                                    <div className="text-center py-8">
+                                        <p className="text-gray-500 dark:text-gray-400">Yükleniyor...</p>
+                                    </div>
+                                ) : notifications.length === 0 ? (
                                     <div className="text-center py-8">
                                         <Bell className="h-12 w-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
                                         <p className="text-gray-500 dark:text-gray-400">Henüz bildiriminiz yok</p>
                                     </div>
                                 ) : (
-                                    mockNotifications.map((notification) => (
+                                    notifications.map((notification) => (
                                         <div
                                             key={notification.id}
                                             className={`p-4 rounded-lg border ${getNotificationTypeColor(notification.type)} hover:shadow-md transition-shadow cursor-pointer ${!notification.isRead ? 'ring-2 ring-amber-200 dark:ring-amber-800' : ''}`}
+                                            onClick={() => handleNotificationClick(notification)}
                                         >
                                             <div className="flex items-start gap-3">
                                                 <div className="flex-shrink-0 mt-1">
@@ -197,7 +175,7 @@ export function NotificationsSidebar({ isOpen, onClose, onMouseEnter, onMouseLea
                                                     </p>
                                                     <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
                                                         <Clock className="h-3 w-3" />
-                                                        <span>{notification.time}</span>
+                                                        <span>{getTimeAgo(notification.createdAt?.toDate ? notification.createdAt.toDate() : new Date(notification.createdAt))}</span>
                                                     </div>
                                                 </div>
                                             </div>

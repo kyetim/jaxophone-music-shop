@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Header } from '@/components/layout/header';
 import { Button } from '@/components/ui/button';
-import { ProductService } from '@/lib/firestore';
+import { ProductService, NotificationService } from '@/lib/firestore';
 import {
     Users,
     Package,
@@ -464,6 +464,12 @@ export default function AdminDashboard() {
     const [activeTab, setActiveTab] = useState('products');
     const [searchTerm, setSearchTerm] = useState('');
     const [products, setProducts] = useState<Product[]>([]);
+    const [notifications, setNotifications] = useState<any[]>([]);
+    const [notificationStats, setNotificationStats] = useState({
+        totalSent: 0,
+        thisMonthSent: 0,
+        totalUsers: 0
+    });
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isNotificationModalOpen, setIsNotificationModalOpen] = useState(false);
@@ -514,17 +520,24 @@ export default function AdminDashboard() {
     ];
 
     useEffect(() => {
-        // Load products from database
-        const loadProducts = async () => {
+        // Load products and notifications from database
+        const loadData = async () => {
             try {
-                const products = await ProductService.getAll();
-                setProducts(products);
+                const [productsData, notificationsData, statsData] = await Promise.all([
+                    ProductService.getAll(),
+                    NotificationService.getAll(),
+                    NotificationService.getStatistics()
+                ]);
+
+                setProducts(productsData);
+                setNotifications(notificationsData);
+                setNotificationStats(statsData);
             } catch (error) {
-                console.error('Error loading products:', error);
-                alert('Ürünler yüklenirken bir hata oluştu.');
+                console.error('Error loading data:', error);
+                alert('Veriler yüklenirken bir hata oluştu.');
             }
         };
-        loadProducts();
+        loadData();
     }, []);
 
     // Filter products based on search term
@@ -558,11 +571,25 @@ export default function AdminDashboard() {
         setIsNotificationLoading(true);
 
         try {
-            // Burada gerçek bildirim gönderme API'si çağrılacak
-            console.log('Sending notification:', notificationFormData);
+            // Create notification using NotificationService
+            await NotificationService.create({
+                type: notificationFormData.type as 'order' | 'promotion' | 'system' | 'product',
+                title: notificationFormData.title,
+                message: notificationFormData.message,
+                icon: notificationFormData.icon as 'shipping' | 'gift' | 'check' | 'star',
+                isUrgent: notificationFormData.isUrgent,
+                sentBy: 'admin', // You can replace this with actual admin user ID
+                sentTo: 'all'
+            });
 
-            // Simüle edilmiş başarı
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            // Reload notifications and stats
+            const [notificationsData, statsData] = await Promise.all([
+                NotificationService.getAll(),
+                NotificationService.getStatistics()
+            ]);
+
+            setNotifications(notificationsData);
+            setNotificationStats(statsData);
 
             alert('Bildirim başarıyla gönderildi!');
             setIsNotificationModalOpen(false);
@@ -788,6 +815,16 @@ export default function AdminDashboard() {
         setSelectedFile(null);
         setUploadPreview('');
     }, []);
+
+    // Helper function to format time ago
+    const getTimeAgo = (date: Date) => {
+        const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
+        if (seconds < 60) return `${seconds} saniye önce`;
+        if (seconds < 3600) return `${Math.floor(seconds / 60)} dakika önce`;
+        if (seconds < 86400) return `${Math.floor(seconds / 3600)} saat önce`;
+        if (seconds < 2592000) return `${Math.floor(seconds / 86400)} gün önce`;
+        return `${Math.floor(seconds / 2592000)} ay önce`;
+    };
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-black">
@@ -1042,7 +1079,7 @@ export default function AdminDashboard() {
                                         <div className="flex items-center justify-between">
                                             <div>
                                                 <p className="text-gray-400 text-sm">Toplam Gönderilen</p>
-                                                <p className="text-2xl font-bold text-white">1,247</p>
+                                                <p className="text-2xl font-bold text-white">{notificationStats.totalSent}</p>
                                             </div>
                                             <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
                                                 <Bell className="h-6 w-6 text-white" />
@@ -1054,7 +1091,7 @@ export default function AdminDashboard() {
                                         <div className="flex items-center justify-between">
                                             <div>
                                                 <p className="text-gray-400 text-sm">Bu Ay</p>
-                                                <p className="text-2xl font-bold text-white">89</p>
+                                                <p className="text-2xl font-bold text-white">{notificationStats.thisMonthSent}</p>
                                             </div>
                                             <div className="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center">
                                                 <TrendingUp className="h-6 w-6 text-white" />
@@ -1066,7 +1103,7 @@ export default function AdminDashboard() {
                                         <div className="flex items-center justify-between">
                                             <div>
                                                 <p className="text-gray-400 text-sm">Aktif Kullanıcı</p>
-                                                <p className="text-2xl font-bold text-white">2,341</p>
+                                                <p className="text-2xl font-bold text-white">{notificationStats.totalUsers}</p>
                                             </div>
                                             <div className="w-12 h-12 bg-purple-600 rounded-lg flex items-center justify-center">
                                                 <Users className="h-6 w-6 text-white" />
@@ -1081,49 +1118,44 @@ export default function AdminDashboard() {
                                         <h4 className="text-lg font-medium text-white">Son Gönderilen Bildirimler</h4>
                                     </div>
                                     <div className="p-6">
-                                        <div className="space-y-4">
-                                            <div className="flex items-center justify-between p-4 bg-gray-700 rounded-lg">
-                                                <div className="flex items-center space-x-3">
-                                                    <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                                                    <div>
-                                                        <p className="text-white font-medium">Özel İndirim Fırsatı!</p>
-                                                        <p className="text-gray-400 text-sm">Tüm gitar kategorisinde %20 indirim</p>
-                                                    </div>
-                                                </div>
-                                                <div className="text-right">
-                                                    <p className="text-gray-400 text-sm">2 saat önce</p>
-                                                    <p className="text-green-400 text-sm">2,341 kullanıcıya gönderildi</p>
-                                                </div>
+                                        {notifications.length === 0 ? (
+                                            <div className="text-center py-8">
+                                                <Bell className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+                                                <p className="text-gray-400">Henüz bildirim gönderilmemiş</p>
                                             </div>
+                                        ) : (
+                                            <div className="space-y-4">
+                                                {notifications.slice(0, 5).map((notification) => {
+                                                    const createdAt = notification.createdAt?.toDate ?
+                                                        notification.createdAt.toDate() :
+                                                        new Date(notification.createdAt);
 
-                                            <div className="flex items-center justify-between p-4 bg-gray-700 rounded-lg">
-                                                <div className="flex items-center space-x-3">
-                                                    <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                                                    <div>
-                                                        <p className="text-white font-medium">Sistem Güncellemesi</p>
-                                                        <p className="text-gray-400 text-sm">Yeni özellikler eklendi</p>
-                                                    </div>
-                                                </div>
-                                                <div className="text-right">
-                                                    <p className="text-gray-400 text-sm">1 gün önce</p>
-                                                    <p className="text-green-400 text-sm">2,341 kullanıcıya gönderildi</p>
-                                                </div>
-                                            </div>
+                                                    const timeAgo = getTimeAgo(createdAt);
 
-                                            <div className="flex items-center justify-between p-4 bg-gray-700 rounded-lg">
-                                                <div className="flex items-center space-x-3">
-                                                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                                                    <div>
-                                                        <p className="text-white font-medium">Yeni Ürünler</p>
-                                                        <p className="text-gray-400 text-sm">Yeni gitar modelleri eklendi</p>
-                                                    </div>
-                                                </div>
-                                                <div className="text-right">
-                                                    <p className="text-gray-400 text-sm">3 gün önce</p>
-                                                    <p className="text-green-400 text-sm">2,341 kullanıcıya gönderildi</p>
-                                                </div>
+                                                    return (
+                                                        <div key={notification.id} className="flex items-center justify-between p-4 bg-gray-700 rounded-lg">
+                                                            <div className="flex items-center space-x-3">
+                                                                <div className={`w-3 h-3 rounded-full ${notification.type === 'order' ? 'bg-blue-500' :
+                                                                        notification.type === 'promotion' ? 'bg-red-500' :
+                                                                            notification.type === 'system' ? 'bg-green-500' :
+                                                                                'bg-yellow-500'
+                                                                    }`}></div>
+                                                                <div>
+                                                                    <p className="text-white font-medium">{notification.title}</p>
+                                                                    <p className="text-gray-400 text-sm">{notification.message}</p>
+                                                                </div>
+                                                            </div>
+                                                            <div className="text-right">
+                                                                <p className="text-gray-400 text-sm">{timeAgo}</p>
+                                                                <p className="text-green-400 text-sm">
+                                                                    {notification.sentTo === 'all' ? 'Tüm kullanıcılara' : `${notification.sentTo?.length || 0} kullanıcıya`} gönderildi
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })}
                                             </div>
-                                        </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>
