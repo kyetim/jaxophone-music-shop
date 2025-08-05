@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Header } from '@/components/layout/header';
 import { Button } from '@/components/ui/button';
-import { ProductService, NotificationService } from '@/lib/firestore';
+import { ProductService, NotificationService, BlogService } from '@/lib/firestore';
 import {
     Users,
     Package,
@@ -460,23 +460,186 @@ const NotificationModal = ({
     );
 };
 
+// BlogModal component for viewing blog details
+const BlogModal = ({
+    isOpen,
+    onClose,
+    blog,
+    onApprove,
+    onReject,
+    onDelete,
+    isLoading
+}: {
+    isOpen: boolean;
+    onClose: () => void;
+    blog: any;
+    onApprove: (blogId: string) => void;
+    onReject: (blogId: string) => void;
+    onDelete: (blogId: string) => void;
+    isLoading: boolean;
+}) => {
+    if (!isOpen || !blog) return null;
+
+    const formatDate = (date: any) => {
+        if (!date) return '';
+        const d = date.toDate ? date.toDate() : new Date(date);
+        return d.toLocaleDateString('tr-TR', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    };
+
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-gray-900 rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto border border-gray-800">
+                <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-xl font-semibold text-white">Blog Detayları</h2>
+                    <button onClick={onClose} className="text-gray-400 hover:text-gray-200">
+                        <X className="h-6 w-6" />
+                    </button>
+                </div>
+
+                <div className="space-y-6">
+                    {/* Blog Header */}
+                    <div className="bg-gray-800 rounded-lg p-4">
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-lg font-semibold text-white">{blog.title}</h3>
+                            <span className={`px-3 py-1 rounded-full text-sm font-medium ${blog.status === 'published' ? 'bg-green-900 text-green-300' :
+                                blog.status === 'pending' ? 'bg-yellow-900 text-yellow-300' :
+                                    'bg-red-900 text-red-300'
+                                }`}>
+                                {blog.status === 'published' ? 'Yayınlandı' :
+                                    blog.status === 'pending' ? 'Beklemede' : 'Reddedildi'}
+                            </span>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-300">
+                            <div>
+                                <span className="font-medium">Yazar:</span> {blog.author}
+                            </div>
+                            <div>
+                                <span className="font-medium">Kategori:</span> {blog.category}
+                            </div>
+                            <div>
+                                <span className="font-medium">Gönderen:</span> {blog.userEmail}
+                            </div>
+                            <div>
+                                <span className="font-medium">Tarih:</span> {formatDate(blog.createdAt)}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Blog Content */}
+                    <div className="space-y-4">
+                        <div>
+                            <h4 className="font-semibold text-white mb-2">Özet</h4>
+                            <p className="text-gray-300 bg-gray-800 rounded-lg p-3">{blog.excerpt}</p>
+                        </div>
+
+                        <div>
+                            <h4 className="font-semibold text-white mb-2">İçerik</h4>
+                            <div className="text-gray-300 bg-gray-800 rounded-lg p-3 whitespace-pre-wrap max-h-60 overflow-y-auto">
+                                {blog.content}
+                            </div>
+                        </div>
+
+                        {blog.tags && blog.tags.length > 0 && (
+                            <div>
+                                <h4 className="font-semibold text-white mb-2">Etiketler</h4>
+                                <div className="flex flex-wrap gap-2">
+                                    {blog.tags.map((tag: string, index: number) => (
+                                        <span key={index} className="bg-amber-900 text-amber-300 px-2 py-1 rounded text-sm">
+                                            {tag}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {blog.imageUrl && (
+                            <div>
+                                <h4 className="font-semibold text-white mb-2">Görsel</h4>
+                                <img
+                                    src={blog.imageUrl}
+                                    alt={blog.title}
+                                    className="w-full max-w-md h-auto rounded-lg"
+                                />
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Action Buttons */}
+                    {blog.status === 'pending' && (
+                        <div className="flex items-center justify-end space-x-4 pt-6 border-t border-gray-700">
+                            <Button
+                                onClick={() => onReject(blog.id)}
+                                disabled={isLoading}
+                                className="bg-red-600 hover:bg-red-700 text-white"
+                            >
+                                {isLoading ? 'İşleniyor...' : 'Reddet'}
+                            </Button>
+                            <Button
+                                onClick={() => onApprove(blog.id)}
+                                disabled={isLoading}
+                                className="bg-green-600 hover:bg-green-700 text-white"
+                            >
+                                {isLoading ? 'İşleniyor...' : 'Onayla'}
+                            </Button>
+                        </div>
+                    )}
+
+                    <div className="flex items-center justify-end space-x-4 pt-6 border-t border-gray-700">
+                        <Button
+                            onClick={() => onDelete(blog.id)}
+                            disabled={isLoading}
+                            className="bg-red-600 hover:bg-red-700 text-white"
+                        >
+                            {isLoading ? 'İşleniyor...' : 'Sil'}
+                        </Button>
+                        <Button
+                            onClick={onClose}
+                            variant="outline"
+                            className="border-gray-600 text-gray-300 hover:bg-gray-800"
+                        >
+                            Kapat
+                        </Button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 export default function AdminDashboard() {
     const [activeTab, setActiveTab] = useState('products');
     const [searchTerm, setSearchTerm] = useState('');
     const [products, setProducts] = useState<Product[]>([]);
     const [notifications, setNotifications] = useState<any[]>([]);
+    const [blogs, setBlogs] = useState<any[]>([]);
+    const [pendingBlogs, setPendingBlogs] = useState<any[]>([]);
     const [notificationStats, setNotificationStats] = useState({
         totalSent: 0,
         thisMonthSent: 0,
         totalUsers: 0
     });
+    const [blogStats, setBlogStats] = useState({
+        totalPosts: 0,
+        publishedPosts: 0,
+        pendingPosts: 0,
+        totalViews: 0
+    });
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isNotificationModalOpen, setIsNotificationModalOpen] = useState(false);
+    const [isBlogModalOpen, setIsBlogModalOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+    const [selectedBlog, setSelectedBlog] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
     const [isNotificationLoading, setIsNotificationLoading] = useState(false);
+    const [isBlogLoading, setIsBlogLoading] = useState(false);
 
     // Form state for adding/editing products
     const [formData, setFormData] = useState({
@@ -497,6 +660,18 @@ export default function AdminDashboard() {
         message: '',
         icon: 'shipping',
         isUrgent: false
+    });
+
+    // Form state for blogs
+    const [blogFormData, setBlogFormData] = useState({
+        title: '',
+        excerpt: '',
+        content: '',
+        author: '',
+        category: '',
+        tags: '',
+        imageUrl: '',
+        isPublished: false
     });
 
     // File upload state
@@ -523,15 +698,21 @@ export default function AdminDashboard() {
         // Load products and notifications from database
         const loadData = async () => {
             try {
-                const [productsData, notificationsData, statsData] = await Promise.all([
+                const [productsData, notificationsData, statsData, blogsData, pendingBlogsData, blogStatsData] = await Promise.all([
                     ProductService.getAll(),
                     NotificationService.getAll(),
-                    NotificationService.getStatistics()
+                    NotificationService.getStatistics(),
+                    BlogService.getAll(),
+                    BlogService.getPending(),
+                    BlogService.getStatistics()
                 ]);
 
                 setProducts(productsData);
                 setNotifications(notificationsData);
                 setNotificationStats(statsData);
+                setBlogs(blogsData);
+                setPendingBlogs(pendingBlogsData);
+                setBlogStats(blogStatsData);
             } catch (error) {
                 console.error('Error loading data:', error);
                 alert('Veriler yüklenirken bir hata oluştu.');
@@ -564,6 +745,89 @@ export default function AdminDashboard() {
             [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
         }));
     }, []);
+
+    // Handle blog form input changes
+    const handleBlogInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+        const { name, value, type } = e.target;
+        setBlogFormData(prev => ({
+            ...prev,
+            [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
+        }));
+    }, []);
+
+    // Handle blog approval
+    const handleBlogApprove = async (blogId: string) => {
+        try {
+            setIsBlogLoading(true);
+            await BlogService.approve(blogId, 'admin');
+            alert('Blog yazısı onaylandı!');
+            // Reload data
+            const [blogsData, pendingBlogsData, blogStatsData] = await Promise.all([
+                BlogService.getAll(),
+                BlogService.getPending(),
+                BlogService.getStatistics()
+            ]);
+            setBlogs(blogsData);
+            setPendingBlogs(pendingBlogsData);
+            setBlogStats(blogStatsData);
+        } catch (error) {
+            console.error('Error approving blog:', error);
+            alert('Blog onaylanırken bir hata oluştu.');
+        } finally {
+            setIsBlogLoading(false);
+        }
+    };
+
+    // Handle blog rejection
+    const handleBlogReject = async (blogId: string) => {
+        const reason = prompt('Blog yazısını neden reddediyorsunuz?');
+        if (!reason) return;
+
+        try {
+            setIsBlogLoading(true);
+            await BlogService.reject(blogId, 'admin', reason);
+            alert('Blog yazısı reddedildi!');
+            // Reload data
+            const [blogsData, pendingBlogsData, blogStatsData] = await Promise.all([
+                BlogService.getAll(),
+                BlogService.getPending(),
+                BlogService.getStatistics()
+            ]);
+            setBlogs(blogsData);
+            setPendingBlogs(pendingBlogsData);
+            setBlogStats(blogStatsData);
+        } catch (error) {
+            console.error('Error rejecting blog:', error);
+            alert('Blog reddedilirken bir hata oluştu.');
+        } finally {
+            setIsBlogLoading(false);
+        }
+    };
+
+    // Handle blog deletion
+    const handleBlogDelete = async (blogId: string) => {
+        if (!confirm('Bu blog yazısını silmek istediğinizden emin misiniz?')) return;
+
+        try {
+            setIsBlogLoading(true);
+            await BlogService.delete(blogId);
+            alert('Blog yazısı silindi!');
+            // Reload data
+            const [blogsData, pendingBlogsData, blogStatsData] = await Promise.all([
+                BlogService.getAll(),
+                BlogService.getPending(),
+                BlogService.getStatistics()
+            ]);
+            setBlogs(blogsData);
+            setPendingBlogs(pendingBlogsData);
+            setBlogStats(blogStatsData);
+        } catch (error) {
+            console.error('Error deleting blog:', error);
+            alert('Blog silinirken bir hata oluştu.');
+        } finally {
+            setIsBlogLoading(false);
+        }
+    };
 
     // Handle notification submission
     const handleNotificationSubmit = async (e: React.FormEvent) => {
@@ -850,6 +1114,7 @@ export default function AdminDashboard() {
                             {[
                                 { id: 'overview', name: 'Genel Bakış', icon: BarChart3 },
                                 { id: 'products', name: 'Ürün Yönetimi', icon: Package },
+                                { id: 'blogs', name: 'Blog Yönetimi', icon: FileText },
                                 { id: 'orders', name: 'Siparişler', icon: ShoppingCart },
                                 { id: 'customers', name: 'Müşteriler', icon: Users },
                                 { id: 'reports', name: 'Raporlar', icon: FileText },
@@ -1136,9 +1401,9 @@ export default function AdminDashboard() {
                                                         <div key={notification.id} className="flex items-center justify-between p-4 bg-gray-700 rounded-lg">
                                                             <div className="flex items-center space-x-3">
                                                                 <div className={`w-3 h-3 rounded-full ${notification.type === 'order' ? 'bg-blue-500' :
-                                                                        notification.type === 'promotion' ? 'bg-red-500' :
-                                                                            notification.type === 'system' ? 'bg-green-500' :
-                                                                                'bg-yellow-500'
+                                                                    notification.type === 'promotion' ? 'bg-red-500' :
+                                                                        notification.type === 'system' ? 'bg-green-500' :
+                                                                            'bg-yellow-500'
                                                                     }`}></div>
                                                                 <div>
                                                                     <p className="text-white font-medium">{notification.title}</p>
@@ -1150,6 +1415,204 @@ export default function AdminDashboard() {
                                                                 <p className="text-green-400 text-sm">
                                                                     {notification.sentTo === 'all' ? 'Tüm kullanıcılara' : `${notification.sentTo?.length || 0} kullanıcıya`} gönderildi
                                                                 </p>
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Blog Management Tab */}
+                        {activeTab === 'blogs' && (
+                            <div className="space-y-6">
+                                <div className="flex items-center justify-between">
+                                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Blog Yönetimi</h3>
+                                    <div className="flex items-center space-x-4">
+                                        <div className="text-sm text-gray-600 dark:text-gray-400">
+                                            <span className="font-medium">Toplam:</span> {blogStats.totalPosts} |
+                                            <span className="font-medium text-green-600">Yayınlanan:</span> {blogStats.publishedPosts} |
+                                            <span className="font-medium text-yellow-600">Bekleyen:</span> {blogStats.pendingPosts}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Blog Statistics */}
+                                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                                    <div className="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <p className="text-gray-500 dark:text-gray-400 text-sm">Toplam Blog</p>
+                                                <p className="text-2xl font-bold text-gray-900 dark:text-white">{blogStats.totalPosts}</p>
+                                            </div>
+                                            <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
+                                                <FileText className="h-6 w-6 text-white" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <p className="text-gray-500 dark:text-gray-400 text-sm">Yayınlanan</p>
+                                                <p className="text-2xl font-bold text-green-600">{blogStats.publishedPosts}</p>
+                                            </div>
+                                            <div className="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center">
+                                                <FileText className="h-6 w-6 text-white" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <p className="text-gray-500 dark:text-gray-400 text-sm">Bekleyen</p>
+                                                <p className="text-2xl font-bold text-yellow-600">{blogStats.pendingPosts}</p>
+                                            </div>
+                                            <div className="w-12 h-12 bg-yellow-600 rounded-lg flex items-center justify-center">
+                                                <FileText className="h-6 w-6 text-white" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <p className="text-gray-500 dark:text-gray-400 text-sm">Toplam Görüntüleme</p>
+                                                <p className="text-2xl font-bold text-gray-900 dark:text-white">{blogStats.totalViews}</p>
+                                            </div>
+                                            <div className="w-12 h-12 bg-purple-600 rounded-lg flex items-center justify-center">
+                                                <Eye className="h-6 w-6 text-white" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Pending Blogs */}
+                                <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                                    <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+                                        <h4 className="text-lg font-semibold text-gray-900 dark:text-white">Bekleyen Blog Yazıları</h4>
+                                        <p className="text-gray-600 dark:text-gray-400 text-sm">Onay bekleyen kullanıcı blog yazıları</p>
+                                    </div>
+                                    <div className="p-6">
+                                        {pendingBlogs.length === 0 ? (
+                                            <div className="text-center py-8">
+                                                <FileText className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+                                                <p className="text-gray-500 dark:text-gray-400">Bekleyen blog yazısı yok</p>
+                                            </div>
+                                        ) : (
+                                            <div className="space-y-4">
+                                                {pendingBlogs.map((blog) => {
+                                                    const createdAt = blog.createdAt?.toDate ? blog.createdAt.toDate() : new Date(blog.createdAt);
+                                                    const timeAgo = getTimeAgo(createdAt);
+                                                    return (
+                                                        <div key={blog.id} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                                            <div className="flex items-center space-x-4">
+                                                                <div className="flex-1">
+                                                                    <h5 className="font-semibold text-gray-900 dark:text-white">{blog.title}</h5>
+                                                                    <p className="text-gray-600 dark:text-gray-400 text-sm">{blog.excerpt}</p>
+                                                                    <div className="flex items-center space-x-4 mt-2 text-xs text-gray-500 dark:text-gray-400">
+                                                                        <span>Yazar: {blog.author}</span>
+                                                                        <span>Kategori: {blog.category}</span>
+                                                                        <span>{timeAgo}</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div className="flex items-center space-x-2">
+                                                                <Button
+                                                                    onClick={() => {
+                                                                        setSelectedBlog(blog);
+                                                                        setIsBlogModalOpen(true);
+                                                                    }}
+                                                                    size="sm"
+                                                                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                                                                >
+                                                                    <Eye className="h-4 w-4" />
+                                                                </Button>
+                                                                <Button
+                                                                    onClick={() => handleBlogApprove(blog.id)}
+                                                                    disabled={isBlogLoading}
+                                                                    size="sm"
+                                                                    className="bg-green-600 hover:bg-green-700 text-white"
+                                                                >
+                                                                    {isBlogLoading ? 'İşleniyor...' : 'Onayla'}
+                                                                </Button>
+                                                                <Button
+                                                                    onClick={() => handleBlogReject(blog.id)}
+                                                                    disabled={isBlogLoading}
+                                                                    size="sm"
+                                                                    className="bg-red-600 hover:bg-red-700 text-white"
+                                                                >
+                                                                    {isBlogLoading ? 'İşleniyor...' : 'Reddet'}
+                                                                </Button>
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* All Blogs */}
+                                <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                                    <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+                                        <h4 className="text-lg font-semibold text-gray-900 dark:text-white">Tüm Blog Yazıları</h4>
+                                        <p className="text-gray-600 dark:text-gray-400 text-sm">Sistemdeki tüm blog yazıları</p>
+                                    </div>
+                                    <div className="p-6">
+                                        {blogs.length === 0 ? (
+                                            <div className="text-center py-8">
+                                                <FileText className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+                                                <p className="text-gray-500 dark:text-gray-400">Henüz blog yazısı yok</p>
+                                            </div>
+                                        ) : (
+                                            <div className="space-y-4">
+                                                {blogs.map((blog) => {
+                                                    const createdAt = blog.createdAt?.toDate ? blog.createdAt.toDate() : new Date(blog.createdAt);
+                                                    const timeAgo = getTimeAgo(createdAt);
+                                                    return (
+                                                        <div key={blog.id} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                                            <div className="flex items-center space-x-4">
+                                                                <div className="flex-1">
+                                                                    <div className="flex items-center space-x-2 mb-1">
+                                                                        <h5 className="font-semibold text-gray-900 dark:text-white">{blog.title}</h5>
+                                                                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${blog.status === 'published' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' :
+                                                                                blog.status === 'pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' :
+                                                                                    'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
+                                                                            }`}>
+                                                                            {blog.status === 'published' ? 'Yayınlandı' :
+                                                                                blog.status === 'pending' ? 'Beklemede' : 'Reddedildi'}
+                                                                        </span>
+                                                                    </div>
+                                                                    <p className="text-gray-600 dark:text-gray-400 text-sm">{blog.excerpt}</p>
+                                                                    <div className="flex items-center space-x-4 mt-2 text-xs text-gray-500 dark:text-gray-400">
+                                                                        <span>Yazar: {blog.author}</span>
+                                                                        <span>Kategori: {blog.category}</span>
+                                                                        <span>Görüntüleme: {blog.views || 0}</span>
+                                                                        <span>{timeAgo}</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div className="flex items-center space-x-2">
+                                                                <Button
+                                                                    onClick={() => {
+                                                                        setSelectedBlog(blog);
+                                                                        setIsBlogModalOpen(true);
+                                                                    }}
+                                                                    size="sm"
+                                                                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                                                                >
+                                                                    <Eye className="h-4 w-4" />
+                                                                </Button>
+                                                                <Button
+                                                                    onClick={() => handleBlogDelete(blog.id)}
+                                                                    disabled={isBlogLoading}
+                                                                    size="sm"
+                                                                    className="bg-red-600 hover:bg-red-700 text-white"
+                                                                >
+                                                                    {isBlogLoading ? 'İşleniyor...' : <Trash2 className="h-4 w-4" />}
+                                                                </Button>
                                                             </div>
                                                         </div>
                                                     );
@@ -1213,6 +1676,17 @@ export default function AdminDashboard() {
                 formData={notificationFormData}
                 onInputChange={handleNotificationInputChange}
                 isLoading={isNotificationLoading}
+            />
+
+            {/* Blog Modal */}
+            <BlogModal
+                isOpen={isBlogModalOpen}
+                onClose={() => setIsBlogModalOpen(false)}
+                blog={selectedBlog}
+                onApprove={handleBlogApprove}
+                onReject={handleBlogReject}
+                onDelete={handleBlogDelete}
+                isLoading={isBlogLoading}
             />
         </div>
     );
