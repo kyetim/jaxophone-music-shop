@@ -21,9 +21,9 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        console.log(`Sending test email to: ${email}`);
+        console.log('Attempting to send email via Resend...');
 
-        const result = await resend.emails.send({
+        const emailData = {
             from: 'Jaxophone <noreply@jaxophone.com>',
             to: email,
             subject: 'Jaxophone - Test E-postası',
@@ -53,21 +53,49 @@ export async function POST(request: NextRequest) {
                     </div>
                 </div>
             `
-        });
+        };
 
-        console.log('Test email sent successfully:', result);
+        const result = await resend.emails.send(emailData);
+
+        console.log('Resend API response:', JSON.stringify(result, null, 2));
+
+        // Check if the email was actually sent
+        if (result && result.data && result.data.id) {
+            console.log(`Email sent successfully with ID: ${result.data.id}`);
+            return NextResponse.json(
+                {
+                    message: 'Test e-postası başarıyla gönderildi',
+                    emailId: result.data.id,
+                    result: result,
+                    timestamp: new Date().toISOString()
+                },
+                { status: 200 }
+            );
+        } else {
+            console.error('Resend returned unexpected response:', result);
+            return NextResponse.json(
+                {
+                    error: 'E-posta gönderildi ancak beklenmeyen yanıt alındı',
+                    result: result
+                },
+                { status: 500 }
+            );
+        }
+    } catch (error: any) {
+        console.error('Test email error details:', {
+            message: error?.message || 'Unknown error',
+            stack: error?.stack,
+            name: error?.name || 'Unknown error type'
+        });
 
         return NextResponse.json(
             {
-                message: 'Test e-postası başarıyla gönderildi',
-                result: result
+                error: 'Test e-postası gönderilirken hata oluştu',
+                details: {
+                    message: error?.message || 'Unknown error',
+                    name: error?.name || 'Unknown error type'
+                }
             },
-            { status: 200 }
-        );
-    } catch (error) {
-        console.error('Test email error:', error);
-        return NextResponse.json(
-            { error: 'Test e-postası gönderilirken hata oluştu', details: error },
             { status: 500 }
         );
     }

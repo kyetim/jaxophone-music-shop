@@ -1014,6 +1014,8 @@ export default function AdminDashboard() {
         if (!testEmail) return;
 
         try {
+            console.log('Sending test email to:', testEmail);
+
             const response = await fetch('/api/test-email', {
                 method: 'POST',
                 headers: {
@@ -1023,15 +1025,34 @@ export default function AdminDashboard() {
             });
 
             const result = await response.json();
+            console.log('Test email API response:', result);
 
             if (response.ok) {
-                alert(`Test e-postası başarıyla gönderildi!\n\nSonuç: ${JSON.stringify(result, null, 2)}`);
+                const successMessage = `Test e-postası başarıyla gönderildi!
+
+E-posta ID: ${result.emailId || 'N/A'}
+Gönderim Zamanı: ${result.timestamp || 'N/A'}
+
+Lütfen şunları kontrol edin:
+1. Gelen kutusu (Inbox)
+2. Spam/Junk klasörü
+3. Promotions klasörü (Gmail)
+4. E-posta filtreleri
+
+E-posta 5-10 dakika içinde gelmelidir.`;
+
+                alert(successMessage);
             } else {
-                alert(`Test e-postası gönderilemedi: ${result.error}`);
+                const errorMessage = `Test e-postası gönderilemedi!
+
+Hata: ${result.error}
+Detaylar: ${JSON.stringify(result.details, null, 2)}`;
+
+                alert(errorMessage);
             }
         } catch (error) {
             console.error('Test email error:', error);
-            alert('Test e-postası gönderilirken bir hata oluştu.');
+            alert(`Test e-postası gönderilirken bir hata oluştu: ${error}`);
         }
     };
 
