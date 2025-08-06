@@ -15,8 +15,20 @@ export async function POST(request: NextRequest) {
             );
         }
 
+        // Check if Resend API key is configured
+        if (!process.env.RESEND_API_KEY) {
+            console.error('RESEND_API_KEY is not configured');
+            return NextResponse.json(
+                { error: 'E-posta servisi yapılandırılmamış' },
+                { status: 500 }
+            );
+        }
+
+        console.log('Starting newsletter email sending process...');
+
         // Get all newsletter subscribers
         const subscribers = await NewsletterService.getAllSubscribers();
+        console.log(`Found ${subscribers.length} subscribers`);
 
         if (subscribers.length === 0) {
             return NextResponse.json(
@@ -25,10 +37,18 @@ export async function POST(request: NextRequest) {
             );
         }
 
+        // Log subscriber emails for debugging
+        console.log('Subscriber emails:', subscribers.map((s: any) => s.email));
+
+        let successCount = 0;
+        let errorCount = 0;
+
         // Send email to all subscribers
-        const emailPromises = subscribers.map(async (subscriber: any) => {
+        for (const subscriber of subscribers) {
             try {
-                await resend.emails.send({
+                console.log(`Sending email to: ${subscriber.email}`);
+
+                const result = await resend.emails.send({
                     from: 'Jaxophone <noreply@jaxophone.com>',
                     to: subscriber.email,
                     subject: subject,
@@ -60,15 +80,24 @@ export async function POST(request: NextRequest) {
                         </div>
                     `
                 });
+
+                console.log(`Email sent successfully to ${subscriber.email}:`, result);
+                successCount++;
             } catch (error) {
                 console.error(`Error sending email to ${subscriber.email}:`, error);
+                errorCount++;
             }
-        });
+        }
 
-        await Promise.all(emailPromises);
+        console.log(`Email sending completed. Success: ${successCount}, Errors: ${errorCount}`);
 
         return NextResponse.json(
-            { message: `${subscribers.length} aboneye e-posta gönderildi` },
+            {
+                message: `${successCount} aboneye e-posta gönderildi`,
+                successCount,
+                errorCount,
+                totalSubscribers: subscribers.length
+            },
             { status: 200 }
         );
     } catch (error) {

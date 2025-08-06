@@ -781,7 +781,10 @@ export default function AdminDashboard() {
     const [notificationStats, setNotificationStats] = useState({
         totalSent: 0,
         thisMonthSent: 0,
-        totalUsers: 0
+        totalUsers: 0,
+        totalNotifications: 0,
+        readNotifications: 0,
+        unreadNotifications: 0
     });
     const [blogStats, setBlogStats] = useState({
         totalPosts: 0,
@@ -1005,6 +1008,33 @@ export default function AdminDashboard() {
         }
     };
 
+    // Handle test email
+    const handleTestEmail = async () => {
+        const testEmail = prompt('Test e-postası göndermek istediğiniz e-posta adresini girin:');
+        if (!testEmail) return;
+
+        try {
+            const response = await fetch('/api/test-email', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email: testEmail }),
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                alert(`Test e-postası başarıyla gönderildi!\n\nSonuç: ${JSON.stringify(result, null, 2)}`);
+            } else {
+                alert(`Test e-postası gönderilemedi: ${result.error}`);
+            }
+        } catch (error) {
+            console.error('Test email error:', error);
+            alert('Test e-postası gönderilirken bir hata oluştu.');
+        }
+    };
+
     // Handle notification submission
     const handleNotificationSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -1036,10 +1066,18 @@ export default function AdminDashboard() {
                     }),
                 });
 
+                const emailResult = await response.json();
+
                 if (response.ok) {
-                    console.log('Newsletter email sent successfully');
+                    console.log('Newsletter email result:', emailResult);
+                    if (emailResult.successCount > 0) {
+                        console.log(`Successfully sent emails to ${emailResult.successCount} subscribers`);
+                    }
+                    if (emailResult.errorCount > 0) {
+                        console.error(`Failed to send emails to ${emailResult.errorCount} subscribers`);
+                    }
                 } else {
-                    console.error('Failed to send newsletter email');
+                    console.error('Failed to send newsletter email:', emailResult.error);
                 }
             } catch (emailError) {
                 console.error('Error sending newsletter email:', emailError);
@@ -1631,17 +1669,27 @@ export default function AdminDashboard() {
                         {activeTab === 'notifications' && (
                             <div className="space-y-6">
                                 <div className="flex items-center justify-between">
-                                    <div>
-                                        <h3 className="text-lg font-medium text-white mb-2">Bildirim Yönetimi</h3>
-                                        <p className="text-gray-400">Tüm kullanıcılara toplu bildirim gönderin</p>
+                                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Bildirim Yönetimi</h3>
+                                    <div className="flex items-center space-x-4">
+                                        <div className="text-sm text-gray-600 dark:text-gray-400">
+                                            <span className="font-medium">Toplam:</span> {notificationStats.totalNotifications} |
+                                            <span className="font-medium text-green-600">Okunmuş:</span> {notificationStats.readNotifications} |
+                                            <span className="font-medium text-yellow-600">Okunmamış:</span> {notificationStats.unreadNotifications}
+                                        </div>
+                                        <Button
+                                            onClick={() => setIsNotificationModalOpen(true)}
+                                            className="bg-blue-600 hover:bg-blue-700 text-white"
+                                        >
+                                            <Send className="h-4 w-4 mr-2" />
+                                            Bildirim Gönder
+                                        </Button>
+                                        <Button
+                                            onClick={handleTestEmail}
+                                            className="bg-green-600 hover:bg-green-700 text-white"
+                                        >
+                                            Test E-posta
+                                        </Button>
                                     </div>
-                                    <Button
-                                        onClick={() => setIsNotificationModalOpen(true)}
-                                        className="bg-amber-600 hover:bg-amber-700 text-white"
-                                    >
-                                        <Bell className="h-4 w-4 mr-2" />
-                                        Yeni Bildirim
-                                    </Button>
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

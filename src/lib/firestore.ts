@@ -552,17 +552,25 @@ export class NotificationService {
 
         const totalSent = notifications.length;
         const thisMonthSent = notifications.filter(n =>
-            n.createdAt.toDate() >= thisMonth
+            n.createdAt?.toDate ? n.createdAt.toDate() >= thisMonth : new Date(n.createdAt) >= thisMonth
         ).length;
 
         // Get total users count (you might want to implement this separately)
         const usersSnapshot = await getDocs(collection(db, 'users'));
         const totalUsers = usersSnapshot.size;
 
+        // Calculate read/unread statistics
+        const totalNotifications = notifications.length;
+        const readNotifications = notifications.filter(n => n.isRead).length;
+        const unreadNotifications = totalNotifications - readNotifications;
+
         return {
             totalSent,
             thisMonthSent,
-            totalUsers
+            totalUsers,
+            totalNotifications,
+            readNotifications,
+            unreadNotifications
         };
     }
 
