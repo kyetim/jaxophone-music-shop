@@ -46,11 +46,11 @@ export async function POST(request: NextRequest) {
         // Send email to all subscribers
         for (const subscriber of subscribers) {
             try {
-                console.log(`Sending email to: ${subscriber.email}`);
+                console.log(`Sending email to: ${(subscriber as any).email}`);
 
                 const result = await resend.emails.send({
                     from: 'Jaxophone <noreply@jaxophone.com>',
-                    to: subscriber.email,
+                    to: (subscriber as any).email,
                     subject: subject,
                     html: `
                         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -74,17 +74,26 @@ export async function POST(request: NextRequest) {
                             </div>
                             
                             <div style="background: #f3f4f6; padding: 20px; text-align: center; color: #6b7280; font-size: 14px;">
-                                <p>Bu e-postayı almak istemiyorsanız, <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'https://jaxophone.com'}/unsubscribe?email=${subscriber.email}" style="color: #f59e0b;">abonelikten çıkabilirsiniz</a>.</p>
+                                <p>Bu e-postayı almak istemiyorsanız, <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'https://jaxophone.com'}/unsubscribe?email=${(subscriber as any).email}" style="color: #f59e0b;">abonelikten çıkabilirsiniz</a>.</p>
                                 <p>&copy; 2024 Jaxophone. Tüm hakları saklıdır.</p>
                             </div>
                         </div>
                     `
                 });
 
-                console.log(`Email sent successfully to ${subscriber.email}:`, result);
-                successCount++;
+                // Check if there was an error in the response
+                if (result.error) {
+                    console.error(`Error sending email to ${(subscriber as any).email}:`, result.error);
+                    errorCount++;
+                } else if (result.data && result.data.id) {
+                    console.log(`Email sent successfully to ${(subscriber as any).email}:`, result.data.id);
+                    successCount++;
+                } else {
+                    console.error(`Unexpected response for ${(subscriber as any).email}:`, result);
+                    errorCount++;
+                }
             } catch (error) {
-                console.error(`Error sending email to ${subscriber.email}:`, error);
+                console.error(`Error sending email to ${(subscriber as any).email}:`, error);
                 errorCount++;
             }
         }

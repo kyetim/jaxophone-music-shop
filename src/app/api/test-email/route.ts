@@ -15,13 +15,17 @@ export async function POST(request: NextRequest) {
         }
 
         if (!process.env.RESEND_API_KEY) {
+            console.error('RESEND_API_KEY is not configured');
             return NextResponse.json(
                 { error: 'RESEND_API_KEY yapılandırılmamış' },
                 { status: 500 }
             );
         }
 
-        console.log('Attempting to send email via Resend...');
+        console.log('Starting test email process...');
+        console.log(`API Key exists: ${!!process.env.RESEND_API_KEY}`);
+        console.log(`API Key length: ${process.env.RESEND_API_KEY?.length}`);
+        console.log(`Target email: ${email}`);
 
         const emailData = {
             from: 'Jaxophone <noreply@jaxophone.com>',
@@ -39,6 +43,9 @@ export async function POST(request: NextRequest) {
                         <p style="color: #4b5563; line-height: 1.6; margin-bottom: 30px;">
                             Bu bir test e-postasıdır. E-posta sistemi çalışıyor!
                         </p>
+                        <p style="color: #4b5563; line-height: 1.6; margin-bottom: 30px;">
+                            Gönderim zamanı: ${new Date().toLocaleString('tr-TR')}
+                        </p>
                         
                         <div style="text-align: center; margin-top: 30px;">
                             <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'https://jaxophone.com'}" 
@@ -55,12 +62,33 @@ export async function POST(request: NextRequest) {
             `
         };
 
+        console.log('Email data prepared:', {
+            from: emailData.from,
+            to: emailData.to,
+            subject: emailData.subject,
+            htmlLength: emailData.html.length
+        });
+
+        console.log('Attempting to send email via Resend...');
+
         const result = await resend.emails.send(emailData);
 
         console.log('Resend API response:', JSON.stringify(result, null, 2));
 
-        // Check if the email was actually sent
-        if (result && result.data && result.data.id) {
+        // Check if there was an error in the response
+        if (result.error) {
+            console.error('Resend API error:', result.error);
+            return NextResponse.json(
+                {
+                    error: 'E-posta gönderilemedi',
+                    details: result.error
+                },
+                { status: 500 }
+            );
+        }
+
+        // Check if the email was actually sent successfully
+        if (result.data && result.data.id) {
             console.log(`Email sent successfully with ID: ${result.data.id}`);
             return NextResponse.json(
                 {
