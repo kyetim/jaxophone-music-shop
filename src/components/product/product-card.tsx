@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { addToCart } from '@/store/slices/cart-slice';
 import { addToFavorites, removeFromFavorites } from '@/store/slices/favorites-slice';
@@ -16,6 +17,7 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
+    const router = useRouter();
     const dispatch = useAppDispatch();
     const favoriteItems = useAppSelector((state) => state.favorites.items);
     const isFavorited = favoriteItems.some((item) => item.id === product.id);
@@ -32,27 +34,32 @@ export function ProductCard({ product }: ProductCardProps) {
         }
     }
 
+    function handleImageClick() {
+        router.push(`/products/${product.id}`);
+    }
+
     return (
         <Card className="group overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-500 bg-white dark:bg-gray-800 rounded-2xl cursor-pointer">
             {/* Product Image */}
-            <div className="relative aspect-square overflow-hidden rounded-t-2xl">
-                <Link href={`/products/${product.id}`} className="cursor-pointer">
-                    <Image
-                        src={product.imageWebp || product.imageUrl}
-                        alt={product.name}
-                        fill
-                        className="object-cover transition-transform duration-700 group-hover:scale-110"
-                        sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-                    />
-                </Link>
+            <div className="relative aspect-square overflow-hidden rounded-t-2xl" onClick={handleImageClick}>
+                <Image
+                    src={product.imageWebp || product.imageUrl}
+                    alt={product.name}
+                    fill
+                    className="object-cover transition-transform duration-700 group-hover:scale-110 cursor-pointer"
+                    sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                />
 
                 {/* Gradient Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
                 {/* Favorite Button */}
                 <button
-                    onClick={handleToggleFavorite}
-                    className={`absolute top-3 right-3 p-2 rounded-full transition-all duration-300 backdrop-blur-sm cursor-pointer ${isFavorited
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        handleToggleFavorite();
+                    }}
+                    className={`absolute top-3 right-3 p-2 rounded-full transition-all duration-300 backdrop-blur-sm cursor-pointer z-10 ${isFavorited
                         ? 'bg-red-500 text-white shadow-lg scale-110'
                         : 'bg-white/80 dark:bg-gray-800/80 text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-700 hover:text-red-500'
                         }`}
@@ -62,14 +69,14 @@ export function ProductCard({ product }: ProductCardProps) {
 
                 {/* Discount Badge */}
                 {product.originalPrice && (
-                    <Badge className="absolute top-3 left-3 bg-gradient-to-r from-red-500 to-pink-500 text-white border-0 font-semibold shadow-lg">
+                    <Badge className="absolute top-3 left-3 bg-gradient-to-r from-red-500 to-pink-500 text-white border-0 font-semibold shadow-lg z-10">
                         %{Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)} İNDİRİM
                     </Badge>
                 )}
 
                 {/* Stock Status */}
                 {!product.inStock && (
-                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-10">
                         <Badge variant="destructive" className="text-white font-semibold">
                             Stokta Yok
                         </Badge>
@@ -124,7 +131,10 @@ export function ProductCard({ product }: ProductCardProps) {
                         </div>
 
                         <Button
-                            onClick={handleAddToCart}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                handleAddToCart();
+                            }}
                             disabled={!product.inStock}
                             size="sm"
                             className="bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
