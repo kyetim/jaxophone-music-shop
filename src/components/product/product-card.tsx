@@ -34,52 +34,52 @@ export function ProductCard({ product }: ProductCardProps) {
 
     return (
         <Card className="group overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-500 bg-white dark:bg-gray-800 rounded-2xl cursor-pointer">
-            <CardContent className="p-0 relative">
-                {/* Product Image */}
-                <div className="relative aspect-square overflow-hidden rounded-t-2xl">
-                    <Link href={`/products/${product.id}`} className="cursor-pointer">
-                        <Image
-                            src={product.imageWebp || product.imageUrl}
-                            alt={product.name}
-                            fill
-                            className="object-cover transition-transform duration-700 group-hover:scale-110"
-                            sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-                        />
-                    </Link>
+            {/* Product Image */}
+            <div className="relative aspect-square overflow-hidden rounded-t-2xl">
+                <Link href={`/products/${product.id}`} className="cursor-pointer">
+                    <Image
+                        src={product.imageWebp || product.imageUrl}
+                        alt={product.name}
+                        fill
+                        className="object-cover transition-transform duration-700 group-hover:scale-110"
+                        sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                    />
+                </Link>
 
-                    {/* Gradient Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                {/* Gradient Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
-                    {/* Favorite Button */}
-                    <button
-                        onClick={handleToggleFavorite}
-                        className={`absolute top-3 right-3 p-2 rounded-full transition-all duration-300 backdrop-blur-sm cursor-pointer ${isFavorited
-                            ? 'bg-red-500 text-white shadow-lg scale-110'
-                            : 'bg-white/80 dark:bg-gray-800/80 text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-700 hover:text-red-500'
-                            }`}
-                    >
-                        <Heart className={`h-4 w-4 ${isFavorited ? 'fill-current' : ''}`} />
-                    </button>
+                {/* Favorite Button */}
+                <button
+                    onClick={handleToggleFavorite}
+                    className={`absolute top-3 right-3 p-2 rounded-full transition-all duration-300 backdrop-blur-sm cursor-pointer ${isFavorited
+                        ? 'bg-red-500 text-white shadow-lg scale-110'
+                        : 'bg-white/80 dark:bg-gray-800/80 text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-700 hover:text-red-500'
+                        }`}
+                >
+                    <Heart className={`h-4 w-4 ${isFavorited ? 'fill-current' : ''}`} />
+                </button>
 
-                    {/* Discount Badge */}
-                    {product.originalPrice && (
-                        <Badge className="absolute top-3 left-3 bg-gradient-to-r from-red-500 to-pink-500 text-white border-0 font-semibold shadow-lg">
-                            %{Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)} İNDİRİM
+                {/* Discount Badge */}
+                {product.originalPrice && (
+                    <Badge className="absolute top-3 left-3 bg-gradient-to-r from-red-500 to-pink-500 text-white border-0 font-semibold shadow-lg">
+                        %{Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)} İNDİRİM
+                    </Badge>
+                )}
+
+                {/* Stock Status */}
+                {!product.inStock && (
+                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                        <Badge variant="destructive" className="text-white font-semibold">
+                            Stokta Yok
                         </Badge>
-                    )}
+                    </div>
+                )}
+            </div>
 
-                    {/* Stock Status */}
-                    {!product.inStock && (
-                        <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                            <Badge variant="destructive" className="text-white font-semibold">
-                                Stokta Yok
-                            </Badge>
-                        </div>
-                    )}
-                </div>
-
+            <CardContent className="p-6">
                 {/* Product Info */}
-                <div className="p-6 space-y-3">
+                <div className="space-y-3">
                     <div className="flex items-center justify-between">
                         <span className="text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 px-2 py-1 rounded-full">
                             {product.brand}
