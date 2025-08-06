@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Header } from '@/components/layout/header';
 import { ProductCard } from '@/components/product/product-card';
 import { Product } from '@/interfaces/product';
+import { ProductService } from '@/lib/firestore';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ProductCardSkeleton, CardSkeleton } from '@/components/ui/loading';
@@ -62,126 +63,6 @@ const sliderData = [
   }
 ];
 
-// Örnek ürünler - Unsplash görsellerle
-const sampleProducts: Product[] = [
-  {
-    id: '1',
-    name: 'Yamaha YAS-280 Alto Saksafon',
-    description: 'Başlangıç seviyesi için ideal alto saksafon',
-    price: 15999,
-    originalPrice: 17999,
-    imageUrl: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400',
-    category: 'Üflemeli Çalgılar',
-    brand: 'Yamaha',
-    inStock: true,
-    stockQuantity: 5,
-    rating: 4.8,
-    reviewCount: 124,
-    tags: ['saksafon', 'alto', 'başlangıç']
-  },
-  {
-    id: '2',
-    name: 'Fender Player Stratocaster',
-    description: 'Klasik elektro gitar sesi',
-    price: 23999,
-    imageUrl: 'https://images.unsplash.com/photo-1564186763535-ebb21ef5277f?w=400',
-    category: 'Gitarlar',
-    brand: 'Fender',
-    inStock: true,
-    stockQuantity: 3,
-    rating: 4.9,
-    reviewCount: 89,
-    tags: ['elektro gitar', 'stratocaster']
-  },
-  {
-    id: '3',
-    name: 'Pearl Export Davul Seti',
-    description: 'Profesyonel davul seti',
-    price: 12999,
-    originalPrice: 14999,
-    imageUrl: 'https://images.unsplash.com/photo-1571327073757-af4cf893f3e6?w=400',
-    category: 'Vurmalı Çalgılar',
-    brand: 'Pearl',
-    inStock: false,
-    stockQuantity: 0,
-    rating: 4.7,
-    reviewCount: 56,
-    tags: ['davul', 'set', 'akustik']
-  },
-  {
-    id: '4',
-    name: 'Korg B2 Dijital Piyano',
-    description: '88 tuşlu ağırlıklı klavye',
-    price: 8999,
-    imageUrl: 'https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?w=400',
-    category: 'Klavyeli Çalgılar',
-    brand: 'Korg',
-    inStock: true,
-    stockQuantity: 8,
-    rating: 4.6,
-    reviewCount: 203,
-    tags: ['piyano', 'dijital', 'klavye']
-  },
-  {
-    id: '5',
-    name: 'Ibanez RG450DX Elektro Gitar',
-    description: 'HSS manyetik konfigürasyonu ile çok yönlü ses',
-    price: 18999,
-    originalPrice: 21999,
-    imageUrl: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400',
-    category: 'Gitarlar',
-    brand: 'Ibanez',
-    inStock: true,
-    stockQuantity: 12,
-    rating: 4.5,
-    reviewCount: 78,
-    tags: ['elektro gitar', 'hss', 'ibanez']
-  },
-  {
-    id: '6',
-    name: 'Roland TD-17KV E-Davul',
-    description: 'Profesyonel elektronik davul seti',
-    price: 24999,
-    imageUrl: 'https://images.unsplash.com/photo-1519892300165-cb5542fb47c7?w=400',
-    category: 'Vurmalı Çalgılar',
-    brand: 'Roland',
-    inStock: true,
-    stockQuantity: 4,
-    rating: 4.9,
-    reviewCount: 156,
-    tags: ['e-davul', 'elektronik', 'roland']
-  },
-  {
-    id: '7',
-    name: 'Yamaha YTR-2330 Trompet',
-    description: 'Başlangıç seviyesi için ideal trompet',
-    price: 12999,
-    originalPrice: 14999,
-    imageUrl: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400',
-    category: 'Üflemeli Çalgılar',
-    brand: 'Yamaha',
-    inStock: true,
-    stockQuantity: 7,
-    rating: 4.4,
-    reviewCount: 92,
-    tags: ['trompet', 'yamaha', 'üflemeli']
-  },
-  {
-    id: '8',
-    name: 'Casio PX-S1000 Dijital Piyano',
-    description: 'Ultra ince tasarım, gerçek piyano hissi',
-    price: 15999,
-    imageUrl: 'https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?w=400',
-    category: 'Klavyeli Çalgılar',
-    brand: 'Casio',
-    inStock: true,
-    stockQuantity: 6,
-    rating: 4.7,
-    reviewCount: 134,
-    tags: ['dijital piyano', 'casio', 'ultra ince']
-  }
-];
-
 const features = [
   {
     icon: Truck,
@@ -211,23 +92,33 @@ export default function HomePage() {
   const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [newsletterMessage, setNewsletterMessage] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
 
-  useEffect(() => {
-    // Simulate loading
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  // Auto-slide functionality
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % sliderData.length);
     }, 5000);
 
     return () => clearInterval(interval);
+  }, []);
+
+  // Load products from database
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        setIsLoading(true);
+        const products = await ProductService.getAll();
+        // Get first 8 products for featured section
+        setFeaturedProducts(products.slice(0, 8));
+      } catch (error) {
+        console.error('Error loading products:', error);
+        setFeaturedProducts([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadProducts();
   }, []);
 
   const nextSlide = () => {
@@ -460,9 +351,24 @@ export default function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {sampleProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
+            {isLoading ? (
+              // Loading skeletons
+              Array(8).fill(0).map((_, index) => (
+                <ProductCardSkeleton key={index} />
+              ))
+            ) : featuredProducts.length > 0 ? (
+              // Real products from database
+              featuredProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))
+            ) : (
+              // No products found
+              <div className="col-span-full text-center py-12">
+                <p className="text-gray-500 dark:text-gray-400 text-lg">
+                  Henüz ürün eklenmemiş. Admin panelinden ürün ekleyebilirsiniz.
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -484,7 +390,7 @@ export default function HomePage() {
               { name: 'Gitarlar', icon: '🎸', color: 'from-red-500 to-pink-500', category: 'Gitarlar' },
               { name: 'Piyanolar', icon: '🎹', color: 'from-blue-500 to-purple-500', category: 'Klavyeli Çalgılar' },
               { name: 'Davullar', icon: '🥁', color: 'from-amber-500 to-orange-500', category: 'Vurmalı Çalgılar' },
-              { name: 'Üflemeli', icon: '🎷', color: 'from-green-500 to-emerald-500', category: 'Üflemeli Çalgılar' },
+              { name: 'Üflemeli', icon: '🎷', color: 'from-green-500 to-emerald-500', category: 'Nefesli Çalgılar' },
               { name: 'Yaylılar', icon: '🎻', color: 'from-purple-500 to-pink-500', category: 'Yaylı Çalgılar' },
               { name: 'Aksesuarlar', icon: '🎧', color: 'from-gray-500 to-gray-600', category: 'Aksesuarlar' },
             ].map((category, index) => (
