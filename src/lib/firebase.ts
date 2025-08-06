@@ -3,14 +3,14 @@ import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 
-// Firebase configuration - Direct config (env variables'lar çalışmıyor)
+// Firebase configuration from environment variables
 const firebaseConfig = {
-    apiKey: "AIzaSyC04i2rxkOzt2BBtp8q0WHXRiA6sfvi6qY",
-    authDomain: "jaxophone-music-shop.firebaseapp.com",
-    projectId: "jaxophone-music-shop",
-    storageBucket: "jaxophone-music-shop.firebasestorage.app",
-    messagingSenderId: "409998936254",
-    appId: "1:409998936254:web:e8edd4635b8f13f593f6ef"
+    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
 };
 
 console.log('🔧 Firebase Config:', {

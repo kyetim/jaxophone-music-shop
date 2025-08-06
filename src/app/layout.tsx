@@ -11,12 +11,38 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Jaxophone Music Shop - Türkiye'nin En Büyük Enstrüman Mağazası",
-  description: "Gitarlar, piyanolar, davullar ve daha fazlası. Kaliteli müzik enstrümanları ve profesyonel hizmet.",
-  keywords: ["müzik", "enstrüman", "gitar", "piyano", "davul", "müzik mağazası"],
-  authors: [{ name: "Jaxophone" }],
-  viewport: "width=device-width, initial-scale=1",
-  robots: "index, follow",
+  title: {
+    default: "Jaxophone Music Shop - Türkiye'nin En Büyük Müzik Enstrümanları Mağazası",
+    template: "%s | Jaxophone Music Shop"
+  },
+  description: "Gitar, piyano, davul, üflemeli ve yaylı çalgılar. Türkiye'nin en büyük müzik enstrümanları mağazasından güvenle alışveriş yapın. Ücretsiz kargo, 2 yıl garanti.",
+  keywords: [
+    "müzik enstrümanları",
+    "gitar",
+    "piyano",
+    "davul",
+    "saksafon",
+    "keman",
+    "müzik mağazası",
+    "enstrüman satış",
+    "Türkiye"
+  ],
+  authors: [{ name: "Jaxophone Music Shop" }],
+  creator: "Jaxophone Music Shop",
+  publisher: "Jaxophone Music Shop",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://jaxophone.com'),
+  openGraph: {
+    type: 'website',
+    locale: 'tr_TR',
+    url: '/',
+    title: "Jaxophone Music Shop - Türkiye'nin En Büyük Müzik Enstrümanları Mağazası",
+    description: "Gitar, piyano, davul, üflemeli ve yaylı çalgılar. Türkiye'nin en büyük müzik enstrümanları mağazasından güvenle alışveriş yapın.",
+    siteName: 'Jaxophone Music Shop',
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({
