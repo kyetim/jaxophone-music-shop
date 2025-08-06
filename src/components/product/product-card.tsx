@@ -79,7 +79,7 @@ export function ProductCard({ product }: ProductCardProps) {
                 </div>
 
                 {/* Product Info */}
-                <div className="p-6 space-y-4">
+                <div className="p-6 space-y-3">
                     <div className="flex items-center justify-between">
                         <span className="text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 px-2 py-1 rounded-full">
                             {product.brand}
@@ -92,7 +92,7 @@ export function ProductCard({ product }: ProductCardProps) {
                     </div>
 
                     <Link href={`/products/${product.id}`}>
-                        <h3 className="font-semibold text-gray-900 dark:text-white text-sm leading-tight hover:text-amber-600 dark:hover:text-amber-400 transition-colors duration-200 line-clamp-2">
+                        <h3 className="font-semibold text-gray-900 dark:text-white text-sm leading-tight hover:text-amber-600 dark:hover:text-amber-400 transition-colors duration-200 line-clamp-2 mt-2">
                             {product.name}
                         </h3>
                     </Link>
