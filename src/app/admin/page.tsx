@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Header } from '@/components/layout/header';
 import { Button } from '@/components/ui/button';
 import { ProductService, NotificationService, BlogService, ReviewService } from '@/lib/firestore';
@@ -896,11 +896,13 @@ export default function AdminDashboard() {
     }, []);
 
     // Filter products based on search term
-    const filteredProducts = products.filter(product =>
-        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.brand.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filteredProducts = useMemo(() => {
+        return products.filter(product =>
+            product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            product.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            product.brand.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+    }, [products, searchTerm]);
 
     // Handle form input changes
     const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -1255,7 +1257,7 @@ export default function AdminDashboard() {
     }, []);
 
     // Helper function to format time ago
-    const getTimeAgo = (date: Date) => {
+    const getTimeAgo = useCallback((date: Date) => {
         const now = new Date();
         const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 
@@ -1264,7 +1266,7 @@ export default function AdminDashboard() {
         if (seconds < 86400) return `${Math.floor(seconds / 3600)} saat önce`;
         if (seconds < 2592000) return `${Math.floor(seconds / 86400)} gün önce`;
         return `${Math.floor(seconds / 2592000)} ay önce`;
-    };
+    }, []);
 
     // Handle review approval
     const handleReviewApprove = async (reviewId: string) => {
@@ -1339,6 +1341,36 @@ export default function AdminDashboard() {
             setIsReviewLoading(false);
         }
     };
+
+    // Optimized statistics calculations
+    const optimizedBlogStats = useMemo(() => {
+        const totalPosts = blogs.length;
+        const publishedPosts = blogs.filter(blog => blog.status === 'published').length;
+        const pendingPosts = blogs.filter(blog => blog.status === 'pending').length;
+        const totalViews = blogs.reduce((sum, blog) => sum + (blog.views || 0), 0);
+
+        return { totalPosts, publishedPosts, pendingPosts, totalViews };
+    }, [blogs]);
+
+    const optimizedReviewStats = useMemo(() => {
+        const totalReviews = reviews.length;
+        const approvedReviews = reviews.filter(review => review.status === 'approved').length;
+        const pendingReviews = reviews.filter(review => review.status === 'pending').length;
+        const averageRating = reviews.length > 0
+            ? Math.round((reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length) * 10) / 10
+            : 0;
+
+        return { totalReviews, approvedReviews, pendingReviews, averageRating };
+    }, [reviews]);
+
+    // Optimized pending items
+    const optimizedPendingBlogs = useMemo(() => {
+        return blogs.filter(blog => blog.status === 'pending');
+    }, [blogs]);
+
+    const optimizedPendingReviews = useMemo(() => {
+        return reviews.filter(review => review.status === 'pending');
+    }, [reviews]);
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-black">
@@ -1684,9 +1716,9 @@ export default function AdminDashboard() {
                                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Blog Yönetimi</h3>
                                     <div className="flex items-center space-x-4">
                                         <div className="text-sm text-gray-600 dark:text-gray-400">
-                                            <span className="font-medium">Toplam:</span> {blogStats.totalPosts} |
-                                            <span className="font-medium text-green-600">Yayınlanan:</span> {blogStats.publishedPosts} |
-                                            <span className="font-medium text-yellow-600">Bekleyen:</span> {blogStats.pendingPosts}
+                                            <span className="font-medium">Toplam:</span> {optimizedBlogStats.totalPosts} |
+                                            <span className="font-medium text-green-600">Yayınlanan:</span> {optimizedBlogStats.publishedPosts} |
+                                            <span className="font-medium text-yellow-600">Bekleyen:</span> {optimizedBlogStats.pendingPosts}
                                         </div>
                                     </div>
                                 </div>
@@ -1697,7 +1729,7 @@ export default function AdminDashboard() {
                                         <div className="flex items-center justify-between">
                                             <div>
                                                 <p className="text-gray-500 dark:text-gray-400 text-sm">Toplam Blog</p>
-                                                <p className="text-2xl font-bold text-gray-900 dark:text-white">{blogStats.totalPosts}</p>
+                                                <p className="text-2xl font-bold text-gray-900 dark:text-white">{optimizedBlogStats.totalPosts}</p>
                                             </div>
                                             <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
                                                 <FileText className="h-6 w-6 text-white" />
@@ -1708,7 +1740,7 @@ export default function AdminDashboard() {
                                         <div className="flex items-center justify-between">
                                             <div>
                                                 <p className="text-gray-500 dark:text-gray-400 text-sm">Yayınlanan</p>
-                                                <p className="text-2xl font-bold text-green-600">{blogStats.publishedPosts}</p>
+                                                <p className="text-2xl font-bold text-green-600">{optimizedBlogStats.publishedPosts}</p>
                                             </div>
                                             <div className="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center">
                                                 <FileText className="h-6 w-6 text-white" />
@@ -1719,7 +1751,7 @@ export default function AdminDashboard() {
                                         <div className="flex items-center justify-between">
                                             <div>
                                                 <p className="text-gray-500 dark:text-gray-400 text-sm">Bekleyen</p>
-                                                <p className="text-2xl font-bold text-yellow-600">{blogStats.pendingPosts}</p>
+                                                <p className="text-2xl font-bold text-yellow-600">{optimizedBlogStats.pendingPosts}</p>
                                             </div>
                                             <div className="w-12 h-12 bg-yellow-600 rounded-lg flex items-center justify-center">
                                                 <FileText className="h-6 w-6 text-white" />
@@ -1730,7 +1762,7 @@ export default function AdminDashboard() {
                                         <div className="flex items-center justify-between">
                                             <div>
                                                 <p className="text-gray-500 dark:text-gray-400 text-sm">Toplam Görüntüleme</p>
-                                                <p className="text-2xl font-bold text-gray-900 dark:text-white">{blogStats.totalViews}</p>
+                                                <p className="text-2xl font-bold text-gray-900 dark:text-white">{optimizedBlogStats.totalViews}</p>
                                             </div>
                                             <div className="w-12 h-12 bg-purple-600 rounded-lg flex items-center justify-center">
                                                 <Eye className="h-6 w-6 text-white" />
@@ -1746,14 +1778,14 @@ export default function AdminDashboard() {
                                         <p className="text-gray-600 dark:text-gray-400 text-sm">Onay bekleyen kullanıcı blog yazıları</p>
                                     </div>
                                     <div className="p-6">
-                                        {pendingBlogs.length === 0 ? (
+                                        {optimizedPendingBlogs.length === 0 ? (
                                             <div className="text-center py-8">
                                                 <FileText className="h-12 w-12 text-gray-400 mx-auto mb-3" />
                                                 <p className="text-gray-500 dark:text-gray-400">Bekleyen blog yazısı yok</p>
                                             </div>
                                         ) : (
                                             <div className="space-y-4">
-                                                {pendingBlogs.map((blog) => {
+                                                {optimizedPendingBlogs.map((blog) => {
                                                     const createdAt = blog.createdAt?.toDate ? blog.createdAt.toDate() : new Date(blog.createdAt);
                                                     const timeAgo = getTimeAgo(createdAt);
                                                     return (
@@ -1882,9 +1914,9 @@ export default function AdminDashboard() {
                                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Yorum Yönetimi</h3>
                                     <div className="flex items-center space-x-4">
                                         <div className="text-sm text-gray-600 dark:text-gray-400">
-                                            <span className="font-medium">Toplam:</span> {reviewStats.totalReviews} |
-                                            <span className="font-medium text-green-600">Onaylanan:</span> {reviewStats.approvedReviews} |
-                                            <span className="font-medium text-yellow-600">Bekleyen:</span> {reviewStats.pendingReviews}
+                                            <span className="font-medium">Toplam:</span> {optimizedReviewStats.totalReviews} |
+                                            <span className="font-medium text-green-600">Onaylanan:</span> {optimizedReviewStats.approvedReviews} |
+                                            <span className="font-medium text-yellow-600">Bekleyen:</span> {optimizedReviewStats.pendingReviews}
                                         </div>
                                     </div>
                                 </div>
@@ -1895,7 +1927,7 @@ export default function AdminDashboard() {
                                         <div className="flex items-center justify-between">
                                             <div>
                                                 <p className="text-gray-500 dark:text-gray-400 text-sm">Toplam Yorum</p>
-                                                <p className="text-2xl font-bold text-gray-900 dark:text-white">{reviewStats.totalReviews}</p>
+                                                <p className="text-2xl font-bold text-gray-900 dark:text-white">{optimizedReviewStats.totalReviews}</p>
                                             </div>
                                             <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
                                                 <Star className="h-6 w-6 text-white" />
@@ -1906,7 +1938,7 @@ export default function AdminDashboard() {
                                         <div className="flex items-center justify-between">
                                             <div>
                                                 <p className="text-gray-500 dark:text-gray-400 text-sm">Onaylanan</p>
-                                                <p className="text-2xl font-bold text-green-600">{reviewStats.approvedReviews}</p>
+                                                <p className="text-2xl font-bold text-green-600">{optimizedReviewStats.approvedReviews}</p>
                                             </div>
                                             <div className="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center">
                                                 <Star className="h-6 w-6 text-white" />
@@ -1917,7 +1949,7 @@ export default function AdminDashboard() {
                                         <div className="flex items-center justify-between">
                                             <div>
                                                 <p className="text-gray-500 dark:text-gray-400 text-sm">Bekleyen</p>
-                                                <p className="text-2xl font-bold text-yellow-600">{reviewStats.pendingReviews}</p>
+                                                <p className="text-2xl font-bold text-yellow-600">{optimizedReviewStats.pendingReviews}</p>
                                             </div>
                                             <div className="w-12 h-12 bg-yellow-600 rounded-lg flex items-center justify-center">
                                                 <Star className="h-6 w-6 text-white" />
@@ -1928,7 +1960,7 @@ export default function AdminDashboard() {
                                         <div className="flex items-center justify-between">
                                             <div>
                                                 <p className="text-gray-500 dark:text-gray-400 text-sm">Ortalama Puan</p>
-                                                <p className="text-2xl font-bold text-gray-900 dark:text-white">{reviewStats.averageRating}</p>
+                                                <p className="text-2xl font-bold text-gray-900 dark:text-white">{optimizedReviewStats.averageRating}</p>
                                             </div>
                                             <div className="w-12 h-12 bg-purple-600 rounded-lg flex items-center justify-center">
                                                 <Star className="h-6 w-6 text-white" />
@@ -1944,14 +1976,14 @@ export default function AdminDashboard() {
                                         <p className="text-gray-600 dark:text-gray-400 text-sm">Onay bekleyen kullanıcı yorumları</p>
                                     </div>
                                     <div className="p-6">
-                                        {pendingReviews.length === 0 ? (
+                                        {optimizedPendingReviews.length === 0 ? (
                                             <div className="text-center py-8">
                                                 <Star className="h-12 w-12 text-gray-400 mx-auto mb-3" />
                                                 <p className="text-gray-500 dark:text-gray-400">Bekleyen yorum yok</p>
                                             </div>
                                         ) : (
                                             <div className="space-y-4">
-                                                {pendingReviews.map((review) => {
+                                                {optimizedPendingReviews.map((review) => {
                                                     const createdAt = review.createdAt?.toDate ? review.createdAt.toDate() : new Date(review.createdAt);
                                                     const timeAgo = getTimeAgo(createdAt);
                                                     return (
