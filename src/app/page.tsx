@@ -481,16 +481,17 @@ export default function HomePage() {
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
             {[
-              { name: 'Gitarlar', icon: '🎸', color: 'from-red-500 to-pink-500' },
-              { name: 'Piyanolar', icon: '🎹', color: 'from-blue-500 to-purple-500' },
-              { name: 'Davullar', icon: '🥁', color: 'from-amber-500 to-orange-500' },
-              { name: 'Üflemeli', icon: '🎷', color: 'from-green-500 to-emerald-500' },
-              { name: 'Yaylılar', icon: '🎻', color: 'from-purple-500 to-pink-500' },
-              { name: 'Aksesuarlar', icon: '🎧', color: 'from-gray-500 to-gray-600' },
+              { name: 'Gitarlar', icon: '🎸', color: 'from-red-500 to-pink-500', category: 'Gitarlar' },
+              { name: 'Piyanolar', icon: '🎹', color: 'from-blue-500 to-purple-500', category: 'Klavyeli Çalgılar' },
+              { name: 'Davullar', icon: '🥁', color: 'from-amber-500 to-orange-500', category: 'Vurmalı Çalgılar' },
+              { name: 'Üflemeli', icon: '🎷', color: 'from-green-500 to-emerald-500', category: 'Üflemeli Çalgılar' },
+              { name: 'Yaylılar', icon: '🎻', color: 'from-purple-500 to-pink-500', category: 'Yaylı Çalgılar' },
+              { name: 'Aksesuarlar', icon: '🎧', color: 'from-gray-500 to-gray-600', category: 'Aksesuarlar' },
             ].map((category, index) => (
               <div
                 key={index}
                 className="group cursor-pointer"
+                onClick={() => window.location.href = `/products?category=${encodeURIComponent(category.category)}`}
               >
                 <div className={`bg-gradient-to-br ${category.color} p-6 rounded-xl text-center hover:scale-105 transition-transform duration-300 shadow-lg hover:shadow-xl`}>
                   <div className="text-4xl mb-3">{category.icon}</div>
@@ -532,8 +533,8 @@ export default function HomePage() {
 
           {newsletterMessage && (
             <div className={`mt-4 p-3 rounded-lg max-w-md mx-auto ${newsletterStatus === 'success'
-                ? 'bg-green-100 text-green-800 border border-green-200'
-                : 'bg-red-100 text-red-800 border border-red-200'
+              ? 'bg-green-100 text-green-800 border border-green-200'
+              : 'bg-red-100 text-red-800 border border-red-200'
               }`}>
               {newsletterMessage}
             </div>

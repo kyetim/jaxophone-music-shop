@@ -113,7 +113,7 @@ export function FavoritesSidebar({ isOpen, onClose, onMouseEnter, onMouseLeave }
                             className="bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white cursor-pointer"
                             onClick={onClose}
                         >
-                            <Link href="/">Ürünleri Keşfet</Link>
+                            <Link href="/products">Ürünleri Keşfet</Link>
                         </Button>
                     </div>
                 ) : (

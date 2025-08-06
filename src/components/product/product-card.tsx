@@ -36,7 +36,7 @@ export function ProductCard({ product }: ProductCardProps) {
         <Card className="group overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-500 bg-white dark:bg-gray-800 rounded-2xl cursor-pointer">
             <CardContent className="p-0 relative">
                 {/* Product Image */}
-                <div className="relative aspect-square overflow-hidden">
+                <div className="relative aspect-square overflow-hidden rounded-t-2xl">
                     <Link href={`/products/${product.id}`} className="cursor-pointer">
                         <Image
                             src={product.imageWebp || product.imageUrl}

@@ -13,7 +13,8 @@ import { Product } from '@/interfaces/product';
 import {
     Search,
     Grid3X3,
-    List
+    List,
+    Filter
 } from 'lucide-react';
 import { useSearch } from '@/hooks/use-search';
 
@@ -22,11 +23,13 @@ export default function ProductsPage() {
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
     const [isLoading, setIsLoading] = useState(true);
     const [allProducts, setAllProducts] = useState<Product[]>([]);
+    const [selectedCategory, setSelectedCategory] = useState<string>('');
     const searchParams = useSearchParams();
     const { searchResults, search, query, setQuery, isSearching } = useSearch();
 
-    // URL'den arama parametresini al
+    // URL'den arama ve kategori parametrelerini al
     const urlSearchQuery = searchParams?.get('search');
+    const urlCategory = searchParams?.get('category');
 
     // Tüm ürünleri Firestore'dan yükle
     useEffect(() => {
@@ -51,14 +54,31 @@ export default function ProductsPage() {
             setQuery(urlSearchQuery);
             search(urlSearchQuery);
         }
-    }, [urlSearchQuery, query, search, setQuery]);
+    }, [urlSearchQuery, search, query, setQuery]);
 
-    // Gösterilecek ürünleri belirle (arama varsa search results, yoksa tüm ürünler)
-    const isSearchActive = query && query.length >= 2;
-    const displayProducts = isSearchActive ? searchResults.products : allProducts;
+    // URL'den kategori parametresini al ve uygula
+    useEffect(() => {
+        if (urlCategory) {
+            setSelectedCategory(urlCategory);
+        }
+    }, [urlCategory]);
+
+    // Filtrelenmiş ürünleri al
+    const getFilteredProducts = () => {
+        let products = query && searchResults.products.length > 0 ? searchResults.products : allProducts;
+
+        // Kategori filtresi uygula
+        if (selectedCategory) {
+            products = products.filter((product: Product) => product.category === selectedCategory);
+        }
+
+        return products;
+    };
+
+    const filteredProducts = getFilteredProducts();
 
     // Ürünleri sırala
-    const sortedProducts = [...displayProducts].sort((a, b) => {
+    const sortedProducts = [...filteredProducts].sort((a, b) => {
         switch (sortBy) {
             case 'price-asc':
                 return a.price - b.price;
@@ -74,7 +94,7 @@ export default function ProductsPage() {
     });
 
     // Loading durumunu belirle
-    const showLoading = isLoading || (isSearchActive && isSearching);
+    const showLoading = isLoading || (isSearching && query && query.length >= 2);
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-black">
@@ -84,7 +104,7 @@ export default function ProductsPage() {
                 {/* Page Header */}
                 <div className="mb-8">
                     <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-4">
-                        {isSearchActive ? `"${query}" için Sonuçlar` : 'Tüm Ürünler'}
+                        {isSearching ? `"${query}" için Sonuçlar` : 'Tüm Ürünler'}
                     </h1>
 
                     {/* Search and Controls */}
@@ -134,7 +154,7 @@ export default function ProductsPage() {
                     {/* Results Count */}
                     {!showLoading && (
                         <p className="text-gray-600 dark:text-gray-300 mt-4">
-                            {isSearchActive
+                            {isSearching
                                 ? `${sortedProducts.length} sonuç bulundu`
                                 : `${sortedProducts.length} ürün gösteriliyor`
                             }
@@ -175,15 +195,15 @@ export default function ProductsPage() {
                     <div className="text-center py-12">
                         <Search className="h-12 w-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
                         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                            {isSearchActive ? 'Aradığınız ürün bulunamadı' : 'Henüz ürün bulunmuyor'}
+                            {isSearching ? 'Aradığınız ürün bulunamadı' : 'Henüz ürün bulunmuyor'}
                         </h3>
                         <p className="text-gray-600 dark:text-gray-300 mb-6">
-                            {isSearchActive
+                            {isSearching
                                 ? 'Farklı anahtar kelimeler deneyebilir veya filtreleri değiştirebilirsiniz.'
                                 : 'Çok yakında yeni ürünler eklenecek!'
                             }
                         </p>
-                        {isSearchActive && (
+                        {isSearching && (
                             <Button
                                 variant="outline"
                                 onClick={() => {

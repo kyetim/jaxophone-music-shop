@@ -106,7 +106,7 @@ export function CartSidebar({ isOpen, onClose, onMouseEnter, onMouseLeave }: Car
                             className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white"
                             onClick={onClose}
                         >
-                            <Link href="/">Alışverişe Başla</Link>
+                            <Link href="/products">Alışverişe Başla</Link>
                         </Button>
                     </div>
                 ) : (

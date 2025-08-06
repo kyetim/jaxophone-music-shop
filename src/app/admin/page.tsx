@@ -1704,12 +1704,6 @@ Detaylar: ${JSON.stringify(result.details, null, 2)}`;
                                             <Send className="h-4 w-4 mr-2" />
                                             Bildirim Gönder
                                         </Button>
-                                        <Button
-                                            onClick={handleTestEmail}
-                                            className="bg-green-600 hover:bg-green-700 text-white"
-                                        >
-                                            Test E-posta
-                                        </Button>
                                     </div>
                                 </div>
 
