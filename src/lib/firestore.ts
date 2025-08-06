@@ -1089,4 +1089,58 @@ export class ReviewService {
             averageRating: Math.round(averageRating * 10) / 10
         };
     }
+}
+
+export class NewsletterService {
+    private static collection = 'newsletter_subscribers';
+
+    // Get all newsletter subscribers
+    static async getAllSubscribers() {
+        if (!db) throw new Error('Firestore not initialized');
+
+        const querySnapshot = await getDocs(collection(db, this.collection));
+        const subscribers = querySnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+
+        return subscribers.filter((subscriber: any) => subscriber.isActive);
+    }
+
+    // Get subscriber count
+    static async getSubscriberCount() {
+        if (!db) throw new Error('Firestore not initialized');
+
+        const querySnapshot = await getDocs(collection(db, this.collection));
+        return querySnapshot.docs.filter(doc => doc.data().isActive).length;
+    }
+
+    // Add new subscriber
+    static async addSubscriber(email: string) {
+        if (!db) throw new Error('Firestore not initialized');
+
+        const now = new Date();
+        const subscriber = {
+            email: email.toLowerCase(),
+            subscribedAt: now,
+            isActive: true
+        };
+
+        const docRef = await addDoc(collection(db, this.collection), subscriber);
+        return docRef.id;
+    }
+
+    // Unsubscribe
+    static async unsubscribe(email: string) {
+        if (!db) throw new Error('Firestore not initialized');
+
+        const subscribersRef = collection(db, this.collection);
+        const q = query(subscribersRef, where('email', '==', email.toLowerCase()));
+        const querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+            const docRef = doc(db, this.collection, querySnapshot.docs[0].id);
+            await updateDoc(docRef, { isActive: false });
+        }
+    }
 } 

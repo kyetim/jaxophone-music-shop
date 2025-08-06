@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Header } from '@/components/layout/header';
+import { useRouter } from 'next/navigation';
 import {
     ShoppingCart,
     Plus,
@@ -24,6 +25,7 @@ import Link from 'next/link';
 export default function CartPage() {
     const dispatch = useAppDispatch();
     const { items, total, itemCount } = useAppSelector((state) => state.cart);
+    const router = useRouter();
 
     const handleUpdateQuantity = (productId: string, newQuantity: number) => {
         if (newQuantity <= 0) {
@@ -104,8 +106,9 @@ export default function CartPage() {
                                                 src={item.product.imageWebp || item.product.imageUrl}
                                                 alt={item.product.name}
                                                 fill
-                                                className="object-cover"
+                                                className="object-cover cursor-pointer"
                                                 sizes="96px"
+                                                onClick={() => router.push(`/products/${item.product.id}`)}
                                             />
                                         </div>
 

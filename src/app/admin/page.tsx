@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Header } from '@/components/layout/header';
 import { Button } from '@/components/ui/button';
-import { ProductService, NotificationService, BlogService, ReviewService } from '@/lib/firestore';
+import { ProductService, NotificationService, BlogService, ReviewService, NewsletterService } from '@/lib/firestore';
 import {
     Users,
     Package,
@@ -1022,6 +1022,29 @@ export default function AdminDashboard() {
                 sentTo: 'all'
             });
 
+            // Send email to newsletter subscribers
+            try {
+                const response = await fetch('/api/send-newsletter-email', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        subject: notificationFormData.title,
+                        message: notificationFormData.message,
+                        type: notificationFormData.type
+                    }),
+                });
+
+                if (response.ok) {
+                    console.log('Newsletter email sent successfully');
+                } else {
+                    console.error('Failed to send newsletter email');
+                }
+            } catch (emailError) {
+                console.error('Error sending newsletter email:', emailError);
+            }
+
             // Reload notifications and stats
             const [notificationsData, statsData] = await Promise.all([
                 NotificationService.getAll(),
@@ -1031,7 +1054,7 @@ export default function AdminDashboard() {
             setNotifications(notificationsData);
             setNotificationStats(statsData);
 
-            alert('Bildirim başarıyla gönderildi!');
+            alert('Bildirim başarıyla gönderildi ve e-posta abonelerine iletildi!');
             setIsNotificationModalOpen(false);
             setNotificationFormData({
                 type: '',

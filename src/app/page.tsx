@@ -121,6 +121,64 @@ const sampleProducts: Product[] = [
     rating: 4.6,
     reviewCount: 203,
     tags: ['piyano', 'dijital', 'klavye']
+  },
+  {
+    id: '5',
+    name: 'Ibanez RG450DX Elektro Gitar',
+    description: 'HSS manyetik konfigürasyonu ile çok yönlü ses',
+    price: 18999,
+    originalPrice: 21999,
+    imageUrl: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400',
+    category: 'Gitarlar',
+    brand: 'Ibanez',
+    inStock: true,
+    stockQuantity: 12,
+    rating: 4.5,
+    reviewCount: 78,
+    tags: ['elektro gitar', 'hss', 'ibanez']
+  },
+  {
+    id: '6',
+    name: 'Roland TD-17KV E-Davul',
+    description: 'Profesyonel elektronik davul seti',
+    price: 24999,
+    imageUrl: 'https://images.unsplash.com/photo-1519892300165-cb5542fb47c7?w=400',
+    category: 'Vurmalı Çalgılar',
+    brand: 'Roland',
+    inStock: true,
+    stockQuantity: 4,
+    rating: 4.9,
+    reviewCount: 156,
+    tags: ['e-davul', 'elektronik', 'roland']
+  },
+  {
+    id: '7',
+    name: 'Yamaha YTR-2330 Trompet',
+    description: 'Başlangıç seviyesi için ideal trompet',
+    price: 12999,
+    originalPrice: 14999,
+    imageUrl: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400',
+    category: 'Üflemeli Çalgılar',
+    brand: 'Yamaha',
+    inStock: true,
+    stockQuantity: 7,
+    rating: 4.4,
+    reviewCount: 92,
+    tags: ['trompet', 'yamaha', 'üflemeli']
+  },
+  {
+    id: '8',
+    name: 'Casio PX-S1000 Dijital Piyano',
+    description: 'Ultra ince tasarım, gerçek piyano hissi',
+    price: 15999,
+    imageUrl: 'https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?w=400',
+    category: 'Klavyeli Çalgılar',
+    brand: 'Casio',
+    inStock: true,
+    stockQuantity: 6,
+    rating: 4.7,
+    reviewCount: 134,
+    tags: ['dijital piyano', 'casio', 'ultra ince']
   }
 ];
 
@@ -149,6 +207,9 @@ const features = [
 
 export default function HomePage() {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [newsletterMessage, setNewsletterMessage] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -179,6 +240,42 @@ export default function HomePage() {
 
   const goToSlide = (index: number) => {
     setCurrentSlide(index);
+  };
+
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!newsletterEmail || !newsletterEmail.includes('@')) {
+      setNewsletterStatus('error');
+      setNewsletterMessage('Geçerli bir e-posta adresi giriniz');
+      return;
+    }
+
+    setNewsletterStatus('loading');
+
+    try {
+      const response = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: newsletterEmail }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setNewsletterStatus('success');
+        setNewsletterMessage(data.message);
+        setNewsletterEmail('');
+      } else {
+        setNewsletterStatus('error');
+        setNewsletterMessage(data.error);
+      }
+    } catch (error) {
+      setNewsletterStatus('error');
+      setNewsletterMessage('Bir hata oluştu. Lütfen tekrar deneyiniz.');
+    }
   };
 
   if (isLoading) {
@@ -414,16 +511,33 @@ export default function HomePage() {
           <p className="text-amber-100 mb-8 text-lg">
             E-posta listemize katılın ve özel indirimlerden ilk siz haberdar olun
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+
+          <form onSubmit={handleNewsletterSubmit} className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
             <input
               type="email"
               placeholder="E-posta adresiniz"
+              value={newsletterEmail}
+              onChange={(e) => setNewsletterEmail(e.target.value)}
               className="flex-1 px-4 py-3 rounded-lg border-0 focus:ring-2 focus:ring-white focus:ring-opacity-50 text-gray-900"
+              disabled={newsletterStatus === 'loading'}
             />
-            <Button className="bg-white text-amber-600 hover:bg-gray-100 font-semibold px-6 py-3 rounded-lg">
-              Abone Ol
+            <Button
+              type="submit"
+              disabled={newsletterStatus === 'loading'}
+              className="bg-white text-amber-600 hover:bg-gray-100 font-semibold px-6 py-3 rounded-lg h-12 disabled:opacity-50"
+            >
+              {newsletterStatus === 'loading' ? 'Gönderiliyor...' : 'Abone Ol'}
             </Button>
-          </div>
+          </form>
+
+          {newsletterMessage && (
+            <div className={`mt-4 p-3 rounded-lg max-w-md mx-auto ${newsletterStatus === 'success'
+                ? 'bg-green-100 text-green-800 border border-green-200'
+                : 'bg-red-100 text-red-800 border border-red-200'
+              }`}>
+              {newsletterMessage}
+            </div>
+          )}
         </div>
       </section>
 
