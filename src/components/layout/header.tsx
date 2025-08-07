@@ -289,6 +289,7 @@ export function Header() {
     const handleCartHover = (isHovering: boolean) => {
         if (cartHoverTimeoutRef.current) {
             clearTimeout(cartHoverTimeoutRef.current);
+            cartHoverTimeoutRef.current = null;
         }
 
         if (isHovering) {
@@ -305,6 +306,7 @@ export function Header() {
     const handleFavoritesHover = (isHovering: boolean) => {
         if (favoritesHoverTimeoutRef.current) {
             clearTimeout(favoritesHoverTimeoutRef.current);
+            favoritesHoverTimeoutRef.current = null;
         }
 
         if (isHovering) {
@@ -321,6 +323,7 @@ export function Header() {
     const handleNotificationsHover = (isHovering: boolean) => {
         if (notificationsHoverTimeoutRef.current) {
             clearTimeout(notificationsHoverTimeoutRef.current);
+            notificationsHoverTimeoutRef.current = null;
         }
 
         if (isHovering) {
@@ -332,6 +335,31 @@ export function Header() {
                 setIsNotificationsOpen(false);
             }, 1200); // 1200ms delay before closing
         }
+    };
+
+    // Manual close handlers to clear timeouts
+    const handleCartClose = () => {
+        if (cartHoverTimeoutRef.current) {
+            clearTimeout(cartHoverTimeoutRef.current);
+            cartHoverTimeoutRef.current = null;
+        }
+        setIsCartOpen(false);
+    };
+
+    const handleFavoritesClose = () => {
+        if (favoritesHoverTimeoutRef.current) {
+            clearTimeout(favoritesHoverTimeoutRef.current);
+            favoritesHoverTimeoutRef.current = null;
+        }
+        setIsFavoritesOpen(false);
+    };
+
+    const handleNotificationsClose = () => {
+        if (notificationsHoverTimeoutRef.current) {
+            clearTimeout(notificationsHoverTimeoutRef.current);
+            notificationsHoverTimeoutRef.current = null;
+        }
+        setIsNotificationsOpen(false);
     };
 
     return (
@@ -457,9 +485,9 @@ export function Header() {
                             {/* Theme Toggle */}
                             <ThemeToggle />
 
-                            {/* Favorites - Hidden on small mobile */}
+                            {/* Favorites - Show on mobile */}
                             <div
-                                className="hidden sm:block relative cursor-pointer"
+                                className="relative cursor-pointer"
                                 onMouseEnter={() => handleFavoritesHover(true)}
                                 onMouseLeave={() => handleFavoritesHover(false)}
                             >
@@ -719,21 +747,21 @@ export function Header() {
             {/* Sidebars */}
             <CartSidebar
                 isOpen={isCartOpen}
-                onClose={() => setIsCartOpen(false)}
+                onClose={handleCartClose}
                 onMouseEnter={() => handleCartHover(true)}
                 onMouseLeave={() => handleCartHover(false)}
             />
 
             <FavoritesSidebar
                 isOpen={isFavoritesOpen}
-                onClose={() => setIsFavoritesOpen(false)}
+                onClose={handleFavoritesClose}
                 onMouseEnter={() => handleFavoritesHover(true)}
                 onMouseLeave={() => handleFavoritesHover(false)}
             />
 
             <NotificationsSidebar
                 isOpen={isNotificationsOpen}
-                onClose={() => setIsNotificationsOpen(false)}
+                onClose={handleNotificationsClose}
                 onMouseEnter={() => handleNotificationsHover(true)}
                 onMouseLeave={() => handleNotificationsHover(false)}
             />
