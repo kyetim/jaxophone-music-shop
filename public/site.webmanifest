@@ -1,0 +1,34 @@
+{
+    "name": "Jaxophone Music Shop",
+    "short_name": "Jaxophone",
+    "description": "Türkiye'nin en büyük müzik enstrümanları mağazası",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#000000",
+    "theme_color": "#f59e0b",
+    "orientation": "portrait-primary",
+    "icons": [
+        {
+            "src": "/favicon-simple.svg",
+            "sizes": "any",
+            "type": "image/svg+xml",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/favicon.ico",
+            "sizes": "32x32",
+            "type": "image/x-icon"
+        },
+        {
+            "src": "/apple-touch-icon.png",
+            "sizes": "180x180",
+            "type": "image/png"
+        }
+    ],
+    "categories": [
+        "music",
+        "shopping",
+        "entertainment"
+    ],
+    "lang": "tr-TR"
+}
