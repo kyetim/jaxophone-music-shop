@@ -393,20 +393,20 @@ export function Header() {
 
             {/* Main Header - DoReMusic Style */}
             <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-50">
-                <div className="max-w-7xl mx-auto px-4">
-                    <div className="flex items-center justify-between h-20">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6">
+                    <div className="flex items-center justify-between h-16 sm:h-20">
                         {/* Logo */}
-                        <Link href="/" className="flex items-center cursor-pointer group relative">
-                            <div className="text-3xl font-serif font-bold text-gray-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors duration-300">
+                        <Link href="/" className="flex items-center cursor-pointer group relative flex-shrink-0">
+                            <div className="text-2xl sm:text-3xl font-serif font-bold text-gray-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors duration-300">
                                 jaxophone
                             </div>
-                            <div className="absolute -bottom-2 -right-4 text-xs font-medium text-gray-500 dark:text-gray-400 group-hover:text-amber-500 dark:group-hover:text-amber-300 transition-colors duration-300 tracking-wide">
+                            <div className="absolute -bottom-1 sm:-bottom-2 -right-2 sm:-right-4 text-xs font-medium text-gray-500 dark:text-gray-400 group-hover:text-amber-500 dark:group-hover:text-amber-300 transition-colors duration-300 tracking-wide">
                                 Music Shop
                             </div>
                         </Link>
 
                         {/* Center Search */}
-                        <div className="flex-1 max-w-2xl mx-8 hidden md:block">
+                        <div className="flex-1 max-w-2xl mx-4 sm:mx-8 hidden md:block">
                             <div className="relative">
                                 <SearchInput
                                     placeholder="Aramak istediğiniz ürünü yazın"
@@ -422,11 +422,11 @@ export function Header() {
                         </div>
 
                         {/* Right Actions */}
-                        <div className="flex items-center space-x-6">
-                            {/* User Account */}
+                        <div className="flex items-center space-x-2 sm:space-x-4 lg:space-x-6">
+                            {/* User Account - Hidden on small mobile */}
                             <Link
                                 href={isAuthenticated ? "/account" : "/login"}
-                                className="flex items-center space-x-2 text-gray-700 dark:text-gray-300 hover:text-amber-600 dark:hover:text-amber-400 transition-colors cursor-pointer"
+                                className="hidden sm:flex items-center space-x-2 text-gray-700 dark:text-gray-300 hover:text-amber-600 dark:hover:text-amber-400 transition-colors cursor-pointer"
                                 onClick={(e) => handleNavClick(isAuthenticated ? "/account" : "/login", e)}
                             >
                                 <User className="h-5 w-5" />
@@ -440,9 +440,9 @@ export function Header() {
                                 </div>
                             </Link>
 
-                            {/* Notifications */}
+                            {/* Notifications - Hidden on small mobile */}
                             <div
-                                className="relative cursor-pointer"
+                                className="hidden sm:block relative cursor-pointer"
                                 onMouseEnter={() => handleNotificationsHover(true)}
                                 onMouseLeave={() => handleNotificationsHover(false)}
                             >
@@ -457,9 +457,9 @@ export function Header() {
                             {/* Theme Toggle */}
                             <ThemeToggle />
 
-                            {/* Favorites */}
+                            {/* Favorites - Hidden on small mobile */}
                             <div
-                                className="relative cursor-pointer"
+                                className="hidden sm:block relative cursor-pointer"
                                 onMouseEnter={() => handleFavoritesHover(true)}
                                 onMouseLeave={() => handleFavoritesHover(false)}
                             >
@@ -497,10 +497,10 @@ export function Header() {
                             <Button
                                 variant="ghost"
                                 size="icon"
-                                className="lg:hidden"
+                                className="lg:hidden ml-2 sm:ml-0"
                                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                             >
-                                {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                                {isMobileMenuOpen ? <X className="h-5 w-5 sm:h-6 sm:w-6" /> : <Menu className="h-5 w-5 sm:h-6 sm:w-6" />}
                             </Button>
                         </div>
                     </div>
@@ -605,7 +605,7 @@ export function Header() {
             {/* Mobile Menu */}
             {isMobileMenuOpen && (
                 <div className="lg:hidden bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
-                    <div className="px-4 py-4 space-y-4">
+                    <div className="px-4 py-4 space-y-3">
                         {/* Mobile Search */}
                         <div className="mb-4">
                             <SearchInput
@@ -614,76 +614,104 @@ export function Header() {
                             />
                         </div>
 
-                        {/* Mobile Categories */}
-                        {mainCategories.map((category) => (
+                        {/* Mobile User Account - Show in mobile menu */}
+                        <div className="border-b border-gray-200 dark:border-gray-700 pb-3 mb-3">
                             <Link
-                                key={category.name}
-                                href={category.href}
-                                className="block py-2 text-gray-700 dark:text-gray-300 hover:text-amber-600 dark:hover:text-amber-400 transition-colors cursor-pointer"
+                                href={isAuthenticated ? "/account" : "/login"}
+                                className="flex items-center space-x-2 text-gray-700 dark:text-gray-300 hover:text-amber-600 dark:hover:text-amber-400 transition-colors cursor-pointer"
                                 onClick={(e) => {
-                                    handleNavClick(category.href, e);
+                                    handleNavClick(isAuthenticated ? "/account" : "/login", e);
                                     setIsMobileMenuOpen(false);
                                 }}
                             >
-                                {category.name}
+                                <User className="h-5 w-5" />
+                                <div className="text-sm">
+                                    <div className="font-medium">
+                                        {isAuthenticated ? (user?.displayName || user?.email?.split('@')[0] || "Kullanıcı") : "Giriş Yap"}
+                                    </div>
+                                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                                        {isAuthenticated ? "Hesabım" : "veya Üye Ol"}
+                                    </div>
+                                </div>
                             </Link>
-                        ))}
+                        </div>
+
+                        {/* Mobile Categories */}
+                        <div className="space-y-2">
+                            <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">Kategoriler</h3>
+                            {mainCategories.slice(0, 6).map((category) => (
+                                <Link
+                                    key={category.name}
+                                    href={category.href}
+                                    className="block py-2 px-3 text-gray-700 dark:text-gray-300 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer rounded-md"
+                                    onClick={(e) => {
+                                        handleNavClick(category.href, e);
+                                        setIsMobileMenuOpen(false);
+                                    }}
+                                >
+                                    {category.name}
+                                </Link>
+                            ))}
+                        </div>
 
                         {/* Additional mobile links */}
-                        <Link
-                            href="/about"
-                            className="block py-2 text-gray-700 dark:text-gray-300 hover:text-amber-600 dark:hover:text-amber-400 transition-colors cursor-pointer border-t border-gray-200 dark:border-gray-700 pt-4"
-                            onClick={(e) => {
-                                handleNavClick('/about', e);
-                                setIsMobileMenuOpen(false);
-                            }}
-                        >
-                            Hakkımızda
-                        </Link>
+                        <div className="space-y-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+                            <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">Sayfalar</h3>
+                            <Link
+                                href="/about"
+                                className="block py-2 px-3 text-gray-700 dark:text-gray-300 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer rounded-md"
+                                onClick={(e) => {
+                                    handleNavClick('/about', e);
+                                    setIsMobileMenuOpen(false);
+                                }}
+                            >
+                                Hakkımızda
+                            </Link>
 
-                        <Link
-                            href="/products"
-                            className="block py-2 text-gray-700 dark:text-gray-300 hover:text-amber-600 dark:hover:text-amber-400 transition-colors cursor-pointer"
-                            onClick={(e) => {
-                                handleNavClick('/products', e);
-                                setIsMobileMenuOpen(false);
-                            }}
-                        >
-                            Ürünler
-                        </Link>
+                            <Link
+                                href="/products"
+                                className="block py-2 px-3 text-gray-700 dark:text-gray-300 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer rounded-md"
+                                onClick={(e) => {
+                                    handleNavClick('/products', e);
+                                    setIsMobileMenuOpen(false);
+                                }}
+                            >
+                                Ürünler
+                            </Link>
 
-                        <Link
-                            href="/contact"
-                            className="block py-2 text-gray-700 dark:text-gray-300 hover:text-amber-600 dark:hover:text-amber-400 transition-colors cursor-pointer"
-                            onClick={(e) => {
-                                handleNavClick('/contact', e);
-                                setIsMobileMenuOpen(false);
-                            }}
-                        >
-                            İletişim
-                        </Link>
+                            <Link
+                                href="/contact"
+                                className="block py-2 px-3 text-gray-700 dark:text-gray-300 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer rounded-md"
+                                onClick={(e) => {
+                                    handleNavClick('/contact', e);
+                                    setIsMobileMenuOpen(false);
+                                }}
+                            >
+                                İletişim
+                            </Link>
 
-                        <Link
-                            href="/blog"
-                            className="block py-2 text-gray-700 dark:text-gray-300 hover:text-amber-600 dark:hover:text-amber-400 transition-colors cursor-pointer"
-                            onClick={(e) => {
-                                handleNavClick('/blog', e);
-                                setIsMobileMenuOpen(false);
-                            }}
-                        >
-                            Blog
-                        </Link>
+                            <Link
+                                href="/blog"
+                                className="block py-2 px-3 text-gray-700 dark:text-gray-300 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer rounded-md"
+                                onClick={(e) => {
+                                    handleNavClick('/blog', e);
+                                    setIsMobileMenuOpen(false);
+                                }}
+                            >
+                                Blog
+                            </Link>
 
-                        <Link
-                            href="/installment"
-                            className="block py-2 text-gray-700 dark:text-gray-300 hover:text-amber-600 dark:hover:text-amber-400 transition-colors cursor-pointer"
-                            onClick={(e) => {
-                                handleNavClick('/installment', e);
-                                setIsMobileMenuOpen(false);
-                            }}
-                        >
-                            Sipariş Takibi
-                        </Link>
+                            <Link
+                                href="/installment"
+                                className="block py-2 px-3 text-gray-700 dark:text-gray-300 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer rounded-md"
+                                onClick={(e) => {
+                                    handleNavClick('/installment', e);
+                                    setIsMobileMenuOpen(false);
+                                }}
+                            >
+                                Sipariş Takibi
+                            </Link>
+                        </div>
                     </div>
                 </div>
             )}
