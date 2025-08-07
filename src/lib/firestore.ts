@@ -11,7 +11,8 @@ import {
     orderBy,
     limit,
     startAfter,
-    DocumentSnapshot
+    DocumentSnapshot,
+    writeBatch
 } from 'firebase/firestore';
 import { db } from './firebase';
 import { Product } from '@/interfaces/product';
@@ -579,6 +580,34 @@ export class NotificationService {
         if (!db) throw new Error('Firestore not initialized');
 
         await deleteDoc(doc(db, this.collection, notificationId));
+    }
+
+    // Clear all notifications for a user
+    static async clearAllNotifications(userId: string) {
+        if (!db) throw new Error('Firestore not initialized');
+
+        try {
+            // Get all notifications for the user
+            const userNotificationsQuery = query(
+                collection(db, this.collection),
+                where('sentTo', 'array-contains', userId)
+            );
+
+            const querySnapshot = await getDocs(userNotificationsQuery);
+
+            // Delete all notifications in batch
+            const batch = writeBatch(db);
+            querySnapshot.docs.forEach((doc) => {
+                batch.delete(doc.ref);
+            });
+
+            await batch.commit();
+
+            return { success: true, deletedCount: querySnapshot.docs.length };
+        } catch (error) {
+            console.error('Error clearing notifications:', error);
+            throw error;
+        }
     }
 }
 

@@ -468,9 +468,9 @@ export function Header() {
                                 </div>
                             </Link>
 
-                            {/* Notifications - Hidden on small mobile */}
+                            {/* Notifications - Show on mobile */}
                             <div
-                                className="hidden sm:block relative cursor-pointer"
+                                className="relative cursor-pointer"
                                 onMouseEnter={() => handleNotificationsHover(true)}
                                 onMouseLeave={() => handleNotificationsHover(false)}
                             >

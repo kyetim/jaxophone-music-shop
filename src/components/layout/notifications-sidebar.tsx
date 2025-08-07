@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useState } from 'react';
 
 interface NotificationsSidebarProps {
     isOpen: boolean;
@@ -26,7 +27,8 @@ interface NotificationsSidebarProps {
 
 export function NotificationsSidebar({ isOpen, onClose, onMouseEnter, onMouseLeave }: NotificationsSidebarProps) {
     const isAuthenticated = useAppSelector((state) => state.user.isAuthenticated);
-    const { notifications, loading, markAsRead } = useNotifications();
+    const { notifications, loading, markAsRead, clearAllNotifications } = useNotifications();
+    const [isClearing, setIsClearing] = useState(false);
 
     const getNotificationIcon = (icon: string) => {
         switch (icon) {
@@ -70,6 +72,22 @@ export function NotificationsSidebar({ isOpen, onClose, onMouseEnter, onMouseLea
     const handleNotificationClick = async (notification: any) => {
         if (notification.isRead) return;
         await markAsRead(notification.id);
+    };
+
+    const handleClearAllNotifications = async () => {
+        if (notifications.length === 0) return;
+
+        const confirmed = window.confirm('Tüm bildirimlerinizi silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.');
+        if (!confirmed) return;
+
+        setIsClearing(true);
+        try {
+            await clearAllNotifications();
+        } catch (error) {
+            console.error('Error clearing notifications:', error);
+        } finally {
+            setIsClearing(false);
+        }
     };
 
     return (
@@ -187,7 +205,17 @@ export function NotificationsSidebar({ isOpen, onClose, onMouseEnter, onMouseLea
 
                         {/* Footer */}
                         <div className="border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 flex-shrink-0">
-                            <div className="p-4">
+                            <div className="p-4 space-y-3">
+                                {notifications.length > 0 && (
+                                    <Button
+                                        variant="outline"
+                                        className="w-full border-red-300 dark:border-red-600 text-red-700 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
+                                        onClick={handleClearAllNotifications}
+                                        disabled={isClearing}
+                                    >
+                                        {isClearing ? 'Siliniyor...' : 'Bildirimleri Temizle'}
+                                    </Button>
+                                )}
                                 <Button
                                     asChild
                                     variant="outline"

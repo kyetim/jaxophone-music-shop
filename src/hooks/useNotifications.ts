@@ -53,11 +53,24 @@ export function useNotifications() {
         }
     };
 
+    const clearAllNotifications = async () => {
+        if (!user?.uid) return;
+
+        try {
+            await NotificationService.clearAllNotifications(user.uid);
+            // Clear local state immediately for better UX
+            setNotifications([]);
+        } catch (error) {
+            console.error('Error clearing notifications:', error);
+        }
+    };
+
     return {
         notifications,
         loading,
         unreadCount,
         markAsRead,
+        clearAllNotifications,
         refreshNotifications: loadNotifications
     };
 } 
